@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 18 Sep 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 18 September 2026. Home Assistant Core 2026.9.3 patch; Hue Play strip pro UK in stock; Aqara FP400 day-after; stack versions.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 18 September 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>18 September 2026</h1>
+        <p class="lede">Home Assistant Core <strong>2026.9.3</strong> landed this morning — a patch release with Matter cover fixes for Shelly tilt-null, EnergyZero price regression repair, and backup rewrite encryption among the standouts. On the device rail, Hue Play gradient strip <strong>pro</strong> flipped to <strong>In stock</strong> on the UK storefront while the US page still says Coming soon. Aqara FP400 remains day-after worldwide ship.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Home Assistant</p>
+          <h2>Home Assistant Core 2026.9.3 — Matter Shelly covers, EnergyZero, backup rewrite</h2>
+          <p><strong>What happened:</strong> Core tag <strong>2026.9.3</strong> published 2026-09-18T12:11:05Z (author frenck), seven days after 2026.9.2. It is a patch release, not a feature drop. Standouts for local-stack readers from the GitHub body:</p>
+          <ul>
+            <li>Fix Matter cover entity not created when tilt attribute is null for Shelly devices (#182042)</li>
+            <li>Fix EnergyZero market price regression (#181230)</li>
+            <li>Keep the known Bond host when zeroconf still announces it (#181975)</li>
+            <li>Encrypt and decrypt supervisor.tar in backup rewrites (#182220)</li>
+            <li>Require the IRK in the Private BLE Device config flow (#181969)</li>
+            <li>Make Nest climate turn_on idempotent (#182086)</li>
+            <li>Fix Alexa doorbell state report when return status is NO_CONTENT (#182209)</li>
+            <li>Bump reolink_aio to 0.21.17 (#182472)</li>
+          </ul>
+          <p>Also in the notes: Spotify reauth crash when config entry data lacks <code>id</code>, Airthings BLE duplicate devices on incomplete read, IMAP custom data event template not reset when cleared, plus dependency bumps (holidays, pylutron, waterfurnace, aioamazondevices, hassil).</p>
+          <p><strong>Why it matters:</strong> Shelly Matter blinds with a null tilt attribute were silently missing cover entities — this closes that hole. EnergyZero users get the market-price path fixed. Backup rewrite now encrypts/decrypts supervisor.tar. Upgrade from 2026.9.2 is the usual Supervisor / Core path.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.9.3">home-assistant/core 2026.9.3</a> (published 2026-09-18T12:11:05Z)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="aqara">
+          <p class="meta">02 · Matter &amp; Thread / Devices</p>
+          <h2>Aqara FP400 — day after worldwide ship</h2>
+          <figure class="figure">
+            <img src="images/aqara-fp400-product.png" alt="Aqara Spatial Multi-Sensor FP400 product photo" width="1200" height="800" loading="lazy">
+            <figcaption>Aqara Spatial Multi-Sensor FP400 — source <a href="https://www.aqara.com/en/product/spatial-multi-sensor-fp400/">Aqara product page</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> No new calendar from Aqara overnight. The Spatial Multi-Sensor FP400 (PS-S05E / PS-S05D) remains on sale worldwide after yesterday’s availability push: 60&nbsp;GHz mmWave, dual Zigbee + Matter-over-Thread. Matter caveat unchanged — third-party Thread joins expose overall presence + illuminance; do not assume full zone export.</p>
+          <p><strong>Why it matters:</strong> Hardware is live; validate Matter zone exposure on your controller before buying for zone automations.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.aqara.com/us/news-us/spatial-multi-sensor-fp400-availability-announcement/">Aqara availability announcement, 16 Sep 2026</a>; prior brief <a href="brief-2026-09-17.html#lead">17 Sep</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="google-mcp">
+          <p class="meta">03 · Platforms / Google Home</p>
+          <h2>Google Home MCP — early access still rolling (Premium Advanced U.S.)</h2>
+          <p><strong>What happened:</strong> No newer access-window change since the 16 Sep open. MCP-capable agents can still drive Nest / Works-with-Google-Home gear via the Home MCP server after Cloud project + OAuth setup. Docs still list tools such as <code>list_homes</code>, <code>list_home_states</code>, and <code>run_home_actions</code>. Scope remains <strong>Google Home Premium Advanced</strong> in the <strong>U.S.</strong></p>
+          <p><strong>Why it matters:</strong> Cloud-side agent control sets expectations; local-first stacks still need their own agent boundaries.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://techcrunch.com/2026/09/16/your-ai-agents-can-now-control-your-google-home-devices/">TechCrunch, 16 Sep 2026</a>; <a href="https://developers.home.google.com/mcp/home">Google Home MCP developer docs</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">04 · ESPHome</p>
+          <h2>ESPHome still 2026.9.0</h2>
+          <p><strong>What happened:</strong> Latest stable tag remains <strong>2026.9.0</strong> (published 2026-09-16). No 2026.9.1 on the releases list. Noise encrypted OTA, parallelized PlatformIO installs, <code>modbus_controller</code> renames, and the custom eFuse MAC apply across Ethernet / BLE / 802.15.4 still define the upgrade checklist.</p>
+          <p><strong>Why it matters:</strong> Hold the 16 Sep upgrade notes; watch custom-MAC Thread/Zigbee nodes for re-commission.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://esphome.io/blog/2026/09/16/esphome-2026-9/">ESPHome blog, 16 Sep 2026</a>; <a href="https://github.com/esphome/esphome/releases/tag/2026.9.0">esphome/esphome 2026.9.0</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="hue">
+          <p class="meta">05 · Devices / Hue</p>
+          <h2>Hue Play strip pro — UK In stock; US still Coming soon</h2>
+          <figure class="figure">
+            <img src="images/hue-play-gradient-strip-pro.jpg" alt="Philips Hue Play gradient strip light pro installed behind a television" width="1200" height="800" loading="lazy">
+            <figcaption>Philips Hue Play gradient strip light pro — source <a href="https://www.signify.com/global/our-company/news/press-releases/2026/20260903-philips-hue-expands-on-smart-lighting-with-ai-immersive-entertainment-and-design">Signify press kit</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> Signify calendared the Play gradient strip light / strip light <strong>pro</strong> portfolio from <strong>15 September</strong>. As of this morning’s live check: the UK pro 65&quot; page shows <strong>In stock</strong> (£139.99); the US pro 100&quot; page still shows <strong>Coming soon</strong> ($229.99). Rolling ship continues market-by-market.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.signify.com/global/our-company/news/press-releases/2026/20260903-philips-hue-expands-on-smart-lighting-with-ai-immersive-entertainment-and-design">Signify press, 3 Sep 2026</a>; <a href="https://www.philips-hue.com/en-us/p/lightstrips-philips-hue-play-gradient-strip-light-pro-100/046677611880">Hue US pro 100&quot;</a> (Coming soon); <a href="https://www.philips-hue.com/en-gb/p/lightstrips-philips-hue-play-gradient-lightstrip-pro-65/8721103168603">Hue UK pro 65&quot;</a> (In stock)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="ikea">
+          <p class="meta">06 · Matter &amp; Thread / Devices</p>
+          <h2>IKEA DUBBELKISEL — Matter-over-Thread EU listing holds</h2>
+          <figure class="figure">
+            <img src="images/ikea-dubbelkisel.jpg" alt="IKEA DUBBELKISEL 30 W smart LED driver for wireless control" width="1200" height="800" loading="lazy">
+            <figcaption>IKEA DUBBELKISEL driver for wireless control — source <a href="https://www.ikea.com/de/en/p/dubbelkisel-driver-for-wireless-control-smart-white-50609444/">IKEA Germany product page</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> No overnight change to the European listing for <strong>DUBBELKISEL</strong> (article 50609444): Matter over Thread, Thread Border Router required. US/UK timing still unannounced.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.ikea.com/de/en/p/dubbelkisel-driver-for-wireless-control-smart-white-50609444/">IKEA DE product page</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">07 · Z-Wave</p>
+          <h2>Z-Wave JS UI still 11.24.1</h2>
+          <p><strong>What happened:</strong> Latest GitHub release remains <strong>v11.24.1</strong> (published 2026-09-15). No 11.24.2 / 11.25.0 tag overnight.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.24.1">zwave-js-ui v11.24.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">08 · Zigbee</p>
+          <h2>Zigbee2MQTT still 2.14.1</h2>
+          <p><strong>What happened:</strong> Latest GitHub release tag remains <strong>2.14.1</strong> (2026-09-03). No 2.14.2 on the releases list as of this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.1">Zigbee2MQTT 2.14.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="tapo">
+          <p class="meta">09 · Devices / Cameras</p>
+          <h2>Tapo Matter cameras — end-of-September window still open</h2>
+          <p><strong>What happened:</strong> No new TP-Link calendar confirmation overnight. HW revisions of C560WS, C260, and C660 Kit for Matter camera code still framed as end of September — a window, not a lock.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd>Prior brief <a href="brief-2026-09-11.html#tapo">11 Sep</a> (heise / Tapo C560WS)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="shelly">
+          <p class="meta">10 · Devices / Shelly</p>
+          <h2>Shelly ThreadLink Gen4 still ~December — plus today’s Matter cover fix</h2>
+          <p><strong>What happened:</strong> No newer ThreadLink calendar. Gen4 ThreadLink remains the ~December watch from prior IFA framing. Separately, today’s Core <strong>2026.9.3</strong> Matter cover fix (#182042) matters for Shelly devices whose tilt attribute arrives as null — cross-link to the lead.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/media-kit/matter-update-wall-display-ifa-2026">Shelly Wall Display Matter media kit</a>; <a href="https://github.com/home-assistant/core/releases/tag/2026.9.3">Core 2026.9.3 #182042</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+        <input type="tel" name="phone" required autocomplete="tel" placeholder="Phone">
+      </label>
+      <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. We will not call. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

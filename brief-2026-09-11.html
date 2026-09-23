@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 11 Sep 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 11 September 2026. Aqara Thread+Zigbee Matter lighting for October, Z-Wave JS UI 11.24.0, Govee CSA Matter wall light, Third Reality Thread lineup, and radio-stack notes.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 11 September 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>11 September 2026</h1>
+        <p class="lede">Post-IFA follow-through. Aqara’s dual Thread+Zigbee lighting line gets an October ship window; Z-Wave JS UI jumps to 11.24.0 with driver 15.29.0; Govee’s next outdoor wall light shows up in a CSA Matter 1.5 listing.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Matter &amp; Thread / Devices</p>
+          <h2>Aqara lighting: Thread + Zigbee, Matter-ready, October</h2>
+          <figure class="figure">
+            <img src="images/aqara-floor-lamp-t1.jpg" alt="Aqara Floor Lamp T1 washing a living-room wall with gradient light" width="1536" height="864" loading="eager">
+            <figcaption>Aqara Floor Lamp T1 — source <a href="https://www.maison-et-domotique.com/en/173164-ifa-2026-aqara-expands-its-ecosystem-with-thread-zigbee-and-matter-lighting/">Maison et Domotique</a> / Aqara press assets</figcaption>
+          </figure>
+          <p>Aqara’s IFA lighting push is now the clearest post-show ship story: five SKUs — Floor Lamp T1, LED Downlight T2, LED Strip T2, Outdoor String Lights H1, and Permanent Outdoor Lights H1 — all dual-radio <strong>Thread and Zigbee</strong>, Matter-enabled, with Home Assistant listed among the Matter ecosystems. Official press dropped Sep 4; Maison et Domotique’s Sep 10 floor report adds the calendar line local stacks actually need: <strong>October 2026</strong>, prices still TBA.</p>
+          <figure class="figure">
+            <img src="images/aqara-permanent-outdoor-h1.jpg" alt="Aqara Permanent Outdoor Lights H1 installed under a house roofline" width="1200" height="800" loading="lazy">
+            <figcaption>Aqara Permanent Outdoor Lights H1 — source <a href="https://www.matteralpha.com/news/aqara-global-smart-lighting-thread-zigbee-ifa-2026">Matter Alpha</a> / Aqara press</figcaption>
+          </figure>
+          <p>Thread mode is the Matter-over-Thread on-ramp (Apple Home, Google Home, Alexa, SmartThings, Homey, Home Assistant). Zigbee mode keeps deeper Aqara Home automations via an Aqara hub. Floor Lamp T1 is a 1.42&nbsp;m side-emitting wall-wash with 18 zones and 2000–9000&nbsp;K white; Strip T2 claims 108 LEDs/m and 18 zones per 3&nbsp;m section; Downlight T2 is a 20&nbsp;mm-deep recessed CCT or RGB-CCT can; outdoor H1 string and permanent eave lights are IP65 on the fixtures.</p>
+          <p>Practical takeaway: Hue still owns the “every new light is Matter over Thread” headline from yesterday; Aqara is the dual-mesh lighting competitor with a named month.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.aqara.com/en/news/aqara-showcases-immersive-smart-home-experience-ifa-2026/">Aqara IFA 2026 press</a>; <a href="https://www.maison-et-domotique.com/en/173164-ifa-2026-aqara-expands-its-ecosystem-with-thread-zigbee-and-matter-lighting/">Maison et Domotique, 10 Sep 2026</a>; <a href="https://www.matteralpha.com/news/aqara-global-smart-lighting-thread-zigbee-ifa-2026">Matter Alpha</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">02 · Z-Wave</p>
+          <h2>Z-Wave JS UI 11.24.0 ships with zwave-js 15.29.0</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Published Sep 10 (13:19 UTC): Z-Wave JS UI <strong>11.24.0</strong> bumps the bundled driver to <strong>zwave-js 15.29.0</strong>, fixes MQTT unknown command-class name resolution via zwave-js, and rolls dependency/Node maintenance. Driver 15.29.0 adds command deduplication, a persisted <code>lastAwake</code> property, Notification Report idle fixes, and a batch of Aeotec “8” / Zooz / Inovelli / Heatit / Simon config entries.</dd>
+            <dt>Why it matters</dt>
+            <dd>Yesterday’s brief still said “no 11.24.” Operators on 11.23.0 now have a real jump — read the MQTT CC-name fix if Window Covering discovery was noisy.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.24.0">zwave-js-ui v11.24.0</a>; <a href="https://github.com/zwave-js/node-zwave-js/releases/tag/v15.29.0">node-zwave-js v15.29.0</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="govee">
+          <p class="meta">03 · Matter / Devices</p>
+          <h2>Govee Outdoor Classic Wall Light surfaces in CSA as Matter 1.5</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>T3 (10 Sep): days after Govee’s IFA outdoor push (Permanent Outdoor Lights 2 Pro), a CSA listing for the <strong>Outdoor Classic Wall Light</strong> shows Matter 1.5 plus Wi-Fi and Bluetooth. Porch-oriented fixture; white + color effects expected via Govee Home. No official product photo, brightness, or price in the leak.</dd>
+            <dt>Why it matters</dt>
+            <dd>Another outdoor light entering Matter certification pipelines right after the show — still a listing, not a ship date.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.t3.com/home-living/smart-home/govees-next-smart-light-has-already-leaked-after-last-weeks-massive-launch">T3, 10 Sep 2026</a> (CSA listing report)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="thirdreality">
+          <p class="meta">04 · Matter &amp; Thread / Devices</p>
+          <h2>Third Reality’s first Matter-over-Thread quartet</h2>
+          <figure class="figure">
+            <img src="images/thirdreality-ifa-2026.jpg" alt="Third Reality IFA 2026 booth poster with Matter devices" width="1200" height="675" loading="lazy">
+            <figcaption>Third Reality IFA 2026 Matter lineup poster — source <a href="https://www.thirdreality.com/blogs/news/thirdreality-independent-ifa-debut-matter-smart-home-smart-care-solutions">Third Reality</a></figcaption>
+          </figure>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>First independent IFA booth (Hall H1.2, stand 100): Matter-over-Thread Smart Soil Moisture Sensor, Smart Button, Smart Plug, and Smart Bulb, plus a Zigbee security kit and ThirdStage HelpLink care stack. Company says H2 2026 availability; pricing later. Existing Zigbee catalog stays supported.</dd>
+            <dt>Why it matters</dt>
+            <dd>Budget Zigbee specialist finally puts Thread/Matter SKUs on the table — plant care and plugs are the HA-relevant ones to watch.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.thirdreality.com/blogs/news/thirdreality-independent-ifa-debut-matter-smart-home-smart-care-solutions">Third Reality IFA announcement</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="hue">
+          <p class="meta">05 · Matter &amp; Thread</p>
+          <h2>Hue follow: every new light still Matter over Thread</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>No newer Hueblog correction overnight. Yesterday’s lead stands: all new Philips Hue lights/bulbs/strips support Matter over Thread (incl. Hue × Nanoleaf controller); gradients still need the Hue app; Silicon Labs concurrent Zigbee+Thread remains a later CMP software path.</dd>
+            <dt>Why it matters</dt>
+            <dd>Status check against Aqara’s dual-radio lighting push — different strategy, same Matter month.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://hueblog.com/2026/09/09/all-new-philips-hue-lights-support-matter-over-thread/">Hueblog, 9 Sep 2026</a>; prior brief <a href="brief-2026-09-10.html#lead">10 Sep</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="tapo">
+          <p class="meta">06 · Matter / Devices</p>
+          <h2>TP-Link Tapo Matter cameras — still end of September</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>No new TP-Link calendar change. Heise’s wrap still points to end-of-September HW revisions of C560WS, C260, and C660 Kit (v2.0 / v2.6) for Matter camera code; SmartThings-first among major platforms.</dd>
+            <dt>Why it matters</dt>
+            <dd>Watch the calendar — Matter cameras remain gated by controller support outside SmartThings.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.heise.de/en/news/Smart-Home-at-IFA-Matter-cameras-AI-guardians-and-nimble-door-locks-11448613.html">heise online</a>; <a href="https://www.tapo.com/en/product/smart-camera/tapo-c560ws/">Tapo C560WS</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="threadlink">
+          <p class="meta">07 · Matter &amp; Thread</p>
+          <h2>Shelly ThreadLink Gen4 still ~December</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>No new Shelly ThreadLink firmware date. Opt-in Gen4 path remains full TCP/IP over Thread (~3 months after the Sep 3 announce).</dd>
+            <dt>Why it matters</dt>
+            <dd>Still the most aggressive “Thread as the network” vendor story on the board.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="brief-2026-09-10.html#threadlink">10 Sep ThreadLink brief</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="ha-core">
+          <p class="meta">08 · Home Assistant</p>
+          <h2>Home Assistant Core still on 2026.9.1</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>GitHub releases as of this morning: latest stable tag remains <strong>2026.9.1</strong> (Sep 5). No 2026.9.2. Monthly feature story unchanged: Modbus UI device integrations, Matter network map, Security dashboard alerts/favorites, Activity “why it changed.”</dd>
+            <dt>Why it matters</dt>
+            <dd>Operators stay on the .1 patch train.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/09/02/release-20269">HA 2026.9 release notes</a>; <a href="https://github.com/home-assistant/core/releases/tag/2026.9.1">core 2026.9.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">09 · ESPHome</p>
+          <h2>ESPHome: 2026.9.0b3 still the tip of beta</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>No new ESPHome tag overnight. Latest prerelease is still <strong>2026.9.0b3</strong> (Sep 9); latest stable remains <strong>2026.8.2</strong> (Aug 31).</dd>
+            <dt>Why it matters</dt>
+            <dd>Beta polish ahead of the September stable cut — not a production jump.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/esphome/esphome/releases">esphome releases</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">10 · Zigbee</p>
+          <h2>Zigbee2MQTT 2.14.1 still current</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>No 2.15. Latest release tag remains <strong>2.14.1</strong> (Sep 3) after the 2.14.0 device batch and cover/expose hotfixes.</dd>
+            <dt>Why it matters</dt>
+            <dd>Quiet Zigbee week — stay on .1 if you took the 2.14 train.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases">Zigbee2MQTT releases</a></dd>
+          </dl>
+        </article>
+
+        <section class="briefing" aria-labelledby="briefing-inline">
+          <h2 id="briefing-inline">The Briefing</h2>
+          <ol>
+            <li><a href="#lead">Aqara Thread+Zigbee lighting (October)</a></li>
+            <li><a href="#zwave">Z-Wave JS UI 11.24.0 / zwave-js 15.29.0</a></li>
+            <li><a href="#govee">Govee Outdoor Classic Wall Light — CSA Matter 1.5</a></li>
+            <li><a href="#thirdreality">Third Reality Matter-over-Thread quartet</a></li>
+            <li><a href="#hue">Hue Matter over Thread (status)</a></li>
+            <li><a href="#tapo">Tapo Matter cameras (end of Sep)</a></li>
+            <li><a href="#threadlink">Shelly ThreadLink ~Dec</a></li>
+            <li><a href="#ha-core">HA Core 2026.9.1</a></li>
+            <li><a href="#esphome">ESPHome 2026.9.0b3</a></li>
+            <li><a href="#z2m">Zigbee2MQTT 2.14.1</a></li>
+          </ol>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+        <input type="tel" name="phone" required autocomplete="tel" placeholder="Phone">
+      </label>
+      <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. We will not call. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

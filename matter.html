@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Matter & Thread — HA News</title>
+  <meta name="description" content="Homey Matter 1.5 certification and the Home Assistant 2026.8.2 via-device patch.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 15 August 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html" aria-current="page">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Matter &amp; Thread</p>
+        <h1>Matter &amp; Thread</h1>
+        <p class="lede">Controller certification and a Core patch, not a shopping list. Matter 1.5 is the spec; Homey’s CSA cert is a data point on who has implemented it as a controller.</p>
+
+        <article class="story-block">
+          <p class="meta">Certification</p>
+          <h2>Homey is Matter 1.5 certified</h2>
+          <p>Athom’s Homey received Matter 1.5 certification from the Connectivity Standards Alliance. The cert applies to Homey Pro (2023–2026), Homey Pro mini, and Homey Self-Hosted Server. Homey Pro and Pro mini include a built-in Thread border router; Self-Hosted Server uses Matter-over-Thread through the Homey mobile app when a Thread border router is already on the network.</p>
+          <p>CSA lists the product as a software component, certificate ID CSA26025SWC60263-M1, specification version 1.5, certified 29 June 2026, firmware 13.3.0. That is a controller milestone, not a new device type.</p>
+          <p class="source-line">Primary sources: <a href="https://homey.app/en-us/news/homey-matter-1-5-certified/">Homey announcement</a>; <a href="https://csa-iot.org/csa_product/homey/">CSA product listing</a>.</p>
+        </article>
+
+        <article class="story-block">
+          <p class="meta">Explainer</p>
+          <h2><a href="explainer-matter-15.html">Matter 1.5, explained</a></h2>
+          <p>Cameras, closures, soil sensors, and energy-management clusters. What 1.5 actually added, and why a controller cert is not the same as a camera you can buy today.</p>
+        </article>
+
+        <article class="story-block">
+          <p class="meta">Home Assistant · 14 Aug 2026</p>
+          <h2><a href="ha.html">Core 2026.8.2 restores via-device on composed Matter bridges</a></h2>
+          <p>Composed (multi-endpoint) Matter devices behind a bridge lost their “via device” link after 2026.8.0. The 14 Aug patch puts them back under the bridge.</p>
+        </article>
+
+      </div>
+      <aside class="col-right">
+        <section class="briefing" aria-labelledby="briefing-title">
+          <h2 id="briefing-title">The Briefing</h2>
+          <p class="brief-date">15 Aug 2026</p>
+          <ol>
+            <li>
+              <a href="article-esphome-starter-kit.html">ESPHome Starter Kit</a>
+              <p>First official ESPHome product, built with Apollo Automation. Local-first hardware.</p>
+            </li>
+            <li>
+              <a href="ha.html">HA 2026.8 Approachable by design</a>
+              <p>New OS installs drop :8123. Monthly core release is how onboarding actually shifts.</p>
+            </li>
+            <li>
+              <a href="ha.html">Home Assistant Core 2026.8.0</a>
+              <p>August monthly tag is on GitHub. Integrations, repairs, radio-stack work land here.</p>
+            </li>
+            <li>
+              <a href="ha.html">Home Assistant Core 2026.8.2</a>
+              <p>Patch restores via-device on composed Matter devices behind bridges.</p>
+            </li>
+            <li>
+              <a href="matter.html">Homey Matter 1.5 certified</a>
+              <p>CSA cert for Pro, mini, and self-hosted. Controller milestone, not a new device type.</p>
+            </li>
+            <li>
+              <a href="devices.html">SwitchBot Circulator Fan 2 Pro</a>
+              <p>Battery circulator with Matter over Wi-Fi. No SwitchBot hub required for basic control.</p>
+            </li>
+          </ol>
+          <a class="full-brief" href="brief-2026-08-15.html">Full brief →</a>
+        </section>
+
+        <div class="rail-sub">
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </div>
+
+        <nav class="evergreen" aria-label="Explainers">
+          <h3>Weekly evergreen</h3>
+          <ul>
+            <li><a href="explainer-matter-15.html">Matter 1.5, explained</a></li>
+            <li><a href="explainer-esphome-kit.html">What the ESPHome Starter Kit actually is</a></li>
+          </ul>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>No autonomous publishing until approved</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+        <input type="tel" name="phone" required autocomplete="tel" placeholder="Phone">
+      </label>
+      <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. We will not call. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

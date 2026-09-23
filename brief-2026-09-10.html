@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 10 Sep 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 10 September 2026. Philips Hue Matter over Thread on all new lights, TP-Link Matter cameras, Shelly ThreadLink, ESPHome beta, and radio-stack notes.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 10 September 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>10 September 2026</h1>
+        <p class="lede">Post-IFA Matter week. Hue confirms Matter over Thread on every new light; TP-Link’s camera revisions aim for end of September; Shelly ThreadLink still the Gen4 Thread story. ESPHome cuts a third September beta.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Matter &amp; Thread / Devices</p>
+          <h2>Philips Hue: all new lights ship Matter over Thread</h2>
+          <figure class="figure">
+            <img src="images/philips-hue-semeru.jpg" alt="Philips Hue outdoor Semeru wall light" width="1200" height="800" loading="eager">
+            <figcaption>Philips Hue Semeru outdoor wall light — source <a href="https://hueblog.com/2026/09/09/all-new-philips-hue-lights-support-matter-over-thread/">Hueblog</a></figcaption>
+          </figure>
+          <p>Hueblog confirmed Sep 9 what the IFA floor implied: <strong>every new</strong> Philips Hue light, bulb, and light strip supports Matter over Thread, including the Hue × Nanoleaf wall-light controller. Direct Matter pairing is real for simple lamps and outdoor sconces; gradient products still need the Hue app for full color features because Matter does not yet carry gradients.</p>
+          <figure class="figure">
+            <img src="images/philips-hue-bulb.jpg" alt="Philips Hue smart bulb product photo" width="1200" height="800" loading="lazy">
+            <figcaption>Philips Hue bulb — source <a href="https://news.silabs.com/2026-06-23-Signify-Enhances-Philips-Hue-Matter-Support-Through-Collaboration-with-Silicon-Labs">Silicon Labs / Signify press</a></figcaption>
+          </figure>
+          <p>That sits on top of Signify’s June concurrent multiprotocol plan with Silicon Labs: select MG26 / SiMG301 bulbs will eventually run Zigbee and Matter over Thread at once via a later software update. Today, commission-time choice still applies on those chips. Hue Secure battery camera quietly moved to 2K; Apple Home camera support is still “working on it,” with no date.</p>
+          <p>Practical takeaway for a local stack: Bridge + Hue app remains the full-feature path; Matter-over-Thread is the interoperability on-ramp for non-gradient fixtures.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://hueblog.com/2026/09/09/all-new-philips-hue-lights-support-matter-over-thread/">Hueblog, 9 Sep 2026</a>; <a href="https://news.silabs.com/2026-06-23-Signify-Enhances-Philips-Hue-Matter-Support-Through-Collaboration-with-Silicon-Labs">Silicon Labs / Signify CMP announcement</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="tapo">
+          <p class="meta">02 · Matter / Devices</p>
+          <h2>TP-Link Tapo Matter cameras — hardware revisions end of September</h2>
+          <figure class="figure">
+            <img src="images/tapo-c560ws.png" alt="TP-Link Tapo C560WS outdoor pan-tilt camera" width="1000" height="1000" loading="lazy">
+            <figcaption>Tapo C560WS — source <a href="https://www.tapo.com/en/product/smart-camera/tapo-c560ws/">Tapo product page</a></figcaption>
+          </figure>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Heise’s IFA wrap: TP-Link plans end-of-September hardware revisions of Tapo C560WS, C260, and C660 Kit (marked v2.0 / v2.6) with more compute and memory for Matter camera code. Housings stay the same. Ecosystem reality check: among major platforms, only Samsung SmartThings currently speaks Matter cameras; Apple/Google/Amazon are not there yet. Aqara still the only prior Matter camera shipper called out in the piece.</dd>
+            <dt>Why it matters</dt>
+            <dd>Matter cameras leave the slide deck and get SKUs with a calendar date — still gated by controller support outside SmartThings.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.heise.de/en/news/Smart-Home-at-IFA-Matter-cameras-AI-guardians-and-nimble-door-locks-11448613.html">heise online IFA smart-home wrap</a>; <a href="https://www.tapo.com/en/product/smart-camera/tapo-c560ws/">Tapo C560WS</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="threadlink">
+          <p class="meta">03 · Matter &amp; Thread</p>
+          <h2>Shelly ThreadLink — full TCP/IP over Thread for Gen4</h2>
+          <figure class="figure">
+            <img src="images/shelly-threadlink.png" alt="Shelly ThreadLink IFA 2026 announcement graphic" width="1200" height="675" loading="lazy">
+            <figcaption>Shelly ThreadLink — source <a href="https://www.shelly.com/blogs/media-kit/shelly-unveils-threadlink-ifa-2026">Shelly media kit</a></figcaption>
+          </figure>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Missed in Tuesday’s IFA-close brief: opt-in Gen4 firmware that runs a full TCP/IP stack (UDP + TCP) over Thread so Matter, Shelly Cloud (via border-router NAT64), and peer Shelly RPC can share one low-power radio — no Wi-Fi credentials on the device. Free; roll out ~3 months after the Sep 3 announce (roughly December). Needs a Thread border router for cloud/app; device-to-device scenes stay in-mesh. Dedicated HA module promised beyond Matter’s data model.</dd>
+            <dt>Why it matters</dt>
+            <dd>Most vendors treat Thread as Matter transport only. Shelly is treating Thread as the network.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/media-kit/shelly-unveils-threadlink-ifa-2026">Shelly ThreadLink media kit</a></dd>
+          </dl>
+        </article>
+
+
+        <article class="story-block" id="esphome">
+          <p class="meta">05 · ESPHome</p>
+          <h2>ESPHome 2026.9.0b3 (Sep 9)</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Third September beta: audio/i2s and micro wake-word lock fixes, MQTT light brightness discovery restore, Dallas 85 °C reset filter, BLE client Established reporting, Device Builder 1.14.5, noise-c / libsodium bumps, OTA chunk-ack retry, sendspin codec preference list. Stable remains 2026.8.x until the monthly cut.</dd>
+            <dt>Why it matters</dt>
+            <dd>Beta channel polish ahead of 2026.9 stable — not a production jump yet.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/esphome/esphome/releases/tag/2026.9.0b3">esphome 2026.9.0b3</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="ha-core">
+          <p class="meta">06 · Home Assistant</p>
+          <h2>Home Assistant Core still on 2026.9.1</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>No 2026.9.2 as of this morning. Latest remains 2026.9.1 (Sep 5) after 2026.9.0 (“There’s room on this bus,” Sep 2): Modbus UI device integrations, Matter network map, Security dashboard alerts/favorites, Activity “why it changed,” Cloud STT Labs.</dd>
+            <dt>Why it matters</dt>
+            <dd>Operators stay on the .1 patch train; monthly feature story unchanged.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/09/02/release-20269/">HA 2026.9 release notes</a>; <a href="https://github.com/home-assistant/core/releases/tag/2026.9.1">core 2026.9.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">07 · Zigbee</p>
+          <h2>Zigbee2MQTT 2.14.1 still current</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>No 2.15 yet. 2.14.1 (Sep 3) remains latest after 2.14.0’s device batch; cover/expose hotfixes still the reason to prefer .1 over .0.</dd>
+            <dt>Why it matters</dt>
+            <dd>Quiet radio week — stay patched, watch release feed for 2.15.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases">Zigbee2MQTT releases</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">08 · Z-Wave</p>
+          <h2>Z-Wave JS UI 11.23.0 still current</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>No 11.24 as of this morning. 11.23.0 (Sep 1) still leads: speed column, zwave-js 15.28.0, MQTT Window Covering → HA covers, debug session metadata.</dd>
+            <dt>Why it matters</dt>
+            <dd>Status check only — no new driver story since Tuesday.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.23.0">zwave-js-ui 11.23.0</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="shelly-wall">
+          <p class="meta">09 · Matter &amp; Thread</p>
+          <h2>Shelly Wall Display 2.8.0 still rolling out</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>T3 and other outlets are still amplifying Tuesday’s dual-role Matter OTA (X1i/X2i/XL/U1/S1/S2/XT as controller + device). Thread devices still need a separate border router. Unchanged from the 8 Sep brief; noted here because the press wave continued past IFA close.</dd>
+            <dt>Why it matters</dt>
+            <dd>Same dual-role panel story — now with broader secondary coverage.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/media-kit/matter-update-wall-display-ifa-2026">Shelly Wall Display Matter media kit</a>; <a href="https://www.t3.com/home-living/smart-home/shellys-new-matter-update-lets-you-control-different-smart-home-brands-from-one-screen">T3, 9 Sep</a></dd>
+          </dl>
+        </article>
+
+      </div>
+      <aside class="col-right">
+        <section class="briefing" aria-labelledby="briefing-title">
+          <h2 id="briefing-title">The Briefing</h2>
+          <p class="brief-date">10 Sep 2026</p>
+          <ol>
+            <li>
+              <a href="brief-2026-09-10.html#tapo">TP-Link Tapo Matter cameras</a>
+              <p>C560WS / C260 / C660 Kit HW revisions end of September; SmartThings-first for Matter video.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-10.html#threadlink">Shelly ThreadLink Gen4</a>
+              <p>Full TCP/IP over Thread; Matter + cloud + peer RPC; ~Dec opt-in firmware.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-10.html#esphome">ESPHome 2026.9.0b3</a>
+              <p>Third September beta — audio/BLE/OTA polish; Device Builder 1.14.5.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-10.html#ha-core">Home Assistant Core 2026.9.1</a>
+              <p>No .2 yet; Modbus UI and Matter map still the monthly story.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-10.html#z2m">Zigbee2MQTT 2.14.1</a>
+              <p>Still latest; prefer .1 over 2.14.0 for cover/expose fixes.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-10.html#zwave">Z-Wave JS UI 11.23.0</a>
+              <p>No 11.24; speed column + Window Covering discovery stand.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-10.html#shelly-wall">Shelly Wall Display 2.8.0</a>
+              <p>Dual-role Matter OTA still the panel story as secondary press continues.</p>
+            </li>
+          </ol>
+          <a class="full-brief" href="brief-2026-09-10.html">Full brief →</a>
+        </section>
+
+        <div class="rail-sub">
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </div>
+
+        <nav class="evergreen" aria-label="Explainers">
+          <h3>Weekly evergreen</h3>
+          <ul>
+            <li><a href="explainer-matter-15.html">Matter 1.5, explained</a></li>
+            <li><a href="explainer-esphome-kit.html">What the ESPHome Starter Kit actually is</a></li>
+          </ul>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+        <input type="tel" name="phone" required autocomplete="tel" placeholder="Phone">
+      </label>
+      <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. We will not call. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

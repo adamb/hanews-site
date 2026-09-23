@@ -1,0 +1,8 @@
+name = "hanews"
+pages_build_output_dir = "."
+compatibility_date = "2026-08-28"
+# Custom domain hanews.org is a later DNS step. Do not put account_id here (Pages rejects it).
+
+[[kv_namespaces]]
+binding = "SUBSCRIBERS"
+id = "0f64d5199cb844eab5bc654e61496a65"

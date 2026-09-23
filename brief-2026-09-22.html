@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 22 Sep 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 22 September 2026. Supervisor 2026.09.3 catch-up on app capability drops; Open Home Foundation Lisbon meetup Wednesday; stack versions hold after Monday HAOS 18.3.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 22 September 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>22 September 2026</h1>
+        <p class="lede">Quiet overnight on Core / ESPHome / Z2M / Z-Wave tags after Monday’s HAOS 18.3 catch-up. Soft lead today: <strong>Supervisor 2026.09.3</strong> (17 Sep), missed while Core and OS dominated the rail — app-container capability drops and Supervisor API gating. Calendar: Open Home Foundation team meetup in Lisbon tomorrow evening.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Home Assistant / Supervisor</p>
+          <h2>Supervisor 2026.09.3 — app capability drops, API gating while starting</h2>
+          <p><strong>What happened:</strong> Tag <strong>2026.09.3</strong> published 2026-09-17T13:47:09Z — same Thursday as HAOS 18.3, but it never got its own rail while Core 2026.9.3 and the OS release filled the briefs. From the GitHub notes:</p>
+          <ul>
+            <li>Feature flags to drop <code>NET_RAW</code>, plus <code>MKNOD</code>, <code>AUDIT_WRITE</code>, and <code>SETFCAP</code>, from app (add-on) containers</li>
+            <li>Block start / restart / rebuild / update APIs while Supervisor is not fully running</li>
+            <li>Don’t leave rejected AppArmor profile files in the store directory</li>
+            <li>Keep <code>!secret</code> references when persisting app options</li>
+          </ul>
+          <p><strong>Why it matters:</strong> Capability drops harden what apps can do on the host. API gating cuts racey start/update calls during Supervisor boot. If you run HAOS, this rides the usual Supervisor update channel — distinct from Monday’s OS 18.3 story.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/supervisor/releases/tag/2026.09.3">home-assistant/supervisor 2026.09.3</a> (published 2026-09-17T13:47:09Z)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="lisbon">
+          <p class="meta">02 · Open Home Foundation</p>
+          <h2>OHF team meetup — Lisbon, Wednesday 23 Sep</h2>
+          <p><strong>What happened:</strong> Open Home Foundation hosts a free in-person gathering Wednesday, <strong>23 September 2026</strong>, from 7:00&nbsp;PM at Impact Hub Penha da França (Rua Neves Ferreira 13, 3rd floor, Lisbon). Luma lists the full crew plus commercial partners and community; registration required, spots limited, swag promised.</p>
+          <p><strong>Why it matters:</strong> Calendar item for anyone in or near Lisbon this week — not a product release, but the only annual all-hands-style room for the foundation, partners, and local community.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://luma.com/t13dc6er">Luma: Meet the Open Home Foundation team — Lisbon</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="haos">
+          <p class="meta">03 · Home Assistant OS</p>
+          <h2>HAOS still 18.3</h2>
+          <p><strong>What happened:</strong> No 18.4 (or newer RC) overnight. Monday’s lead — <code>ha docker reset-storage</code>, Yellow mini-UART Bluetooth fix, RPi HDMI / USB-SSD repairs — remains the current stable OS tag.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/operating-system/releases/tag/18.3">home-assistant/operating-system 18.3</a>; prior brief <a href="brief-2026-09-21.html#lead">21 Sep</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="core">
+          <p class="meta">04 · Home Assistant</p>
+          <h2>Home Assistant Core still 2026.9.3</h2>
+          <p><strong>What happened:</strong> No 2026.9.4 and no 2026.10 beta on the releases list this morning. Latest stable remains Friday’s <strong>2026.9.3</strong>.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.9.3">home-assistant/core 2026.9.3</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">05 · ESPHome</p>
+          <h2>ESPHome still 2026.9.0</h2>
+          <p><strong>What happened:</strong> Latest stable tag remains <strong>2026.9.0</strong> (16 Sep). No 2026.9.1 on PyPI or the blog this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://esphome.io/blog/2026/09/16/esphome-2026-9/">ESPHome blog, 16 Sep 2026</a>; <a href="https://github.com/esphome/esphome/releases/tag/2026.9.0">esphome/esphome 2026.9.0</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="hue">
+          <p class="meta">06 · Devices / Hue</p>
+          <h2>Hue Play strip pro — UK still In stock; US still Coming soon</h2>
+          <figure class="figure">
+            <img src="images/hue-play-gradient-strip-pro.jpg" alt="Philips Hue Play gradient strip light pro installed behind a television" width="1200" height="800" loading="lazy">
+            <figcaption>Philips Hue Play gradient strip light pro — source <a href="https://www.signify.com/global/our-company/news/press-releases/2026/20260903-philips-hue-expands-on-smart-lighting-with-ai-immersive-entertainment-and-design">Signify press kit</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> Live check this morning: UK pro 65&quot; page still <strong>In stock</strong> (£139.99); US pro 65&quot; page still <strong>Coming soon</strong> ($179.99). No market flip overnight.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.philips-hue.com/en-gb/p/lightstrips-philips-hue-play-gradient-lightstrip-pro-65/8721103168603">Hue UK pro 65&quot;</a> (In stock); <a href="https://www.philips-hue.com/en-us/p/lightstrips-philips-hue-play-gradient-strip-light-pro-65/046677611828">Hue US pro 65&quot;</a> (Coming soon)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="aqara">
+          <p class="meta">07 · Matter &amp; Thread / Devices</p>
+          <h2>Aqara FP400 — still shipping; Matter zone caveat holds</h2>
+          <figure class="figure">
+            <img src="images/aqara-fp400-product.png" alt="Aqara Spatial Multi-Sensor FP400 product photo" width="1200" height="800" loading="lazy">
+            <figcaption>Aqara Spatial Multi-Sensor FP400 — source <a href="https://www.aqara.com/en/product/spatial-multi-sensor-fp400/">Aqara product page</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> No new Aqara calendar overnight. FP400 remains on sale worldwide after the 16 Sep availability push. Matter caveat unchanged — third-party Thread joins expose overall presence + illuminance; do not assume full zone export.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.aqara.com/us/news-us/spatial-multi-sensor-fp400-availability-announcement/">Aqara availability announcement, 16 Sep 2026</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">08 · Z-Wave</p>
+          <h2>Z-Wave JS UI still 11.24.1</h2>
+          <p><strong>What happened:</strong> Latest GitHub release remains <strong>v11.24.1</strong> (15 Sep). No 11.24.2 / 11.25.0 overnight.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.24.1">zwave-js-ui v11.24.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">09 · Zigbee</p>
+          <h2>Zigbee2MQTT still 2.14.1</h2>
+          <p><strong>What happened:</strong> Latest GitHub release tag remains <strong>2.14.1</strong> (3 Sep). No 2.14.2 on the releases list as of this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.1">Zigbee2MQTT 2.14.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="tapo">
+          <p class="meta">10 · Devices / Cameras</p>
+          <h2>Tapo Matter cameras — end-of-September window closing</h2>
+          <p><strong>What happened:</strong> Still no new TP-Link calendar confirmation. HW revisions of C560WS, C260, and C660 Kit for Matter camera code remain framed as end of September — with eight days left in the month, the window is closing, not locked.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd>Prior brief <a href="brief-2026-09-11.html#tapo">11 Sep</a> (heise / Tapo C560WS)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="shelly">
+          <p class="meta">11 · Devices / Shelly</p>
+          <h2>Shelly ThreadLink Gen4 still ~December</h2>
+          <p><strong>What happened:</strong> No newer ThreadLink calendar overnight. Gen4 ThreadLink remains the ~December watch from prior IFA framing.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/media-kit/shelly-unveils-threadlink-ifa-2026">Shelly ThreadLink IFA 2026 media kit</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+        <input type="tel" name="phone" required autocomplete="tel" placeholder="Phone">
+      </label>
+      <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. We will not call. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

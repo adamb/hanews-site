@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 8 Sep 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 8 September 2026. Anker MindBase vs Ugreen HomeAgent as IFA closes, plus Matter, HA Core, and radio-stack notes.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 8 September 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>8 September 2026</h1>
+        <p class="lede">Weekday brief as IFA Berlin closes. Local AI Matter hubs lead; Open Home Foundation, Shelly, Heiman, Core 2026.9.1, and the radio stack fill the rail.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Devices / IFA</p>
+          <h2>Local AI hubs collide as IFA closes: Anker MindBase vs Ugreen HomeAgent</h2>
+          <figure class="figure">
+            <img src="images/anker-mindbase-product.jpeg" alt="Anker MindBase home hub product photo" width="1200" height="800" loading="eager">
+            <figcaption>Anker MindBase — source <a href="https://www.einpresswire.com/article/938578750/introducing-anker-mindbase-an-ai-powered-home-hub-built-for-the-autonomous-home-at-ifa-2026">EIN Presswire / Anker</a></figcaption>
+          </figure>
+          <p>IFA Berlin wraps today (Sep 4–8). Two vendors that made their names on chargers and NAS both showed up pitching the same product shape: a Matter controller that also runs on-device AI and keeps camera footage in the house, without a monthly storage plan.</p>
+          <p><strong>Anker MindBase</strong> (unveiled Sep 3) is a Matter 1.5 controller with Wi-Fi, Bluetooth, Thread, and Zigbee, a 26-TOPS on-device AI card (TrueSmart Agent), and expandable storage up to 48TB. Anker says it will talk to Apple HomeKit Secure Video, Alexa, Google Home, and Home Assistant, and plans later “agents” for energy and cleaning after security. The first kit pairs MindBase with the TrackLight Cam S1; also at IFA: Video Doorbell S4 at $299.99 (late September) and Window Camera E10 at $69.99 (later this year). MindBase itself still has no price or ship date.</p>
+          <figure class="figure">
+            <img src="images/ugreen-homeagent-hub.jpeg" alt="Ugreen HomeAgent HA100 Pro hub" width="1200" height="800" loading="lazy">
+            <figcaption>Ugreen HomeAgent HA100 Pro — source <a href="https://www.theverge.com/tech/990006/this-nas-company-wants-to-run-your-local-smart-home">The Verge IFA</a></figcaption>
+          </figure>
+          <p><strong>Ugreen HomeAgent</strong> got a Verge hands-on (Sep 4). Three hubs: HA100, HA100 Pro, and MasterAgent MA100 on Nvidia Jetson Thor T5000 (up to 2,070 TFLOPS). Kickstarter early-bird (October): about $899 / $2,999 / $9,999, with retail roughly double after. Voice assistant is Uliya. Matter controller support is real in the demo (Nanoleaf + blinds), but phase one is lights, switches, sensors, and curtains, and Ugreen wants you on its approved list (Aqara, ThirdReality, SwitchBot, Eve named so far). Push notifications and remote camera viewing still need the internet; cloud Uliya is optional.</p>
+          <figure class="figure">
+            <img src="images/ugreen-masteragent.jpeg" alt="Ugreen MasterAgent MA100" width="1200" height="800" loading="lazy">
+            <figcaption>Ugreen MasterAgent MA100 — source <a href="https://www.theverge.com/tech/990006/this-nas-company-wants-to-run-your-local-smart-home">The Verge IFA</a></figcaption>
+          </figure>
+          <p>Same week, same hall, two “brain of the home” boxes. Local-first pitch is the story; price and Matter breadth decide whether either is more than a booth.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.theverge.com/tech/987936/anker-eufy-mindbase-ai-security-camera-system-matter">The Verge on Anker MindBase</a>; <a href="https://www.einpresswire.com/article/938578750/introducing-anker-mindbase-an-ai-powered-home-hub-built-for-the-autonomous-home-at-ifa-2026">Anker / EIN Presswire</a>; <a href="https://www.theverge.com/tech/990006/this-nas-company-wants-to-run-your-local-smart-home">The Verge on Ugreen HomeAgent</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="ohf">
+          <p class="meta">02 · Open Home</p>
+          <h2>Open Home Foundation — last day at IFA</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>OHF booth Hall 1.2, stand 1.2-153, with Apollo Automation and Nabu Casa. Private/trade visitors today until 18:00. The community meetup was Sunday Sep 6 at Enjoy Rooftop.</dd>
+            <dt>Why it matters</dt>
+            <dd>First OHF exhibitor turn at IFA closes today — the local-stack foundation sharing a hall with commercial “brain of the home” hubs.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.openhomefoundation.org/blog/ifa-berlin-2026-save-the-date/">OHF save-the-date</a>; <a href="https://www.ifa-berlin.com/exhibitors/open-home-foundation">IFA exhibitor listing</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="shelly">
+          <p class="meta">03 · Matter &amp; Thread</p>
+          <h2>Shelly Wall Display firmware 2.8.0 — Matter dual-role</h2>
+          <figure class="figure">
+            <img src="images/shelly-wall-display-xl.webp" alt="Shelly Wall Display XL" width="800" height="600" loading="lazy">
+            <figcaption>Shelly Wall Display XL — source <a href="https://www.shelly.com/blogs/media-kit/matter-update-wall-display-ifa-2026">Shelly media kit</a></figcaption>
+          </figure>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Free OTA turns X1i, X2i, XL, U1, S1, S2, and XT into dual-role Matter panels: commission third-party Matter lights/covers/thermostats/fans/plugs/sensors with no bridge, and expose the panel’s own relays, dimmer, and thermostat to Apple Home, Google Home, Alexa, SmartThings, or Home Assistant. First-gen / X2 get shared Matter devices only. Thread still needs a separate border router. Premium cloud history for Matter devices follows later in September.</dd>
+            <dt>Why it matters</dt>
+            <dd>A wall panel that is both Matter controller and Matter device without a separate bridge — rare dual-role hardware on a free firmware path.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/media-kit/matter-update-wall-display-ifa-2026">Shelly media kit</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="heiman">
+          <p class="meta">04 · Devices / Matter</p>
+          <h2>Heiman HS2HT — Matter 1.6 NFC commissioning</h2>
+          <figure class="figure">
+            <img src="images/heiman-hs2ht.jpg" alt="Heiman HS2HT Matter temperature humidity sensor" width="800" height="600" loading="lazy">
+            <figcaption>Heiman HS2HT — source <a href="https://www.matteralpha.com/news/heiman-matter-1-6-nfc-sensor-ifa-2026">Matter Alpha</a></figcaption>
+          </figure>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>IP65 outdoor temp/humidity sensor at IFA labeled for Matter 1.6 NFC pairing — early hardware of NFC as commissioning transport (not just payload storage). Also shown: WS6GW Matter Bridge for Zigbee/Sub-GHz into Matter ecosystems, SC3 smoke/CO variants, HS2VTD 4-in-1 contact sensor, HS1ZT Zigbee/Thread dongle. Pricing and retail TBA.</dd>
+            <dt>Why it matters</dt>
+            <dd>NFC commissioning on a shipping-shaped Matter 1.6 sensor is a concrete floor demo, not just a CSA slide.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.matteralpha.com/news/heiman-matter-1-6-nfc-sensor-ifa-2026">Matter Alpha</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="ha-core">
+          <p class="meta">05 · Home Assistant</p>
+          <h2>Home Assistant Core 2026.9.1 (Sep 5)</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Patch after 2026.9.0 (“There’s room on this bus,” Sep 2). Headline features still stand: Modbus UI device integrations, Matter network map in the main UI, Security dashboard active alerts/favorites, Activity “why it changed,” Cloud STT Labs. .1 is the stability/hotfix train community threads pointed people at after reboot/load pain on .0.</dd>
+            <dt>Why it matters</dt>
+            <dd>The monthly story (Modbus UI + Matter map) is unchanged; operators should be on the .1 patch train.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/09/02/release-20269/">HA 2026.9 release notes</a>; <a href="https://github.com/home-assistant/core/releases/tag/2026.9.1">core 2026.9.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">06 · ESPHome</p>
+          <h2>ESPHome 2026.9.0b2 (Sep 7)</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Second beta: template climate platform, OTA encryption offer using the API key, Noise/libsodium bumps, ESP-NOW-over-hosted for ESP32-P4, Device Builder bumps through 1.14.4. Stable remains 2026.8.x until the monthly cut.</dd>
+            <dt>Why it matters</dt>
+            <dd>Beta channel only — useful for early adopters, not a stable cut yet.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/esphome/esphome/releases/tag/2026.9.0b2">esphome 2026.9.0b2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">07 · Zigbee</p>
+          <h2>Zigbee2MQTT 2.14.1</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Follow-up to 2.14.0: cover/expose hotfixes, more device support (Lincukoo, Aqara blinds, Siemens thermostats, Nova Digital, etc.). Umbrel and Docker tags show 2.14.1 live.</dd>
+            <dt>Why it matters</dt>
+            <dd>Patch after a large 2.14.0 device batch — cover/expose fixes matter for real installs.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases">Zigbee2MQTT releases</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">08 · Z-Wave</p>
+          <h2>Z-Wave JS UI 11.23.0</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Speed column in the control panel, zwave-js 15.28.0, MQTT Window Covering → HA cover discovery, debug session metadata. No 11.24 yet as of this morning.</dd>
+            <dt>Why it matters</dt>
+            <dd>Driver bump plus cover discovery for MQTT/HA paths — quiet but useful ops release.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.23.0">zwave-js-ui 11.23.0</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="google">
+          <p class="meta">09 · Voice / cloud</p>
+          <h2>Google Assistant mobile sunset underway</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Google started removing classic Assistant on Android / Wear OS / projected Android Auto from Sep 4; Gemini is the phone path. Nest speakers keep Assistant for now. HA community reports mixed: devices exposed via google_assistant often still controllable from Gemini; voice→script routines that depended on Assistant intent matching are breaking.</dd>
+            <dt>Why it matters</dt>
+            <dd>Another cloud-assistant lock-in moment — local voice / HA’s own assistant stack gets another nudge.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://9to5google.com/2026/08/04/google-assistant-september-2026-shutdown/">9to5Google</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="suzi">
+          <p class="meta">10 · Matter &amp; Thread / Zigbee</p>
+          <h2>CSA Suzi product certification open</h2>
+          <dl class="facts">
+            <dt>What happened</dt>
+            <dd>Zigbee sub-GHz (Suzi) certification program is open for members — long-range / better penetration sibling to 2.4 GHz Zigbee 4.0, not a Matter replacement. Bridges still the path into Matter ecosystems.</dd>
+            <dt>Why it matters</dt>
+            <dd>The “vendors can ship branded interoperable hardware” gate for sub-GHz Zigbee, not a consumer end-product day.</dd>
+            <dt>Primary source</dt>
+            <dd><a href="https://csa-iot.org/newsroom/suzi-product-certification-is-now-open/">CSA-IOT</a></dd>
+          </dl>
+        </article>
+
+      </div>
+      <aside class="col-right">
+        <section class="briefing" aria-labelledby="briefing-title">
+          <h2 id="briefing-title">The Briefing</h2>
+          <p class="brief-date">8 Sep 2026</p>
+          <ol>
+            <li>
+              <a href="brief-2026-09-08.html#ohf">Open Home Foundation — last day at IFA</a>
+              <p>Hall 1.2 stand 1.2-153 with Apollo Automation and Nabu Casa. Private/trade until 18:00.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-08.html#shelly">Shelly Wall Display 2.8.0</a>
+              <p>OTA dual-role Matter: commission third-party devices and expose the panel’s own loads.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-08.html#heiman">Heiman HS2HT Matter 1.6 NFC</a>
+              <p>IP65 outdoor temp/humidity with NFC commissioning on the IFA floor.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-08.html#ha-core">Home Assistant Core 2026.9.1</a>
+              <p>Hotfix train after 2026.9.0; Modbus UI and Matter map still the monthly story.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-08.html#esphome">ESPHome 2026.9.0b2</a>
+              <p>Second September beta: template climate, OTA encryption offer, Device Builder bumps.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-08.html#z2m">Zigbee2MQTT 2.14.1</a>
+              <p>Cover/expose hotfixes and more device support after 2.14.0.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-08.html#zwave">Z-Wave JS UI 11.23.0</a>
+              <p>Speed column, zwave-js 15.28.0, MQTT Window Covering → HA covers.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-08.html#google">Google Assistant mobile sunset</a>
+              <p>Classic Assistant removal on Android/Wear underway from Sep 4; Gemini is the phone path.</p>
+            </li>
+            <li>
+              <a href="brief-2026-09-08.html#suzi">CSA Suzi product certification open</a>
+              <p>Zigbee sub-GHz cert program for members — long-range sibling to 2.4 GHz, not Matter.</p>
+            </li>
+          </ol>
+          <a class="full-brief" href="brief-2026-09-08.html">Full brief →</a>
+        </section>
+
+        <div class="rail-sub">
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </div>
+
+        <nav class="evergreen" aria-label="Explainers">
+          <h3>Weekly evergreen</h3>
+          <ul>
+            <li><a href="explainer-matter-15.html">Matter 1.5, explained</a></li>
+            <li><a href="explainer-esphome-kit.html">What the ESPHome Starter Kit actually is</a></li>
+          </ul>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+        <input type="tel" name="phone" required autocomplete="tel" placeholder="Phone">
+      </label>
+      <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. We will not call. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
+
