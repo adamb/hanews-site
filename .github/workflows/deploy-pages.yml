@@ -1,0 +1,28 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages-hanews-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Pages project hanews
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: "47fc5188afc9aa2306c4f30dc9e3cc30"
+          # Direct-upload to the existing production project (domains + secrets live here).
+          # Native Git cannot attach to a Direct Upload project; this is the push→live path.
+          command: pages deploy . --project-name=hanews
