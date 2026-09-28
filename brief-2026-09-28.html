@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 28 Sep 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 28 September 2026. Home Assistant Core 2026.9.4 ships; Thread Group Sub-GHz; Matter 1.6.1; IKEA TIMMERFLOTTE test firmware.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 28 September 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>28 September 2026</h1>
+        <p class="lede">Weekend patch landed: Home Assistant Core <strong>2026.9.4</strong> (Sat 27 Sep). Thread Group green-lights Sub-GHz work; CSA ships Matter <strong>1.6.1</strong>; IKEA puts TIMMERFLOTTE <strong>1.2.2</strong> on the Matter test network. Stack otherwise holds — HAOS 18.3, ESPHome 2026.9.0, Z2M 2.14.1, Z-Wave JS UI 11.24.1.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Home Assistant</p>
+          <h2>Home Assistant Core 2026.9.4 ships</h2>
+          <p><strong>What happened:</strong> Frenck tagged <strong>2026.9.4</strong> on Saturday (2026-09-27T09:51:05Z). Maintenance cut: Tuya fans turn off at 0% speed, Todoist timed calendar duration fix, ISEO Argo BLE discovery cleanup, HomematicIP Cloud PIN flow no longer advances on a rejected PIN, Z-Wave controller statistics key typo, HTTP security filter cost tracks request target length, plus Enphase / Xbox / OpenEVSE bumps.</p>
+          <p><strong>Why it matters:</strong> Friday’s brief was still waiting on .4 — the patch cadence slipped a day into the weekend. Stable channel default is now 2026.9.4.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.9.4">home-assistant/core 2026.9.4</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a> (default 2026.9.4)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="thread-subghz">
+          <p class="meta">02 · Matter &amp; Thread</p>
+          <h2>Thread Group approves Sub-GHz development</h2>
+          <p><strong>What happened:</strong> On 21 Sep the Thread Group Board of Directors approved work to extend Thread’s IP-based mesh to a Sub-GHz PHY. Official blog: commercial/industrial range and penetration use cases; a distinct brand name is promised in coming months. Spec, regional frequencies, and ship calendar are not published yet. Existing 2.4&nbsp;GHz Thread hardware will not gain Sub-G via firmware alone.</p>
+          <p><strong>Why it matters:</strong> Long-range Matter discussions finally have an official Thread track — still years of silicon and Matter accommodation away from shipping Matter-over-Sub-G devices, but the standards fork is no longer rumor.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://threadgroup.org/newsroom/blog/thread-group-is-bringing-the-benefits-of-thread-to-sub-ghz">Thread Group blog, 21 Sep 2026</a>; context <a href="https://www.matteralpha.com/industry-news/thread-group-sub-ghz-long-range-networking">Matter Alpha</a>; <a href="https://www.silabs.com/blog/expanding-the-reach-of-thread-with-sub-ghz">Silicon Labs</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="matter161">
+          <p class="meta">03 · Matter</p>
+          <h2>Matter 1.6.1 finalizes Groupcast; chime volume/mute</h2>
+          <p><strong>What happened:</strong> CSA released Matter <strong>1.6.1</strong>, promoting Groupcast out of provisional status (recommended path for multi-device group commands) and adding optional speaker-endpoint volume/mute for doorbell chimes so sound can be silenced without killing visual alerts. No new device types — maintenance on existing categories.</p>
+          <p><strong>Why it matters:</strong> Groupcast is the intended fix for the “popcorn” effect when HA helper groups poke Matter lights one-by-one. Home Assistant’s native Matter group work is on the OHF roadmap / Matter.js drafts — not a user-facing ship date yet.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.matteralpha.com/industry-news/matter-1-6-1-finalizes-groupcast-and-adds-chime-sound-controls">Matter Alpha on Matter 1.6.1</a> (CSA / Project CHIP)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="timmerflotte">
+          <p class="meta">04 · Devices / IKEA</p>
+          <h2>IKEA TIMMERFLOTTE — test firmware 1.2.2 (Matter 1.5 / Thread 1.4)</h2>
+          <figure class="figure">
+            <img src="images/ikea-timmerflotte-product.jpg" alt="IKEA TIMMERFLOTTE Matter temperature and humidity sensor, white circular product photo" width="900" height="900" loading="eager">
+            <figcaption>IKEA TIMMERFLOTTE temperature/humidity sensor — source <a href="https://www.ikea.com/us/en/p/timmerflotte-temperature-humidity-sensor-smart-50618957/">IKEA US product page</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> IKEA published TIMMERFLOTTE firmware <strong>1.2.2</strong> to its Matter <em>test</em> network on 22 Sep. Notes: moves the E2314 sensor to Matter 1.5 and Thread 1.4, claims stability improvements, adds a serial-number attribute. Production channel remains <strong>1.0.21</strong>.</p>
+          <figure class="figure">
+            <img src="images/ikea-timmerflotte-display.jpg" alt="IKEA TIMMERFLOTTE sensor showing temperature on its built-in display" width="900" height="900" loading="lazy">
+            <figcaption>TIMMERFLOTTE on-device display — source <a href="https://www.ikea.com/us/en/p/timmerflotte-temperature-humidity-sensor-smart-50618957/">IKEA US product page</a></figcaption>
+          </figure>
+          <p><strong>Why it matters:</strong> Signal that IKEA is actively testing a newer Matter/Thread stack for this SKU — not a reason to reset working production units. HA Matter Server’s <code>enable_test_net_dcl</code> is the advanced path if you deliberately chase test builds.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://matterhome.io/news/ikea-timmerflotte-thread-1-4-test-firmware">Matterhome, 26 Sep 2026</a>; product <a href="https://www.ikea.com/us/en/p/timmerflotte-temperature-humidity-sensor-smart-50618957/">IKEA TIMMERFLOTTE</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="supervisor">
+          <p class="meta">05 · Home Assistant / Supervisor</p>
+          <h2>Stable channel pins Supervisor 2026.09.2</h2>
+          <p><strong>What happened:</strong> <code>stable.json</code> currently advertises Supervisor <strong>2026.09.2</strong> (15 Sep). GitHub still has the newer <strong>2026.09.3</strong> tag (17 Sep — app capability drop flags / API gating), but the stable channel pin is what version.home-assistant.io serves this morning. Prefer the pin over the tag for “what installs.”</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://version.home-assistant.io/stable.json">stable.json</a> (supervisor 2026.09.2); tag <a href="https://github.com/home-assistant/supervisor/releases/tag/2026.09.3">2026.09.3</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="haos">
+          <p class="meta">06 · Home Assistant OS</p>
+          <h2>HAOS still 18.3</h2>
+          <p><strong>What happened:</strong> No 18.4 overnight. Stable OS boards in <code>stable.json</code> remain on <strong>18.3</strong>.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/operating-system/releases/tag/18.3">home-assistant/operating-system 18.3</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">07 · ESPHome</p>
+          <h2>ESPHome still 2026.9.0</h2>
+          <p><strong>What happened:</strong> Latest stable tag remains <strong>2026.9.0</strong> (16 Sep). No 2026.9.1 on the blog or releases list this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://esphome.io/blog/2026/09/16/esphome-2026-9/">ESPHome blog, 16 Sep 2026</a>; <a href="https://github.com/esphome/esphome/releases/tag/2026.9.0">esphome/esphome 2026.9.0</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="hue">
+          <p class="meta">08 · Devices / Hue</p>
+          <h2>Hue Play strip pro — UK still In stock; US still Coming soon</h2>
+          <figure class="figure">
+            <img src="images/hue-play-gradient-strip-pro.jpg" alt="Philips Hue Play gradient strip light pro installed behind a television" width="1200" height="800" loading="lazy">
+            <figcaption>Philips Hue Play gradient strip light pro — source <a href="https://www.signify.com/global/our-company/news/press-releases/2026/20260903-philips-hue-expands-on-smart-lighting-with-ai-immersive-entertainment-and-design">Signify press kit</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> Live check this morning: UK pro 65&quot; page still <strong>In stock</strong> (£139.99); US pro 65&quot; page still <strong>Coming soon</strong> ($179.99). No market flip over the weekend.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.philips-hue.com/en-gb/p/lightstrips-philips-hue-play-gradient-lightstrip-pro-65/8721103168603">Hue UK pro 65&quot;</a> (In stock); <a href="https://www.philips-hue.com/en-us/p/lightstrips-philips-hue-play-gradient-strip-light-pro-65/046677611828">Hue US pro 65&quot;</a> (Coming soon)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">09 · Z-Wave</p>
+          <h2>Z-Wave JS UI still 11.24.1</h2>
+          <p><strong>What happened:</strong> Latest GitHub release remains <strong>v11.24.1</strong> (15 Sep). No 11.24.2 / 11.25.0 over the weekend.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.24.1">zwave-js-ui v11.24.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">10 · Zigbee</p>
+          <h2>Zigbee2MQTT still 2.14.1</h2>
+          <p><strong>What happened:</strong> Latest GitHub release tag remains <strong>2.14.1</strong> (3 Sep). No 2.14.2 on the releases list as of this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.1">Zigbee2MQTT 2.14.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="tapo">
+          <p class="meta">11 · Devices / Cameras</p>
+          <h2>Tapo Matter cameras — two days left in end-Sep window</h2>
+          <p><strong>What happened:</strong> Still no new TP-Link calendar confirmation. HW revisions of C560WS, C260, and C660 Kit for Matter camera code remain framed as end of September — with two calendar days left as of 28 Sep, the window is nearly closed, not locked.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd>Prior brief <a href="brief-2026-09-11.html#tapo">11 Sep</a> (heise / Tapo C560WS)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="shelly">
+          <p class="meta">12 · Devices / Shelly</p>
+          <h2>Shelly ThreadLink Gen4 still ~December</h2>
+          <p><strong>What happened:</strong> No newer ThreadLink calendar over the weekend. Gen4 ThreadLink remains the ~December watch from prior IFA framing.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/media-kit/shelly-unveils-threadlink-ifa-2026">Shelly ThreadLink IFA 2026 media kit</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+        <input type="tel" name="phone" required autocomplete="tel" placeholder="Phone">
+      </label>
+      <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. We will not call. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
