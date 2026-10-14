@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HA News brief — Wed 14 Oct 2026</title>
+<style>
+body{font-family:Georgia,serif;max-width:720px;margin:0 auto;padding:1rem;line-height:1.5;color:#1a1a1a}
+h1{font-size:1.4rem} h2{font-size:1.1rem;margin-top:2rem} a{color:#0a57c2}
+.small{font-size:.85rem;color:#555} figure{margin:1rem 0} img{max-width:100%}
+.box{background:#f4f4f4;padding:.75rem 1rem}
+</style>
+</head>
+<body>
+<h1>The Watched Releases</h1>
+<p class="small">Wed 14 Oct 2026 · daily brief · <a href="/">HA News</a></p>
+
+<h2 id="lead">Led: takeover of Shelly Group</h2>
+<p>Shelly Group's board considers the <strong>&euro;70/share cash tender offer</strong> from <strong>Schneider Electric</strong> (via subsidiary SE 2026 A SAS) fair and has formally backed it &mdash; an independent fairness opinion from Freitag &amp; Co. agrees. The offer is ~27% above the unaffected six-month VWAP (&euro;55.16 on 28 Jul). Regulatory clearance is still pending; if completed, Shelly keeps its <strong>Sofia HQ and workforce for at least three years</strong>, and a complete offer could end minority liquidity (delisting).</p>
+<p><strong>What happened</strong>: a global energy-and-buildings giant is buying one of Home Assistant's most popular device vendors (via tender offer, board-supported). <strong>Why it matters</strong>: Shelly devices are heavily used in HA setups and their local, no-cloud-first design is a big part of the appeal. Watch for integration friction after close, and note Shelly's 2026 line (ThreadLink, Wall Display XL) was already shipping.</p>
+<p class="small">Sources: <a href="https://www.shelly.com/blogs/news">Shelly Group IR</a>, EQS newswire, <a href="https://www.heise.de">heise online</a>. Image: Shelly.</p>
+<figure><img src="images/shelly-threadlink.png" alt="Shelly ThreadLink product photo"></figure>
+
+<div class="box">
+<h2 id="apple">Apple's new home hub: <a href="https://www.apple.com/newsroom/2026/10/meet-apple-homeview-a-new-way-to-enjoy-entertainment-and-manage-the-home">HomeView</a></h2>
+<p>At the <a href="https://www.apple.com/newsroom/">&ldquo;Welcome Home&rdquo; event</a> on 13 Oct, Apple announced <strong>HomeView</strong>: a 7-inch smart home display with Siri AI, up to six user faces, camera dashboard (nine feeds), and <strong>Matter accessory support</strong>. Also announced: <a href="https://www.apple.com/newsroom/2026/10/apple-announces-the-next-generation-of-homepod-mini">HomePod&nbsp;mini&nbsp;2</a> ($149, 30 Oct) and a new Apple TV 4K. HomeView is <strong>$299</strong> (tabletop or wall), pre-orders today, ships <strong>13 Nov</strong>. Wall mounts are from Schneider Home ($59.95/$79.95; PoE model early 2027).</p>
+<p><strong>Why it matters for HA users</strong>: it's locked to Apple Home &mdash; no Home Assistant bridge, no app installs. Home Assistant will not show up on the dashboard. The one angle: it speaks Matter, and there's a <a href="https://www.home-assistant.io/integrations/apple_tv/">HomeKit Bridge integration</a> path to expose HA entities into Apple Home. Treat that as a workaround, not a platform.</p>
+<p class="small">Sources: Apple newsroom (13 Oct), MacRumors, 9to5Mac.</p>
+</div>
+
+<h2 id="supervisor">Home Assistant Supervisor: <a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.2" title="Supervisor 2026.10.2 release notes">2026.10.2</a></h2>
+<p>Shipped <strong>today</strong>, 08:13 UTC. <a href="https://github.com/home-assistant/supervisor/releases">GitHub release</a>, <a href="https://version.home-assistant.io/stable.json">stable.json</a>.</p>
+<ul>
+<li>Breaking: ingress sessions must enforce <code>panel_admin</code> role.</li>
+</ul>
+<p><strong>Why it matters</strong>: patch release mid-cycle, not tied to last week's 2026.10.1 core patch. Roll it when your add-ons accept ingress auth change.</p>
+<p class="small">Verified against the release page just now.</p>
+
+<h2 id="core">Home Assistant Core: <a href="https://github.com/home-assistant/core/releases/tag/2026.10.1" title="Core 2026.10.1 release notes">2026.10.1</a></h2>
+<p>A patch release shipped last Friday, 10 Oct. <a href="https://github.com/home-assistant/core/releases">GitHub release</a>. <a href="https://version.home-assistant.io/stable.json">stable.json</a> now advertises 2026.10.1 as default. No breaking change from us.</p>
+
+<h2 id="zwave">Z-Wave JS UI: <a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.24.3" title="Z-Wave JS UI 11.24.3 release notes">11.24.3</a></h2>
+<p>Shipped 9 Oct. <a href="https://github.com/zwave-js/zwave-js-ui/releases">GitHub release</a>. Bump to zwave-js 15.31.1. Nothing since.</p>
+
+<h2 id="z2m">Zigbee2MQTT: <a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.2" title="Zigbee2MQTT 2.14.2 release notes">2.14.2</a></h2>
+<p>Shipped 1 Oct. <a href="https://github.com/Koenkk/zigbee2mqtt/releases">GitHub release</a>. Nothing newer on the release page.</p>
+
+<h2 id="haos">Home Assistant OS: <a href="https://github.com/home-assistant/operating-system/releases/tag/18.3" title="HAOS 18.3 release notes">18.3</a></h2>
+<p>Still 18.3, shipped 17 Sep. <a href="https://github.com/home-assistant/operating-system/releases">GitHub release</a>. No change.</p>
+
+<h2 id="esphome">ESPHome: still no 2026.10 stable &mdash; now <a href="https://github.com/esphome/esphome/releases/tag/2026.10.0b4" title="ESPHome beta page">2026.10.0b4</a></h2>
+<p>Re-verified against the <a href="https://esphome.io/blog/">ESPHome blog</a> before writing this: the latest stable is still <strong>2026.9.0</strong> (16 Sep). On GitHub, the latest release is <a href="https://github.com/esphome/esphome/releases">beta&nbsp;2026.10.0b4</a>, tagged <strong>13 Oct</strong>. Wait for the stable if you have production ESPHome devices.</p>
+<p class="small">Checked the blog directly; the beta tag was confirmed on the release page.</p>
+
+<h2 id="hue">Hue Play Gradient Lightstrip Pro: available in the UK, still &ldquo;coming soon&rdquo; in the US</h2>
+<p>Checked the Hue store live today: the <strong>UK</strong> product page lists the 65&Prime; strip <strong>in stock at &pound;139.99</strong>. The <strong>US</strong> page still says <em>coming soon</em>, $179.99. Our <a href="https://hueblog.com" title="hueblog review (German)">29 Sep read</a> of the pro strip's rollout stands: it is trickling out by region. No price change since.</p>
+<figure><img src="images/hue-play-gradient-strip-pro.jpg" alt="Hue Play Gradient Lightstrip Pro"></figure>
+<p class="small">Sources: philips-hue.com US and UK product pages (fetched live 14 Oct).</p>
+
+<h2 id="aqara">Aqara FP400: on sale</h2>
+<p>Out as of <strong>17 Sep</strong> (Aqara <a href="https://www.aqara.com/en">press release</a>). Matter over Thread, mmWave presence sensor. 10-user face tracking. First big Matter-presence alternative to the HA-favourite Aqara FP2 (WiFi). $99.99.</p>
+<figure><img src="images/aqara-fp400-product.png" alt="Aqara FP400 product photo"></figure>
+<p class="small">Sources: Aqara press materials. Image: Aqara.</p>
+
+<h2 id="timmerflotte">IKEA TIMMERFLOTTE: still a mixed picture</h2>
+<p>No change since our <a href="brief-2026-09-29.html">29 Sep brief</a>: the display's firmware 61 (prod) dropped <a href="https://community.smartthings.com" title="SmartThings community thread">devices offline</a>. Keep watching. (Community-sourced, not vendor-confirmed &mdash; treat accordingly.)</p>
+<p class="small">Image: IKEA.</p>
+<figure><img src="images/ikea-timmerflotte-product.jpg" alt="IKEA TIMMERFLOTTE"></figure>
+
+<h2 id="shelly-xl">Shelly Wall Display XL: no new stock</h2>
+<p>No change since the 29 Sep brief. Still listed at the EU shop, no stock date. (We're watching this one.)</p>
+
+<p class="small">HA News &middot; Wed 14 Oct 2026 · Briefing &middot; <a href="/">home</a>. Prepared by HA News AI; edited by Adam Beguelin.</p>
+</body>
+</html>
