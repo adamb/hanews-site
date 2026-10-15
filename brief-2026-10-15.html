@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 15 Oct 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 15 October 2026. ESPHome 2026.10.0 will break external components; Supervisor 2026.10.2 not yet on the stable pin; Core 2026.10.1, HAOS 18.3, Z2M 2.14.2, Z-Wave JS UI 11.24.3 unchanged.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 15 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>15 October 2026</h1>
+        <p class="lede">ESPHome maintainers have logged two breaking changes in the dev blog that land with <strong>2026.10.0</strong> — the stable that still isn't out (beta 4 is). Supervisor <strong>2026.10.2</strong> shipped yesterday but <code>stable.json</code> still pins <strong>2026.09.3</strong>. Core stays <strong>2026.10.1</strong>; HAOS 18.3, Z2M 2.14.2, Z-Wave JS UI 11.24.3 unchanged.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · ESPHome</p>
+          <h2>Two breaking changes banked for ESPHome 2026.10.0 — external components will need edits</h2>
+          <p><strong>What happened:</strong> The ESPHome developer blog logged two API breaks aimed at <strong>2026.10.0 and later</strong>. First (5 Oct): select options and light effects move to build-time flash tables — getters return a <code>ConstVector</code> view instead of <code>FixedVector</code>, and code that names the old type or calls <code>capacity()</code>/<code>full()</code> needs a small change. Second (14 Oct, J. Nick Koston): <code>remote_base</code> protocol methods are no longer virtual and receiver lists are sized from codegen. On the release side, the stable is still <strong>2026.9.0</strong> (16 Sep); the newest tag is beta <strong>2026.10.0b4</strong> (13 Oct).</p>
+          <p><strong>Why it matters:</strong> Anyone running custom or third-party <code>external_components</code> — remote remotes, custom selects, custom light effects — should read both notes before the .0 drops. Production ESPHome devices stay on 2026.9.0 until then, which the beta cadence (four betas in seven days) suggests is close.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://developers.esphome.io/blog/">ESPHome developer blog</a> (5 Oct and 14 Oct entries); <a href="https://github.com/esphome/esphome/releases/tag/2026.10.0b4">esphome 2026.10.0b4</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="supervisor">
+          <p class="meta">02 · Home Assistant / Supervisor</p>
+          <h2>Supervisor 2026.10.2 shipped yesterday — stable pin still 2026.09.3</h2>
+          <p><strong>What happened:</strong> Supervisor <strong>2026.10.2</strong> was tagged 14 Oct (08:13 UTC, we carried it yesterday) and <strong>2026.10.1</strong> on 8 Oct. But <code>version.home-assistant.io/stable.json</code> still advertises <strong>supervisor 2026.09.3</strong> this morning — the pin has not moved to the 2026.10 line. The 2026.10.2 note carries a breaking change: ingress sessions must enforce the <code>panel_admin</code> role.</p>
+          <p><strong>Why it matters:</strong> New installs and updates from the stable channel won't see 2026.10.2 until the pin moves. If your add-ons depend on ingress auth behavior, watch for the 2026.10.x cut landing in the stable channel rather than acting on the GitHub tag alone.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://version.home-assistant.io/stable.json">stable.json</a> (supervisor 2026.09.3); tag <a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.2">2026.10.2</a> (14 Oct)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="core">
+          <p class="meta">03 · Home Assistant</p>
+          <h2>Core still 2026.10.1</h2>
+          <p><strong>What happened:</strong> No 2026.10.2 overnight. The latest stable tag remains <strong>2026.10.1</strong> (10 Oct), and <code>stable.json</code> keeps advertising it as the default for capable boards. Nothing newer on the releases list.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.10.1">home-assistant/core 2026.10.1</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="haos">
+          <p class="meta">04 · Home Assistant OS</p>
+          <h2>HAOS still 18.3</h2>
+          <p><strong>What happened:</strong> No 18.4. All stable OS boards in <code>stable.json</code> remain on <strong>18.3</strong> (17 Sep), four weeks now.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/operating-system/releases/tag/18.3">home-assistant/operating-system 18.3</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">05 · Z-Wave</p>
+          <h2>Z-Wave JS UI still 11.24.3</h2>
+          <p><strong>What happened:</strong> No newer tag since <strong>v11.24.3</strong> (9 Oct, zwave-js 15.31.1). Releases list unchanged this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.24.3">zwave-js-ui v11.24.3</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">06 · Zigbee</p>
+          <h2>Zigbee2MQTT still 2.14.2</h2>
+          <p><strong>What happened:</strong> Latest tag remains <strong>2.14.2</strong> (1 Oct). No 2.14.3 on the releases list this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.2">Zigbee2MQTT 2.14.2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="hue">
+          <p class="meta">07 · Devices / Hue</p>
+          <h2>Hue firmware 1.164.2: Zigbee and Matter at once, bridgeless</h2>
+          <p><strong>What happened:</strong> Philips Hue released lamp firmware <strong>1.164.2</strong> (5 Oct) for lights on hardware platform <code>100b-129</code> — the 2026 lineup plus the Thread-radioed E27 bulbs and GU10 spots from fall 2025. Release notes list Matter 1.4.1 support, Apple adaptive lighting over Matter, and <strong>"Zigbee and Matter concurrency in bridgeless mode"</strong>: a bulb running native Matter can strengthen a Thread mesh without ever joining a Hue Bridge.</p>
+          <p><strong>Why it matters:</strong> That's mains-powered Thread repeaters in the mesh regardless of which ecosystem commissioned the bulb — a meaningful shift for houses running HA as the Matter controller alongside a Hue Bridge. Hueblog reports a bulb first set up over Thread can later join a Bridge without re-pairing.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.philips-hue.com/en-us/support/release-notes/lamps">Hue lamps release notes</a>; coverage: <a href="https://hueblog.com/2026/10/08/firmware-updates-for-hue-lights-and-the-new-sync-box/">hueblog, 8 Oct</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="huepro">
+          <p class="meta">08 · Devices / Hue</p>
+          <h2>Play Gradient Lightstrip Pro — report of US stock in third-party retail</h2>
+          <figure class="figure">
+            <img src="images/hue-play-gradient-strip-pro.jpg" alt="Philips Hue Play gradient strip light pro installed behind a television" width="1200" height="800" loading="lazy">
+            <figcaption>Philips Hue Play gradient strip light pro — source <a href="https://www.signify.com/global/our-company/news/press-releases/2026/20260903-philips-hue-expands-on-smart-lighting-with-ai-immersive-entertainment-and-design">Signify press kit</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> r/Hue reports the pro 65" has reached US stores — Amazon listings at <strong>$179.99</strong> from roughly a week ago — while Hue's own US product page has been the slow one to flip. We could not independently verify the Hue US page going live this morning, so treat the US stock picture as <em>third-party confirmed only</em>; the UK page has been in stock at £139.99 since late September.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.reddit.com/r/Hue/comments/1x0nivj/philips_hue_play_gradient_lightstrip_pro_65_is/">r/Hue report (community-sourced)</a>; <a href="https://www.philips-hue.com/en-us/p/lightstrips-philips-hue-play-gradient-strip-light-pro-65/046677611828">Hue US pro 65"</a> page for the definitive status</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="link">
+          <p class="meta">09 · Home Assistant / Cloud</p>
+          <h2>Reminder: Home Assistant Cloud becomes "Home Assistant Link" on 2 December</h2>
+          <p><strong>What happened:</strong> Nabu Casa confirmed the rename lands in the <strong>2026.12</strong> release on <strong>2 December 2026</strong>. Same subscription, no migration, no price change billed — remote access, voice integration, speech-to-text and cloud backups continue under the new name. The company frames it as disambiguation: the service links a fully local setup to optional online extras rather than storing your home in anyone's cloud.</p>
+          <p><strong>Why it matters:</strong> Purely cosmetic — but if your automations, docs or dashboards reference "Nabu Casa / Home Assistant Cloud" by name, 2026.12 is when strings start changing.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://nabucasa.com/news/2026-10-02-cloud-becomes-link">Nabu Casa: Cloud becomes Link</a>; <a href="https://www.home-assistant.io/blog/2026/10/02/big-tech-ruined-the-cloud-so-were-renaming-ours/">HA blog</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="shelly">
+          <p class="meta">10 · Devices / Shelly</p>
+          <h2>Schneider/Shelly deal pending clearance; ThreadLink still ~December</h2>
+          <figure class="figure">
+            <img src="images/shelly-threadlink.png" alt="Shelly ThreadLink Gen4 promotional graphic" width="1200" height="675" loading="lazy">
+            <figcaption>Shelly ThreadLink — source <a href="https://www.shelly.com/blogs/media-kit/shelly-unveils-threadlink-ifa-2026">Shelly IFA 2026 media kit</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> No regulatory decision on Schneider's €70/share tender for Shelly Group since the board backed it on Tuesday (carried in yesterday's brief). Gen4 <strong>ThreadLink</strong> firmware likewise unchanged — still the "approximately three months" IFA framing, which points at roughly December, delivered as an opt-in per-device update.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/news">Shelly Group IR</a>; <a href="https://www.shelly.com/blogs/media-kit/shelly-unveils-threadlink-ifa-2026">ThreadLink media kit</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="timmerflotte">
+          <p class="meta">11 · Devices / IKEA</p>
+          <h2>IKEA TIMMERFLOTTE — still watching the prod-firmware fallout</h2>
+          <p><strong>What happened:</strong> No new development since Tuesday's reporting that production firmware 61 left devices dropped offline (community-sourced, not vendor-confirmed). No change in the IKEA Matter test line for the TIMMERFLOTTE line this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd>Prior brief <a href="brief-2026-10-14.html#timmerflotte">14 Oct</a>; <a href="brief-2026-09-29.html#timmerflotte">29 Sep brief</a> for the original watch</dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
