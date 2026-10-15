@@ -6,6 +6,10 @@
     "Could not send the confirmation email. Try again, or email adam@code.pr.";
   var GENERIC =
     "Could not record that. Try again, or email adam@code.pr.";
+  var CAPTCHA =
+    "Please complete the security challenge and try again.";
+  var RATE_LIMIT =
+    "Too many attempts from this device. Please try again later.";
   var MAILTO = "mailto:adam@code.pr?subject=HA%20News%20subscribe";
 
   function statusEl(form) {
@@ -75,6 +79,14 @@
           var err = body && body.error;
           if (res.status === 502 || err === "mail_failed") {
             status.textContent = MAIL_FAILED;
+            return;
+          }
+          if (err === "captcha_failed") {
+            status.textContent = CAPTCHA;
+            return;
+          }
+          if (err === "rate_limited") {
+            status.textContent = RATE_LIMIT;
             return;
           }
           if (res.ok || res.status === 202) {
