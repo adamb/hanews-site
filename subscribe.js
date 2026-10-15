@@ -23,11 +23,11 @@
   function readFields(form) {
     var nameIn = form.querySelector('input[name="name"]');
     var emailIn = form.querySelector('input[name="email"]');
-    var phoneIn = form.querySelector('input[name="phone"]');
+    var turnstileIn = form.querySelector('[name="cf-turnstile-response"]');
     return {
       name: nameIn ? String(nameIn.value).trim() : "",
       email: emailIn ? String(emailIn.value).trim() : "",
-      phone: phoneIn ? String(phoneIn.value).trim() : "",
+      turnstileToken: turnstileIn ? String(turnstileIn.value).trim() : "",
     };
   }
 
@@ -36,9 +36,7 @@
       "name: " +
       data.name +
       "\nemail: " +
-      data.email +
-      "\nphone: " +
-      data.phone;
+      data.email;
     window.location.href = MAILTO + "&body=" + encodeURIComponent(body);
   }
 
@@ -55,7 +53,7 @@
     var data = readFields(form);
     var status = statusEl(form);
     ev.preventDefault();
-    if (!data.name || !data.email || !data.phone) return;
+    if (!data.name || !data.email) return;
     status.textContent = "";
 
     fetch("/subscribe", {
@@ -64,7 +62,7 @@
       body: JSON.stringify({
         name: data.name,
         email: data.email,
-        phone: data.phone,
+        ...(data.turnstileToken ? { turnstileToken: data.turnstileToken } : {}),
       }),
     })
       .then(function (res) {

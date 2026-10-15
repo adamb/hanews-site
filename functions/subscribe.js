@@ -2,6 +2,67 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const TOKEN_TTL_MS = 48 * 60 * 60 * 1000;
 const MAIL_COOLDOWN_MS = 120 * 1000;
 
+// Anti-abuse guards (branch: fix/subscribe-abuse-guards)
+// KV counters are last-writer-wins, not atomic — they are approximate by
+// design. They are good enough to stop bot floods; not for billing.
+const IP_LIMIT_PER_HOUR = 5;
+const DAILY_SEND_CAP = 150;
+
+const DISPOSABLE_DOMAINS = new Set([
+  "mailinator.com","10minutemail.com","10minutemail.net","guerrillamail.com",
+  "guerrillamail.net","guerrillamail.org","guerrillamailblock.com","tempmail.com",
+  "temp-mail.org","temp-mail.io","throwawaymail.com","yopmail.com","yopmail.fr",
+  "getnada.com","nada.email","dispostable.com","sharklasers.com","trashmail.com",
+  "trashmail.de","mytemp.email","emailondeck.com","fakeinbox.com","mailnesia.com",
+  "spamgourmet.com","burnermail.io","33mail.com","dropmail.me","instantemailaddress.com",
+  "mohmal.com","tmpmail.net","nowmymail.com","1secmail.com","1secmail.net",
+  "email-temp.com","tempmailo.com","moakt.com","tmailor.com","meltmail.com",
+]);
+
+function isDisposable(email) {
+  const domain = email.split("@")[1] || "";
+  return DISPOSABLE_DOMAINS.has(domain.toLowerCase());
+}
+
+
+
+async function verifyTurnstile(env, token, ip) {
+  if (!env || !env.TURNSTILE_SECRET) return true; // not configured yet
+  if (!token) return false;
+  try {
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        secret: env.TURNSTILE_SECRET,
+        response: token,
+        ...(ip ? { remoteip: ip } : {}),
+      }),
+    });
+    const data = await res.json();
+    return !!(data && data.success);
+  } catch {
+    return false;
+  }
+}
+
+async function bumpCounter(kv, key, limit) {
+  const raw = await kv.get(key);
+  const n = Number.parseInt(raw || "0", 10) || 0;
+  if (n >= limit) return false;
+  await kv.put(key, String(n + 1));
+  return true;
+}
+
+function hourKey(ip) {
+  const h = new Date();
+  return "rl:" + ip + ":" + h.toISOString().slice(0, 13);
+}
+
+function dayKey() {
+  return "cap:" + new Date().toISOString().slice(0, 10);
+}
+
 function corsHeaders(request) {
   const headers = {
     "Content-Type": "application/json; charset=utf-8",
@@ -26,10 +87,6 @@ function json(request, body, status) {
     });
   }
   return new Response(JSON.stringify(body), { status, headers });
-}
-
-function digitsOnly(value) {
-  return String(value || "").replace(/\D/g, "");
 }
 
 function randomToken() {
@@ -125,19 +182,19 @@ export async function onRequestPost(context) {
 
   let name = "";
   let email = "";
-  let phone = "";
+  let turnstileToken = "";
   const ct = (request.headers.get("Content-Type") || "").toLowerCase();
   try {
     if (ct.includes("application/json")) {
       const body = await request.json();
       name = String((body && body.name) || "").trim();
       email = String((body && body.email) || "").trim();
-      phone = String((body && body.phone) || "").trim();
+      turnstileToken = String((body && body.turnstileToken) || (body && body["cf-turnstile-response"]) || "").trim();
     } else {
       const form = await request.formData();
       name = String(form.get("name") || "").trim();
       email = String(form.get("email") || "").trim();
-      phone = String(form.get("phone") || "").trim();
+      turnstileToken = String(form.get("cf-turnstile-response") || "").trim();
     }
   } catch {
     return json(request, { ok: false, error: "invalid_body" }, 400);
@@ -149,14 +206,27 @@ export async function onRequestPost(context) {
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return json(request, { ok: false, error: "invalid_email" }, 400);
   }
-  const phoneDigits = digitsOnly(phone);
-  if (phoneDigits.length < 8 || phoneDigits.length > 20) {
-    return json(request, { ok: false, error: "invalid_phone" }, 400);
+  if (isDisposable(email)) {
+    return json(request, { ok: false, error: "blocked_email" }, 400);
   }
 
   const kv = env && env.SUBSCRIBERS;
   if (!kv) {
     return json(request, { ok: true, live: false, mailed: false }, 202);
+  }
+
+  // Turnstile: verified server-side. If TURNSTILE_SECRET is unset the check
+  // passes so existing deploys do not break until the widget is wired up.
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const turnstileOk = await verifyTurnstile(env, turnstileToken, ip);
+  if (!turnstileOk) {
+    return json(request, { ok: false, error: "captcha_failed" }, 400);
+  }
+
+  // Per-source-IP hourly limit. Counted BEFORE any send so floods burn the
+  // budget instead of the inbox.
+  if (ip !== "unknown" && !(await bumpCounter(kv, hourKey(ip), IP_LIMIT_PER_HOUR))) {
+    return json(request, { ok: false, error: "rate_limited", retry: "hour" }, 429);
   }
 
   const key = email.toLowerCase();
@@ -175,6 +245,12 @@ export async function onRequestPost(context) {
     );
   }
 
+  // Daily cap on confirmation emails out of this domain. Checked before the
+  // mail API call. If the counter is somehow corrupt we fail closed.
+  if (!(await bumpCounter(kv, dayKey(), DAILY_SEND_CAP))) {
+    return json(request, { ok: true, confirmed: false, mailed: false, throttled: true }, 202);
+  }
+
   const now = new Date();
   const token = randomToken();
   const tokenExp = new Date(now.getTime() + TOKEN_TTL_MS).toISOString();
@@ -182,10 +258,10 @@ export async function onRequestPost(context) {
     await kv.delete("token:" + existing.token);
   }
 
+  // Phone field dropped: never required, never stored.
   const record = {
     name: name,
     email: email,
-    phone: phone,
     ts: existing && existing.ts ? existing.ts : now.toISOString(),
     confirmed: false,
     token: token,
