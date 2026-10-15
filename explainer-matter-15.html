@@ -7,6 +7,7 @@
   <meta name="description" content="Matter 1.5: cameras, closures, soil sensors, energy clusters. A controller cert is not a camera.">
   <link rel="stylesheet" href="styles.css">
   <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -114,7 +115,8 @@
   </footer>
   <dialog class="signup-modal" aria-labelledby="signup-modal-title">
     <form class="signup-modal__close" method="dialog">
-      <button type="submit" aria-label="Close">×</button>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
     </form>
     <form class="signup-modal__body sub-form" action="/subscribe" method="post">
       <p class="signup-modal__kicker">The Briefing</p>
@@ -131,7 +133,8 @@
       <label class="signup-modal__field">
         <span>Phone</span>
       </label>
-      <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
       <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
       <p class="sub-status" role="status"></p>
     </form>
