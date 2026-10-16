@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 16 Oct 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 16 October 2026. Apple Home Collection announced with LG and Schneider; HomeView wall hub pre-orders; Supervisor stable pin moves to 2026.10.2; Core 2026.10.1, HAOS 18.3, ESPHome 2026.9.0 unchanged.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 16 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>16 October 2026</h1>
+        <p class="lede">Apple announced <strong>Home Collection</strong> on Tuesday — cameras, thermostats, a doorbell and a deadbolt co-developed with LG and Schneider Electric, alongside the <strong>HomeView</strong> wall hub, now taking pre-orders. On the local stack, the Supervisor stable pin finally moved to <strong>2026.10.2</strong>; Core, HAOS, ESPHome, Z-Wave JS UI and Z2M are all unchanged.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Matter &amp; Thread / Apple</p>
+          <h2>Apple Home Collection: Apple designs smart-home hardware with LG and Schneider Electric</h2>
+          <figure class="figure">
+            <img src="images/apple-home-collection-lineup.jpg" alt="Apple Home Collection lineup: LG Smart Deadbolt Lock, LG Indoor Cam, LG Video Doorbell, and Schneider Electric Smart Thermostat" width="980" height="551" loading="lazy">
+            <figcaption>Apple Home Collection lineup — source <a href="https://www.apple.com/newsroom/2026/10/introducing-apple-home-collection-a-new-lineup-of-smart-home-accessories/">Apple Newsroom press release, 13 Oct 2026</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> Apple announced a lineup of smart-home accessories — LG indoor and outdoor cameras, a video doorbell, an LG Smart Deadbolt Lock, and LG and Schneider Electric smart thermostats with room temperature sensors — designed in collaboration with those two companies rather than merely certified. Setup is one tap on iPhone, everything runs through the Home app with no separate app or account, and Apple says Home app data is encrypted end-to-end so neither LG, Schneider nor Apple can read it. US prices: both thermostats start at <strong>$199.95</strong>, temperature sensors at <strong>$39.95</strong>; the C-wire adapters and trim plates are sold separately. Availability starts <strong>December</strong>, with select accessories in early 2027.</p>
+          <p><strong>Why it matters:</strong> "Works with Apple Home" certification just became the floor, not the ceiling. Apple now designs the product. Apple's own press release stays noticeably quiet on protocol names — coverage (HomeKit News, EDN) reports Thread across the range, Matter support on the lock and thermostats, and Aliro support on the deadbolt, but those specifics come from the press event, not the release text. For households that lean Apple, this is the first first-party-branded accessory line; for Matter watchers it's Apple hedging: local-first, Home-app-centric, Matter as plumbing.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.apple.com/newsroom/2026/10/introducing-apple-home-collection-a-new-lineup-of-smart-home-accessories/">Apple Newsroom: Introducing Apple Home Collection</a> (13 Oct 2026); coverage: <a href="https://homekitnews.com/2026/10/14/apple-unveils-new-home-collection-with-matter-thread-aliro-support/">HomeKit News, 14 Oct</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="homeview">
+          <p class="meta">02 · Matter &amp; Thread / Apple</p>
+          <h2>Apple HomeView: a wall-mounted Home hub, pre-orders open, ships 13 November</h2>
+          <p><strong>What happened:</strong> Alongside the Collection, Apple introduced <strong>HomeView</strong>, a wall-mounted smart-home display. Pre-orders opened Tuesday and availability begins <strong>13 November</strong>. Power Mount USB-C Wall Connector is <strong>$59.95</strong>, AC Wired <strong>$79.95</strong> (both orderable now), and a PoE version arrives early 2027 at <strong>$129.95</strong>. It works with the new Collection and other Works with Apple Home and Matter accessories. EDN, reporting from the event, says Apple confirmed on-site that HomeView can act as a Matter controller and bridge and a Thread border router — the press release itself never says so.</p>
+          <p><strong>Why it matters:</strong> Apple's Thread border-router roster (HomePod mini, Apple TV 4K) gains a dedicated wall panel. Nothing here runs Home Assistant, but a second mass-market Thread border router is good news for Thread mesh density generally.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.apple.com/newsroom/2026/10/meet-apple-homeview-a-new-way-to-enjoy-entertainment-and-manage-the-home/">Apple Newsroom: Meet Apple HomeView</a> (13 Oct 2026); coverage: <a href="https://www.edn.com/apple-heads-home-distributed-identity-validation-and-how-much-does-matter-matter/">EDN</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="supervisor">
+          <p class="meta">03 · Home Assistant / Supervisor</p>
+          <h2>Stable pin moves: Supervisor 2026.10.2 now on the stable channel</h2>
+          <p><strong>What happened:</strong> The thing Tuesday's brief was waiting on: <code>version.home-assistant.io/stable.json</code> now advertises <strong>supervisor 2026.10.2</strong> — the pin has moved from 2026.09.3 to the 2026.10 line, two days after the tag. Updates from the stable channel will pull it going forward. Reminder of the one breaking change in that release: ingress sessions must enforce the <code>panel_admin</code> role.</p>
+          <p><strong>Why it matters:</strong> New installs and stable-channel updates now see the 2026.10 Supervisor. Add-on authors relying on lax ingress role checks should test.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://version.home-assistant.io/stable.json">stable.json</a> (supervisor 2026.10.2); tag <a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.2">2026.10.2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="core">
+          <p class="meta">04 · Home Assistant</p>
+          <h2>Core still 2026.10.1</h2>
+          <p><strong>What happened:</strong> No 2026.10.2. The latest stable tag remains <strong>2026.10.1</strong> (10 Oct) and it's still the default in <code>stable.json</code>.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.10.1">home-assistant/core 2026.10.1</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="haos">
+          <p class="meta">05 · Home Assistant OS</p>
+          <h2>HAOS still 18.3</h2>
+          <p><strong>What happened:</strong> No 18.4. All stable OS boards in <code>stable.json</code> remain on <strong>18.3</strong> (17 Sep) — five weeks now.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/operating-system/releases/tag/18.3">home-assistant/operating-system 18.3</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">06 · ESPHome</p>
+          <h2>ESPHome: stable still 2026.9.0; beta 4 is the newest tag</h2>
+          <p><strong>What happened:</strong> No change since Thursday. The stable remains <strong>2026.9.0</strong> (16 Sep); the newest tag is beta <strong>2026.10.0b4</strong> (13 Oct). Two breaking changes remain banked for 2026.10.0 and later: select options and light effects move to build-time flash tables (5 Oct dev-blog note), and <code>remote_base</code> protocol methods are no longer virtual (14 Oct, J. Nick Koston).</p>
+          <p><strong>Why it matters:</strong> External components touching those APIs will need edits before the .0 drops. The beta cadence has paused at four, which no longer looks imminent.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://esphome.io/blog/rss.xml">esphome.io blog RSS</a> (latest: 2026.9.0, 16 Sep); <a href="https://github.com/esphome/esphome/releases/tag/2026.10.0b4">esphome 2026.10.0b4</a>; <a href="https://developers.esphome.io/blog/">ESPHome developer blog</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">07 · Z-Wave</p>
+          <h2>Z-Wave JS UI still 11.24.3</h2>
+          <p><strong>What happened:</strong> No newer tag since <strong>v11.24.3</strong> (9 Oct, zwave-js 15.31.1).</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.24.3">zwave-js-ui v11.24.3</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">08 · Zigbee</p>
+          <h2>Zigbee2MQTT still 2.14.2</h2>
+          <p><strong>What happened:</strong> Latest tag remains <strong>2.14.2</strong> (1 Oct). No 2.14.3 on the releases list.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.2">Zigbee2MQTT 2.14.2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="googlehue">
+          <p class="meta">09 · Matter &amp; Thread / Google</p>
+          <h2>Google Home is migrating existing Hue bridges to local Matter control</h2>
+          <p><strong>What happened:</strong> Google's October 14 Home release notes, as summarized by matterhome.io, say existing Philips Hue bridges in Google Home are being upgraded in the background to local Matter control through Google hubs — no re-pairing. Google gives no regions, no timing, and no way to check progress, and it requires a Google hub on the same network as the bridge.</p>
+          <p><strong>Why it matters:</strong> Bridges quietly switching transport under users' feet is exactly the kind of change that surfaces as "my Hue lights stopped responding" posts. We could only verify this through a secondary source this morning; treat it as reported, not confirmed in the release notes directly.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://matterhome.io/news">matterhome.io news ticker (14 Oct Google Home release notes, secondary)</a>; Google Home release notes for direct confirmation</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="huepro">
+          <p class="meta">10 · Devices / Hue</p>
+          <h2>Hue Play Gradient Strip Pro: Hue US page still out of stock</h2>
+          <p><strong>What happened:</strong> We checked Hue's own US product page for the pro 65" this morning: still showing out of stock. So the stock picture stands as third-party confirmed only — Amazon listings at <strong>$179.99</strong>, UK page in stock at £139.99 since late September.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.philips-hue.com/en-us/p/lightstrips-philips-hue-play-gradient-strip-light-pro-65/046677611828">Hue US pro 65" page</a> (checked 16 Oct, out of stock)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="shelly">
+          <p class="meta">11 · Devices / Shelly</p>
+          <h2>Shelly: Schneider deal still in clearance; ThreadLink still ~December</h2>
+          <p><strong>What happened:</strong> No regulatory decision on Schneider's €70/share tender for Shelly Group since the board backed it Tuesday. Gen4 <strong>ThreadLink</strong> firmware unchanged — still the IFA framing of roughly December, delivered as an opt-in per-device update.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/news">Shelly Group IR</a>; <a href="https://www.shelly.com/blogs/media-kit/shelly-unveils-threadlink-ifa-2026">ThreadLink media kit</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="timmerflotte">
+          <p class="meta">12 · Devices / IKEA</p>
+          <h2>IKEA TIMMERFLOTTE — no news</h2>
+          <p><strong>What happened:</strong> No new development since Tuesday: prod-firmware 61 offline drops remain community-sourced, not vendor-confirmed. No change in the Matter test firmware line this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd>Prior brief <a href="brief-2026-10-15.html#timmerflotte">15 Oct</a>; <a href="brief-2026-09-29.html#timmerflotte">29 Sep brief</a> for the original watch</dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

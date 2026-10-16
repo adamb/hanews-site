@@ -14,7 +14,7 @@
   <div class="topbar" aria-hidden="true"></div>
   <header class="masthead">
     <div class="masthead__meta">
-      <span class="dateline">Thursday, 15 October 2026</span>
+      <span class="dateline">Friday, 16 October 2026</span>
       <div class="masthead__aside">
         <span class="masthead__edition">Home automation edition</span>
         <button type="button" class="signup-trigger">Get the briefing</button>
@@ -39,60 +39,62 @@
   <main id="main" class="sheet">
     <div class="edition">
       <aside class="col-left" aria-label="Section headlines">
+        <section class="sec" aria-labelledby="k-matter">
+          <h2 class="kicker" id="k-matter">Matter &amp; Thread</h2>
+          <ul>
+            <li><a href="brief-2026-10-16.html#lead">Apple Home Collection with LG/Schneider</a></li>
+            <li><a href="brief-2026-10-16.html#homeview">HomeView hub pre-orders open</a></li>
+            <li><a href="brief-2026-10-16.html#googlehue">Google migrating Hue bridges to Matter</a></li>
+          </ul>
+        </section>
         <section class="sec" aria-labelledby="k-ha">
           <h2 class="kicker" id="k-ha">Home Assistant</h2>
           <ul>
-            <li><a href="brief-2026-10-15.html#supervisor">Supervisor 2026.10.2 not pinned</a></li>
-            <li><a href="brief-2026-10-15.html#link">Cloud becomes Link, 2 Dec</a></li>
-            <li><a href="brief-2026-10-15.html#core">Core still 2026.10.1</a></li>
-          </ul>
-        </section>
-        <section class="sec" aria-labelledby="k-zwave">
-          <h2 class="kicker" id="k-zwave">Z-Wave</h2>
-          <ul>
-            <li><a href="brief-2026-10-15.html#zwave">Z-Wave JS UI still 11.24.3</a></li>
+            <li><a href="brief-2026-10-16.html#supervisor">Supervisor stable pin moves to 2026.10.2</a></li>
+            <li><a href="brief-2026-10-16.html#core">Core still 2026.10.1</a></li>
+            <li><a href="brief-2026-10-16.html#haos">HAOS still 18.3</a></li>
           </ul>
         </section>
         <section class="sec" aria-labelledby="k-dev">
           <h2 class="kicker" id="k-dev">Devices</h2>
           <ul>
-            <li><a href="brief-2026-10-15.html#hue">Hue firmware: Zigbee+Matter</a></li>
-            <li><a href="brief-2026-10-15.html#huepro">Hue Pro strip: US retail stock reported</a></li>
-            <li><a href="brief-2026-10-15.html#timmerflotte">TIMMERFLOTTE unchanged</a></li>
+            <li><a href="brief-2026-10-16.html#huepro">Hue Pro strip: US page still out of stock</a></li>
+            <li><a href="brief-2026-10-16.html#shelly">Shelly/ThreadLink unchanged</a></li>
+            <li><a href="brief-2026-10-16.html#timmerflotte">TIMMERFLOTTE unchanged</a></li>
           </ul>
         </section>
         <section class="sec" aria-labelledby="k-esp">
           <h2 class="kicker" id="k-esp">ESPHome</h2>
           <ul>
-            <li><a href="brief-2026-10-15.html">Two breaking changes banked for 2026.10.0</a></li>
+            <li><a href="brief-2026-10-16.html#esphome">Stable still 2026.9.0; beta 4 newest</a></li>
           </ul>
         </section>
       </aside>
 
       <div class="col-center">
         <article class="lead" id="lead">
-          <p class="lead-kicker">ESPHome</p>
-          <h1><a href="brief-2026-10-15.html">Two breaking changes banked for ESPHome 2026.10.0</a></h1>
-          <p class="dek">External components touching remote_base, select options or light effects will need edits when the stable drops — it's not out yet, beta 4 is the newest tag.</p>
-          <p class="byline">HA News Brief · 15 Oct 2026</p>
-          <p>Also today: Supervisor 2026.10.2 shipped yesterday but stable.json still pins 2026.09.3 — and Hue lamp firmware 1.164.2 lets mains-powered bulbs run Zigbee and Matter at once, bridgeless.</p>
-          <p class="byline">Sources: <a href="https://developers.esphome.io/blog/">ESPHome dev blog</a>, <a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.2">Supervisor release</a>, <a href="https://www.philips-hue.com/en-us/support/release-notes/lamps">Hue release notes</a></p>
+          <p class="lead-kicker">Matter &amp; Thread</p>
+          <h1><a href="brief-2026-10-16.html">Apple Home Collection: Apple co-designs smart-home hardware with LG and Schneider</a></h1>
+          <p class="dek">Cameras, thermostats, a video doorbell and a deadbolt — designed with LG and Schneider Electric, managed entirely in the Home app. HomeView wall hub takes pre-orders today, ships 13 November.</p>
+          <p class="byline">HA News Brief · 16 Oct 2026</p>
+          <p>Also today: the Supervisor stable pin finally moved to 2026.10.2, two days after the tag. Core, HAOS, ESPHome, Z-Wave JS UI and Z2M all unchanged.</p>
+          <p class="byline">Sources: <a href="https://www.apple.com/newsroom/2026/10/introducing-apple-home-collection-a-new-lineup-of-smart-home-accessories/">Apple Newsroom</a>, <a href="https://version.home-assistant.io/stable.json">stable.json</a></p>
           <div class="quote-card">
-            <p>Production ESPHome devices stay on 2026.9.0 until the .0 drops — and four betas in seven days says that's close.</p>
-            <cite>15 Oct 2026 brief · ESPHome breaking changes</cite>
+            <p>"Works with Apple Home" certification just became the floor, not the ceiling — Apple now designs the product.</p>
+            <cite>16 Oct 2026 brief · Apple Home Collection</cite>
           </div>
         </article>
 
         <div class="secondary">
           <article>
             <p class="kicker">Home Assistant / Supervisor</p>
-            <h2><a href="brief-2026-10-15.html#supervisor">Supervisor 2026.10.2 not on stable pin</a></h2>
-            <p>stable.json still 2026.09.3; panel_admin breaking change waits.</p>
+            <h2><a href="brief-2026-10-16.html#supervisor">Supervisor stable pin moves to 2026.10.2</a></h2>
+            <p>stable.json updated; ingress panel_admin breaking change ships with it.</p>
           </article>
           <article>
-            <p class="kicker">Devices / Hue</p>
-            <h2><a href="brief-2026-10-15.html#hue">Hue firmware 1.164.2: Zigbee+Matter concurrency</a></h2>
-            <p>Thread mesh strengthening, bridgeless — Matter 1.4.1, adaptive lighting.</p>
+            <p class="kicker">Matter &amp; Thread / Apple</p>
+            <h2><a href="brief-2026-10-16.html#homeview">HomeView: pre-orders open, ships 13 Nov</a></h2>
+            <p>Reported Matter controller, bridge and Thread border router.</p>
           </article>
         </div>
       </div>
@@ -100,50 +102,50 @@
       <aside class="col-right">
         <section class="briefing" aria-labelledby="briefing-title">
           <h2 id="briefing-title">The Briefing</h2>
-          <p class="brief-date">15 Oct 2026</p>
+          <p class="brief-date">16 Oct 2026</p>
           <ol>
             <li>
-              <a href="brief-2026-10-15.html#lead">ESPHome 2026.10.0 breaking changes</a>
-              <p>Two dev-blog notes; stable still 2026.9.0.</p>
+              <a href="brief-2026-10-16.html#lead">Apple Home Collection announced</a>
+              <p>LG/Schneider co-design; December availability.</p>
             </li>
             <li>
-              <a href="brief-2026-10-15.html#supervisor">Supervisor 2026.10.2 not pinned</a>
-              <p>stable.json still 2026.09.3.</p>
+              <a href="brief-2026-10-16.html#homeview">HomeView wall hub</a>
+              <p>Pre-orders open; ships 13 Nov.</p>
             </li>
             <li>
-              <a href="brief-2026-10-15.html#hue">Hue firmware 1.164.2</a>
-              <p>Zigbee+Matter concurrency, bridgeless.</p>
+              <a href="brief-2026-10-16.html#supervisor">Supervisor pin moves to 2026.10.2</a>
+              <p>stable.json updated.</p>
             </li>
             <li>
-              <a href="brief-2026-10-15.html#huepro">Hue Pro strip: US stock reported</a>
-              <p>Amazon $179.99; Hue US page unverified.</p>
+              <a href="brief-2026-10-16.html#googlehue">Google: Hue bridges to local Matter</a>
+              <p>Background upgrade; secondary-sourced.</p>
             </li>
             <li>
-              <a href="brief-2026-10-15.html#link">Cloud becomes Link, 2 Dec</a>
-              <p>2026.12 release; subscription unchanged.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-15.html#core">HA Core still 2026.10.1</a>
+              <a href="brief-2026-10-16.html#core">HA Core still 2026.10.1</a>
               <p>Default in stable.json.</p>
             </li>
             <li>
-              <a href="brief-2026-10-15.html#haos">HAOS still 18.3</a>
+              <a href="brief-2026-10-16.html#haos">HAOS still 18.3</a>
               <p>No release since 17 Sep.</p>
             </li>
             <li>
-              <a href="brief-2026-10-15.html#zwave">Z-Wave JS UI 11.24.3</a>
-              <p>9 Oct; zwave-js 15.31.1.</p>
+              <a href="brief-2026-10-16.html#esphome">ESPHome stable still 2026.9.0</a>
+              <p>Beta 4 newest; breaks banked for .0.</p>
             </li>
             <li>
-              <a href="brief-2026-10-15.html#z2m">Zigbee2MQTT 2.14.2</a>
+              <a href="brief-2026-10-16.html#zwave">Z-Wave JS UI 11.24.3</a>
+              <p>9 Oct; nothing since.</p>
+            </li>
+            <li>
+              <a href="brief-2026-10-16.html#z2m">Zigbee2MQTT 2.14.2</a>
               <p>1 Oct; nothing since.</p>
             </li>
             <li>
-              <a href="brief-2026-10-15.html#shelly">Schneider/Shelly, ThreadLink</a>
-              <p>Clearance pending; firmware ~Dec.</p>
+              <a href="brief-2026-10-16.html#huepro">Hue Pro strip: US page out of stock</a>
+              <p>Amazon $179.99; UK £139.99 in stock.</p>
             </li>
           </ol>
-          <a class="full-brief" href="brief-2026-10-15.html">Full brief →</a>
+          <a class="full-brief" href="brief-2026-10-16.html">Full brief →</a>
         </section>
 
         <div class="rail-sub">
