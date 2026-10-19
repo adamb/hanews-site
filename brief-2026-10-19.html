@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 19 Oct 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 19 October 2026. ESPHome 2026.10.0b5 breaks the beta pause; Core 2026.10.2 is live on the stable channel; UniFi Network 11 adds Matter device monitoring and Thread topology. HAOS 18.3, Z-Wave JS UI 11.24.3, Z2M 2.14.2 unchanged.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 19 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>19 October 2026</h1>
+        <p class="lede">The 2026.10 release train is moving: <strong>ESPHome 2026.10.0b5</strong> landed overnight, breaking a beta cadence that had sat at four since Friday, and <strong>Core 2026.10.2</strong> shipped Friday evening and is now the stable-channel default. Off the local stack: <strong>UniFi Network 11</strong> adds Matter device monitoring and puts Thread devices into a normal network topology view.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · ESPHome</p>
+          <h2>ESPHome 2026.10.0b5 ships overnight — the beta pause breaks, the stable moves closer</h2>
+          <p><strong>What happened:</strong> Friday's brief read the four-beta plateau as the train slowing. It wasn't: <strong>2026.10.0b5</strong> tagged at 01:03 UTC this morning with 24 PRs. Notables: the recommended ESP-IDF bumps to <strong>5.5.6</strong>, <code>tcp_uart</code>/<code>uart_tcp</code> expose connection entities as new platforms, <code>usb_uart</code> gains <code>interface_class</code> and <code>port_number</code> (new feature), mDNS now advertises the connected interface in the TXT record, and MQTT topic matching moved from per-character recursion to a loop. Two breaking changes remain banked for the eventual .0: build-time flash tables for select options and light effects, and <code>remote_base</code> protocol methods no longer virtual.</p>
+          <p><strong>Why it matters:</strong> Five betas in twelve days usually means the stable is days out. If you maintain external components that touch selects, lights, or IR protocols, this is your window to test against the beta before 2026.10.0 lands. The ESP-IDF 5.5.6 bump is also the kind that changes which toolchain your next compile pulls.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/esphome/esphome/releases/tag/2026.10.0b5">esphome 2026.10.0b5 release notes</a>; stable remains <a href="https://esphome.io/blog/rss.xml">2026.9.0 (esphome.io blog RSS)</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="core">
+          <p class="meta">02 · Home Assistant</p>
+          <h2>Core 2026.10.2 is live — released Friday, now the stable default</h2>
+          <p><strong>What happened:</strong> Core <strong>2026.10.2</strong> released Friday 16 October at 20:04 UTC, and this morning <code>version.home-assistant.io/stable.json</code> advertises it as the default across the current HAOS boards. It's a patch release, mostly fixes: MQTT device triggers and tags no longer fire twice after reload, the group integration no longer crashes when a group has no members, Tesla Fleet redacts schedule coordinates in diagnostics and fixes an IndexError on out-of-range heater levels, KNX no longer cuts off SQLite telegram-store initialization on a timeout, and aiohttp bumps to 3.14.5.</p>
+          <p><strong>Why it matters:</strong> The MQTT double-fire and empty-group crash are both the silent kind of bug — automations triggering twice or sensors going unavailable for no obvious reason. If you saw either on 2026.10.1, updating is warranted; otherwise it's routine patch.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.10.2">home-assistant/core 2026.10.2</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="unifi">
+          <p class="meta">03 · Matter &amp; Thread / Ubiquiti</p>
+          <h2>UniFi Network 11 puts Matter devices and Thread mesh into its topology view</h2>
+          <p><strong>What happened:</strong> Ubiquiti's <strong>UniFi Network 11</strong> lets you pair Matter-over-Thread devices by their pairing codes, then shows manufacturer, model, firmware version, battery and wireless signal strength where the device reports it. Thread devices appear in the same topology view as your Ethernet and Wi-Fi clients — with their Thread border routers as the intermediate hops — and the Time Machine feature keeps historical topology, so you can look back at the mesh state just before a device went dark. UniFi is positioning this as monitoring and diagnostics only: no automations, no device control.</p>
+          <p><strong>Why it matters:</strong> "My Matter device is unresponsive" has always lacked a network-level answer. Home Assistant's Matter 9 server has a good Thread map, but it doesn't keep history. UniFi's Time Machine view — what the mesh looked like before the failure — is the feature Thread troubleshooting has been missing, and for anyone already running UniFi switching gear it's free.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://blog.ui.com/article/introducing-unifi-network-11">Ubiquiti: Introducing UniFi Network 11</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="supervisor">
+          <p class="meta">04 · Home Assistant / Supervisor</p>
+          <h2>Supervisor stable pin unchanged at 2026.10.2</h2>
+          <p><strong>What happened:</strong> No new Supervisor tag since 2026.10.2 (14 Oct); <code>stable.json</code> still pins <strong>supervisor 2026.10.2</strong>. Reminder: its one breaking change is ingress sessions enforcing the <code>panel_admin</code> role.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://version.home-assistant.io/stable.json">stable.json</a>; <a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.2">Supervisor 2026.10.2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="haos">
+          <p class="meta">05 · Home Assistant OS</p>
+          <h2>HAOS still 18.3</h2>
+          <p><strong>What happened:</strong> No 18.4. All stable OS boards in <code>stable.json</code> remain on <strong>18.3</strong> (17 Sep) — just over four weeks. No new release candidate this morning either.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/operating-system/releases/tag/18.3">home-assistant/operating-system 18.3</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">06 · Z-Wave</p>
+          <h2>Z-Wave JS UI still 11.24.3</h2>
+          <p><strong>What happened:</strong> No newer tag since <strong>v11.24.3</strong> (9 Oct, zwave-js 15.31.1).</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.24.3">zwave-js-ui v11.24.3</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">07 · Zigbee</p>
+          <h2>Zigbee2MQTT still 2.14.2</h2>
+          <p><strong>What happened:</strong> Latest tag remains <strong>2.14.2</strong> (1 Oct). No 2.14.3 on the releases list this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.2">Zigbee2MQTT 2.14.2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="huepro">
+          <p class="meta">08 · Devices / Hue</p>
+          <h2>Hue Play Gradient Strip Pro: US page still out of stock</h2>
+          <p><strong>What happened:</strong> We re-checked Hue's own US product page for the pro 65" this morning — still <strong>out of stock</strong> per the page's own availability markup. No change to the standing picture: Amazon listings at <strong>$179.99</strong>, UK page in stock at £139.99 since late September.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.philips-hue.com/en-us/p/lightstrips-philips-hue-play-gradient-strip-light-pro-65/046677611828">Hue US pro 65" page</a> (checked 19 Oct, out of stock)</dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="shelly">
+          <p class="meta">09 · Devices / Shelly</p>
+          <h2>Shelly: no movement on Schneider clearance; ThreadLink still ~December</h2>
+          <p><strong>What happened:</strong> No regulatory decision or company announcement since Friday on Schneider's €70/share tender offer for Shelly Group, which the board backed last Tuesday. Gen4 <strong>ThreadLink</strong> firmware unchanged — still the IFA framing of roughly December, delivered as an opt-in per-device update.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/news">Shelly Group IR</a>; <a href="https://www.shelly.com/blogs/media-kit/shelly-unveils-threadlink-ifa-2026">ThreadLink media kit</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="timmerflotte">
+          <p class="meta">10 · Devices / IKEA</p>
+          <h2>IKEA TIMMERFLOTTE — no news</h2>
+          <p><strong>What happened:</strong> No change since Friday: prod-firmware 61 offline drops remain community-sourced, not vendor-confirmed, and no change in the Matter test firmware line this morning.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd>Prior brief <a href="brief-2026-10-16.html#timmerflotte">16 Oct</a>; <a href="brief-2026-09-29.html#timmerflotte">29 Sep brief</a> for the original watch</dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
