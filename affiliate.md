@@ -22,6 +22,20 @@ page — not a search — gets the tag.
 
 ## Map
 
+### article-thread-network.html
+- Home Assistant ZBT-2 → Home Assistant ZBT-2 Thread border router
+- Home Assistant Green → Home Assistant Green hub
+- Inovelli White Series switch → Inovelli White Series Matter Thread switch
+- Eve Light Switch → Eve Light Switch Thread Matter
+- Onvis plug (exact) → https://www.amazon.com/Onvis-Matter-Thread-Outlet-Google/dp/B0FRFPV5FK?tag=hanews01-20
+- ECOWITT weather station (exact) → https://www.amazon.com/dp/B0BM3BQ425?tag=hanews01-20
+- Smartwings shade → Smartwings matter over thread roller shade (merchant: smartwingshome.com direct, non-affiliate; Amazon tagged search)
+- IKEA MYGGBETT → IKEA MYGGBETT door window sensor Matter (IKEA store direct; Amazon tagged search)
+- IKEA MYGGSPRAY → IKEA MYGGSPRAY motion sensor Matter (Amazon tagged search)
+- IKEA BILRESA dual button → IKEA BILRESA dual button remote Matter (Amazon tagged search)
+- IKEA BILRESA scroll wheel → IKEA BILRESA scroll wheel remote Matter (Amazon tagged search)
+- IKEA KAJPLATS → (IKEA store direct only; bulb item 30611462)
+
 ### brief-2026-10-19.html#huepro
 - Philips Hue Play Gradient Strip Pro (65") → Philips Hue Play Gradient LightStrip Pro 65 inch
 

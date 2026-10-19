@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Building a Thread network for Home Assistant — HA News</title>
+  <meta name="description" content="A field report from a live Thread network: border routers, mains-powered mesh backbone, concrete walls, and the battery-device mistake.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 19 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html" aria-current="page">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Matter &amp; Thread · Field report</p>
+        <h1>Building a Thread network for Home Assistant</h1>
+        <p class="lede">Thread is fast, low-power, and increasingly the backbone of the modern local smart home. It is also, on a property with reinforced-concrete walls, something you have to build deliberately. This is a report from a live network of about 30 Thread devices: what worked, what failed, and the one lesson worth more than any product recommendation.</p>
+        <p class="disclosure">Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page. We link only to products covered editorially, and no story placement is sponsored.</p>
+        <p class="byline">HA News · 19 Oct 2026</p>
+
+        <h2 id="why">Why Thread</h2>
+        <p>Thread is an IP-based wireless protocol built on IEEE 802.15.4. Mains-powered devices form a self-healing mesh; battery devices piggyback on it. The selling points are speed and multi-year battery life for sensors.</p>
+        <p>The practical case for Home Assistant households: it runs without a cloud account. Once a device is commissioned, HA talks to it directly. Wi-Fi devices and their vendor apps are the thing being replaced.</p>
+        <p>One naming trap worth repeating: <strong>Matter does not mean Thread.</strong> Plenty of Matter-certified devices are Wi-Fi. Check the radio spec before buying, not after unboxing.</p>
+        <p>Primary background sources: <a href="https://www.threadgroup.org/">Thread Group</a> for the spec itself.</p>
+
+        <h2 id="border-router">Start with a border router</h2>
+        <p>Before any Thread device joins, there must be a Thread border router bridging the mesh onto the home LAN. The choices for HA households are narrow and simple. The <a href="https://www.home-assistant.io/connect/zbt-2/">Home Assistant ZBT-2</a> is the border router from the HA team — dual-purpose Zigbee and Thread, shipped with a sturdy base and a 1.5-meter cable that keeps it away from interference sources. That is the one to buy if the system is Home Assistant. <a href="https://www.apple.com/homepod-mini/">Apple HomePod mini</a> and <a href="https://eero.com/">Eero</a> can also anchor a Thread network, but they belong to other ecosystems.</p>
+        <p>Pair it with the machine running HA itself. On this network that is <a href="https://www.home-assistant.io/green">Home Assistant Green</a>, the Open Home Foundation's hub hardware.</p>
+          <dl class="facts buy">
+            <dt>Buy (affiliate)</dt>
+            <dd><a href="https://www.amazon.com/s?k=Home%20Assistant%20ZBT-2%20Thread%20border%20router&tag=hanews01-20">Home Assistant ZBT-2 — search on Amazon</a></dd>
+            <dd><a href="https://www.amazon.com/s?k=Home%20Assistant%20Green%20hub&tag=hanews01-20">Home Assistant Green — search on Amazon</a></dd>
+          </dl>
+        <dl class="facts">
+          <dt>Primary source</dt>
+          <dd><a href="https://www.home-assistant.io/connect/zbt-2/">ZBT-2 — Home Assistant</a>; <a href="https://www.home-assistant.io/green">Home Assistant Green — Home Assistant</a></dd>
+        </dl>
+
+        <h2 id="commissioning">Adding the first Thread device</h2>
+        <p>Commissioning is a QR-code + Bluetooth handshake. Scan the Matter QR with the HA companion app (<a href="https://apps.apple.com/us/app/home-assistant/id1099568401">iOS</a>, <a href="https://play.google.com/store/apps/details?id=io.homeassistant.companion.android">Android</a>); the phone talks BLE to the device and pushes the full Thread operational dataset into it. In practice this mostly works seamlessly. One of these sessions at this property required some effort to re-sync the iPhone's credentials with HA — recent app and HA updates have presumably cleaned it up.</p>
+        <p>One warning that cost real time here: <strong>be careful clicking around the HA Thread settings.</strong> Resetting the border router means re-adding every Thread device on the network. Ask how that feels after doing it once, on a network with 30 devices. It is not an experiment worth repeating.</p>
+
+        <h2 id="lesson">The biggest lesson: battery devices are endpoints, not repeaters</h2>
+        <p>The single most important finding from building this network: <strong>battery-powered Thread devices do not extend the mesh.</strong> They are sleepy endpoints. Mesh coverage comes from mains-powered devices acting as Thread routers.</p>
+        <p>If the network consists only of battery sensors, it simply will not reach. Cover the house with mains-powered Thread devices first — switches, plugs, anything wired — and add battery sensors after the backbone exists.</p>
+
+        <h2 id="backbone">The mesh backbone</h2>
+        <h3>Inovelli White Series — the switches that carry the network</h3>
+        <p><a href="https://inovelli.com/collections/inovelli-white-series">Inovelli White Series switches</a> became the backbone. The hardware is good, the automation surface is rich: double-tap gestures on either paddle, and an LED bar usable as a status display. One switch at the front door flashes red when the gate is left open too long — the kind of thing that makes local-first automation worth doing.</p>
+        <p>Because they are permanently powered, every one is a Thread router. Since wall switches are naturally distributed through the house, they are the best infrastructure placement available. Recommended without reservation when wiring or re-switching a home.</p>
+          <dl class="facts buy">
+            <dt>Buy (affiliate)</dt>
+            <dd><a href="https://www.amazon.com/s?k=Inovelli%20White%20Series%20Matter%20Thread%20switch&tag=hanews01-20">Inovelli White Series switch — search on Amazon</a></dd>
+          </dl>
+        <dl class="facts">
+          <dt>Primary source</dt>
+          <dd><a href="https://inovelli.com/collections/inovelli-white-series">Inovelli White Series</a></dd>
+        </dl>
+
+        <h3>Eve switches — solid second tier</h3>
+        <p><a href="https://www.evehome.com/en-us/eve-light-switch">Eve Light Switch</a> units are installed at several locations alongside the Inovelli hardware. They are simpler, but they are mains-powered Thread routers and they strengthen the mesh. They integrated cleanly into Home Assistant and have been reliable.</p>
+          <dl class="facts buy">
+            <dt>Buy (affiliate)</dt>
+            <dd><a href="https://www.amazon.com/s?k=Eve%20Light%20Switch%20Thread%20Matter&tag=hanews01-20">Eve Light Switch — search on Amazon</a></dd>
+          </dl>
+        <dl class="facts">
+          <dt>Primary source</dt>
+          <dd><a href="https://www.evehome.com/en-us/eve-light-switch">Eve Light Switch — Eve Systems</a></dd>
+        </dl>
+
+        <h3>Onvis Thread smart plugs — movable mesh extenders</h3>
+        <p>The most unexpectedly useful devices on the network: <a href="https://www.amazon.com/Onvis-Matter-Thread-Outlet-Google/dp/B0FRFPV5FK?tag=hanews01-20">Onvis Thread smart plugs</a>. Cheap, easy to relocate, and effective. When a coverage survey finds a dead spot, moving a plug into it reinforces the mesh the same minute. They also do real work — one controls the yard lights, another a dehumidifier.</p>
+        <p>Honest caveat: one of the units failed within a few months and another has been flaky. Fastest possible mesh improvement without touching wiring, but reliability is not their strong suit.</p>
+          <dl class="facts buy">
+            <dt>Buy (affiliate)</dt>
+            <dd><a href="https://www.amazon.com/Onvis-Matter-Thread-Outlet-Google/dp/B0FRFPV5FK?tag=hanews01-20">Onvis Matter/Thread smart plug — on Amazon</a></dd>
+          </dl>
+
+        <h2 id="shades">The client layer: shades and sensors</h2>
+        <h3>Smartwings roller shades</h3>
+        <p><a href="https://www.smartwingshome.com/pages/work-with-matter-over-thread">Smartwings Matter-over-Thread roller shades</a> have worked well. Battery powered, clean HA integration, controllable from automations or manually. One operational note from a beachside property: they were installed without guide wires — so an automation raises them whenever wind gets high, driven by the weather station below. Windy days and hanging fabric do not cooperate.</p>
+        <h3>The wind sensor that protects the shades</h3>
+        <p>That shade automation depends on an <a href="https://www.amazon.com/dp/B0BM3BQ425?tag=hanews01-20">ECOWITT weather station</a> — a good example of cross-brand automations that only locally controlled systems can do cleanly.</p>
+          <dl class="facts buy">
+            <dt>Buy (affiliate)</dt>
+            <dd><a href="https://www.smartwingshome.com/pages/work-with-matter-over-thread">Smartwings Matter-over-Thread shades — Smartwings</a></dd>
+            <dd><a href="https://www.amazon.com/s?k=Smartwings%20matter%20over%20thread%20roller%20shade&tag=hanews01-20">Smartwings roller shade — search on Amazon</a></dd>
+            <dd><a href="https://www.amazon.com/dp/B0BM3BQ425?tag=hanews01-20">ECOWITT weather station — on Amazon</a></dd>
+          </dl>
+
+        <h2 id="ikea">IKEA's Thread line — the sensor layer</h2>
+        <p>Once the mesh backbone was solid, the battery layer went on: IKEA. Cheap, big-brand, genuinely Thread-committed, and finally easy to buy. The favorites:</p>
+        <ul>
+          <li><a href="https://www.ikea.com/us/en/p/myggbett-door-window-sensor-smart-60617641/">MYGGBETT door/window sensor</a> — the driving use case for the whole network. Every storage-room door on the property gets one; HA alerts when a door should be shut and is not. <a href="https://www.ikea.com/us/en/p/myggbett-door-window-sensor-smart-60617641/">IKEA</a>; <a href="https://www.amazon.com/s?k=IKEA%20MYGGBETT%20door%20window%20sensor%20Matter&tag=hanews01-20">Amazon</a></li>
+          <li><a href="https://www.ikea.com/us/en/p/myggspray-wireless-motion-sensor-smart-70604186/">MYGGSPRAY wireless motion sensor</a>; <a href="https://www.amazon.com/s?k=IKEA%20MYGGSPRAY%20motion%20sensor%20Matter&tag=hanews01-20">Amazon</a></li>
+          <li><a href="https://www.ikea.com/us/en/p/bilresa-remote-control-white-smart-dual-button-80617876/">BILRESA remote control, dual button</a>; <a href="https://www.amazon.com/s?k=IKEA%20BILRESA%20dual%20button%20remote%20Matter&tag=hanews01-20">Amazon</a></li>
+          <li><a href="https://www.ikea.com/us/en/p/bilresa-remote-control-white-smart-scroll-wheel-70617457/">BILRESA remote control, scroll wheel</a>; <a href="https://www.amazon.com/s?k=IKEA%20BILRESA%20scroll%20wheel%20remote%20Matter&tag=hanews01-20">Amazon</a></li>
+          <li>Lighting: <a href="https://www.ikea.com/us/en/p/kajplats-led-bulb-e26-1100-lumen-smart-color-and-white-spectrum-globe-opal-30611462/">KAJPLATS 1100-lumen globe bulb</a> for the color-and-white-spectrum lamp line; <a href="https://www.ikea.com/us/en/search/?q=matter">IKEA's Matter/Thread catalog search</a> is genuinely useful now.</li>
+        </ul>
+        <p>These all work as advertised — and they work only because the mesh underneath was built first. On IKEA's side, note that these are Matter-over-Thread devices and are not available as tagged Amazon listings; the Amazon links are tagged search links that surface seller listings when present, and the IKEA links are the manufacturer's own store.</p>
+
+        <h2 id="automations">An automation the household actually uses</h2>
+        <p>The BILRESA scroll-wheel remote as a bedside control: press-and-hold raises or lowers the AC setpoint, with the new temperature softly announced on a bedroom speaker. Single tap on the top button kills the bedroom lights, the bottom button kills the adjacent bathroom lights, double tap toggles the AC. Small script, high spouse-approval rating — the best metric for automation value that exists.</p>
+
+        <h2 id="coverage">Coverage was harder than expected</h2>
+        <p>The property is concrete: reinforced-concrete construction throughout. The same walls that forced six Wi-Fi access points onto the property also resist Thread.</p>
+        <p>A mesh protocol does not make coverage automatic. RF still has to get through the walls, and rebar-loaded concrete is among the hardest residential conditions there is. The practical method is Wi-Fi thinking applied to Thread routers:</p>
+        <ul>
+          <li>Place powered devices distributed through the house.</li>
+          <li>Fill dead spots with additional mains-powered routers.</li>
+          <li>Test, adjust, repeat.</li>
+        </ul>
+        <p>The difference from the Wi-Fi days is that adding capacity means mounting another switch or plugging in another plug, not running cable to another access point.</p>
+
+        <h2 id="advice">Advice for a first Thread network</h2>
+        <ol>
+          <li>Start with a proper Thread border router.</li>
+          <li>Plan for mains-powered Thread devices distributed through the house.</li>
+          <li>Use smart plugs as movable mesh extenders while tuning coverage.</li>
+          <li>Add battery-powered sensors only after the mesh is solid.</li>
+          <li>Budget real time for placement tuning, especially in concrete-walled homes.</li>
+        </ol>
+
+        <h2 id="under-the-hood">Thread vs. Wi-Fi, under the hood</h2>
+        <h3>Topology</h3>
+        <p>Wi-Fi is hub-and-spoke: every client needs a direct, strong RF link to an access point, and scaling means more APs and wired backhaul. Thread is a self-healing mesh: every mains-powered node routes packets, and the mesh finds its own paths around interference.</p>
+        <h3>Radio and power</h3>
+        <p>Wi-Fi radios are throughput machines and pull power accordingly — battery motion sensors on Wi-Fi are a maintenance story. Thread runs IEEE 802.15.4 at ~250 kbps in the 2.4 GHz band, with sleepy end devices that sleep 99% of the time and fire tiny packets at their nearest router. That is how a door sensor runs years on a coin cell.</p>
+        <h3>Spectrum</h3>
+        <p>Both share the 83 MHz-wide 2.4 GHz band, but Wi-Fi spends it in 20 MHz channels (three non-overlapping: 1, 6, 11) while Thread uses sixteen 2 MHz channels numbered 11–26. Thread networks can pick a channel sitting in the gaps between the neighbors' Wi-Fi, or scan and migrate channels outright without dropping devices.</p>
+        <h3>Commissioning</h3>
+        <p>Wi-Fi hands a device an SSID and key. Thread broadcasts nothing. Commissioning is an out-of-band BLE handshake: the phone pushes the cryptographically secured Thread operational dataset — master key, extended PAN ID — into the device over Bluetooth, and the device joins the mesh.</p>
+
+        <h2 id="final">Final thoughts</h2>
+        <p>Once built properly, the network is stable and fast, and it does not phone anything home. The recurring failure mode in the wild is treating Thread like Wi-Fi or Zigbee — a bag of battery devices and hope. The mental model that works: mains-powered devices are the infrastructure, battery devices are the clients. Build the infrastructure first and the clients come easy.</p>
+
+        <p class="source-line">Read alongside: <a href="explainer-matter-15.html">Matter 1.5, explained</a> · <a href="matter.html">Matter &amp; Thread section</a></p>
+        <p class="disclosure">Editor's note: this article was adapted with AI assistance by the HA News editing agent from the author's own field notes. Disclosure: Amazon links carry our Associates tag.</p>
+      </div>
+
+      <aside class="col-right">
+        <section class="briefing" aria-labelledby="briefing-title">
+          <h2 id="briefing-title">The Briefing</h2>
+          <p class="brief-date">19 Oct 2026</p>
+          <ol>
+            <li>
+              <a href="matter.html">Hue Play Gradient Strip Pro</a>
+              <p>UK in stock, US coming soon — the flagship immersive strip goes pro.</p>
+            </li>
+            <li>
+              <a href="article-thread-network.html">Thread network field report</a>
+              <p>Build the mains-powered backbone first; battery devices are endpoints.</p>
+            </li>
+            <li>
+              <a href="ha.html">Supervisor 2026.10.2</a>
+              <p>Patch releases keep the appliance stack current.</p>
+            </li>
+          </ol>
+          <a class="full-brief" href="brief-2026-10-19.html">Full brief →</a>
+        </section>
+
+        <div class="rail-sub">
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </div>
+
+        <nav class="evergreen" aria-label="Explainers">
+          <h3>Guides</h3>
+          <ul>
+            <li><a href="article-thread-network.html">Building a Thread network</a></li>
+            <li><a href="explainer-matter-15.html">Matter 1.5, explained</a></li>
+            <li><a href="explainer-esphome-kit.html">What the ESPHome Starter Kit actually is</a></li>
+          </ul>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews-site">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted on Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field"><span>Name</span><input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name"></label>
+      <label class="signup-modal__field"><span>Email</span><input type="email" name="email" required autocomplete="email" placeholder="you@example.com"></label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
