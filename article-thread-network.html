@@ -4,7 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Building a Thread network for Home Assistant — HA News</title>
-  <meta name="description" content="A field report from a live Thread network: border routers, mains-powered mesh backbone, concrete walls, and the battery-device mistake.">
+  <meta name="description" content="A field report from a real Thread network for Home Assistant: border routers, mains-powered mesh backbone, concrete walls, and one costly battery mistake.">
+  <link rel="canonical" href="https://hanews.org/article-thread-network.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="HA News">
+  <meta property="og:title" content="Building a Thread network for Home Assistant">
+  <meta property="og:description" content="A field report from a real Thread network for Home Assistant: border routers, mains-powered mesh backbone, concrete walls, and one costly battery mistake.">
+  <meta property="og:url" content="https://hanews.org/article-thread-network.html">
+  <meta property="og:image" content="https://hanews.org/images/og-thread-network-1200x630.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Building a Thread network for Home Assistant">
+  <meta name="twitter:description" content="A field report from a real Thread network for Home Assistant: border routers, mains-powered mesh backbone, concrete walls, and one costly battery mistake.">
+  <meta name="twitter:image" content="https://hanews.org/images/og-thread-network-1200x630.png">
   <link rel="stylesheet" href="styles.css">
   <script src="/ga.js" defer></script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
@@ -40,7 +53,7 @@
       <div class="page-inner">
         <p class="kicker">Matter &amp; Thread · Field report</p>
         <h1>Building a Thread network for Home Assistant</h1>
-        <p class="lede">Thread is fast, low-power, and increasingly the backbone of the modern local smart home. It is also, on a property with reinforced-concrete walls, something you have to build deliberately. This is a report from a live network of about 30 Thread devices: what worked, what failed, and the one lesson worth more than any product recommendation.</p>
+        <p class="lede">Building a Thread network for Home Assistant is now a realistic weekend project — Thread is fast, low-power, and increasingly the backbone of the modern local smart home. It is also, on a property with reinforced-concrete walls, something you have to build deliberately. This is a report from a live network of about 30 Thread devices: what worked, what failed, and the one lesson worth more than any product recommendation.</p>
         <p class="disclosure">Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page. We link only to products covered editorially, and no story placement is sponsored.</p>
         <p class="byline">HA News · 19 Oct 2026</p>
 
@@ -162,6 +175,21 @@
         <p>Once built properly, the network is stable and fast, and it does not phone anything home. The recurring failure mode in the wild is treating Thread like Wi-Fi or Zigbee — a bag of battery devices and hope. The mental model that works: mains-powered devices are the infrastructure, battery devices are the clients. Build the infrastructure first and the clients come easy.</p>
 
         <p class="source-line">Read alongside: <a href="explainer-matter-15.html">Matter 1.5, explained</a> · <a href="matter.html">Matter &amp; Thread section</a></p>
+
+        <h2 id="faq">FAQ: building a Thread network for Home Assistant</h2>
+        <div class="faq">
+        <h3>Does Thread network Home Assistant gear need a border router?</h3>
+        <p>Yes. Every Thread network needs a border router linking the mesh to your IP network. On Home Assistant the practical pick is the Connect ZBT-2 dongle; a HomePod mini or Eero node also works as the router.</p>
+        <h3>How many Thread devices can share one network?</h3>
+        <p>A residential Thread mesh comfortably carries dozens of devices. The network in this report runs about thirty — switches, plugs, shades, sensors and lights — and stays responsive through concrete walls and interference.</p>
+        <h3>Do battery Thread devices extend the mesh?</h3>
+        <p>No, and this is the most expensive misconception. Battery devices are sleepy endpoints that conserve radio by design and never forward traffic. Only mains-powered devices such as switches and plugs build the routing mesh.</p>
+        <h3>Is Thread better than Wi-Fi for smart home devices?</h3>
+        <p>For always-on small devices, usually yes. Thread runs an IP network over low-power 802.15.4 radio with self-healing routing, so nodes join as full IP neighbors instead of depending on one Wi-Fi access point.</p>
+        <h3>Can you add Thread devices without resetting everything?</h3>
+        <p>Usually yes. Matter over Thread commissioning pushes the network credentials — the Thread Operational Dataset — from a phone to the new device over Bluetooth. Keep the dataset stable and coordinate resets with vendors.</p>
+        </div>
+
         <p class="disclosure">Editor's note: this article was adapted with AI assistance by the HA News editing agent from the author's own field notes. Disclosure: Amazon links carry our Associates tag.</p>
       </div>
 
