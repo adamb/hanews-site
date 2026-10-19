@@ -1,5 +1,7 @@
 # HA News affiliate link map
 
+Standing project config: Associates tracking tag is `hanews01-20` — the standing tag for every future affiliate link on hanews.org (Associates account opened 2026-10-19; 3-sales/180-day approval window applies). Owned by the editing agent; Adam never needs to supply links by hand.
+
 Associates tag: `hanews01-20` (Adam's approved tracking tag).
 
 Every generated link carries `tag=hanews01-20`. Until Adam supplies exact
