@@ -1036,3 +1036,18 @@ a:hover { color: var(--accent); text-decoration-color: var(--accent); }
   max-width: 36rem;
   padding-top: 0.25rem;
 }
+
+/* affiliate disclosure + buy rows */
+.disclosure {
+  margin: 0.5rem 0 1.1rem;
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--rule);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.facts.buy {
+  border-top: 1px solid var(--rule);
+  padding-top: 0.4rem;
+}
+.facts.buy dt { color: var(--ink-soft); }
+.facts.buy a { font-weight: 600; }
