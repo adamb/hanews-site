@@ -17,6 +17,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history: the sitemap generator reads each page's last git
+          # commit date, and a depth-1 clone cannot see those commits.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Regenerate sitemap.xml from the tracked page list + git dates on every
+      # push, so the sitemap never goes stale as briefs are added.
+      - name: Generate sitemap.xml
+        run: python3 scripts/generate-sitemap.py
 
       - name: Deploy to Pages project hanews
         uses: cloudflare/wrangler-action@v3

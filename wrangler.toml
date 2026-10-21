@@ -3,6 +3,11 @@ pages_build_output_dir = "."
 compatibility_date = "2026-08-28"
 # Custom domain hanews.org is a later DNS step. Do not put account_id here (Pages rejects it).
 
+# Cloudflare Pages serves a top-level 404.html with a real HTTP 404 status by
+# default, so there is no `not_found_handling` key to set here: that key is a
+# Workers static-assets setting and is ignored by Pages. Keep 404.html at the
+# repo root. Do not switch this project to SPA mode: it is a multi-page site.
+
 [[kv_namespaces]]
 binding = "SUBSCRIBERS"
 id = "0f64d5199cb844eab5bc654e61496a65"
