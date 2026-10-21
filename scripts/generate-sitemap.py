@@ -22,6 +22,9 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://hanews.org"
 OUTPUT = os.path.join(REPO_ROOT, "sitemap.xml")
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from site_urls import canonical_url  # noqa: E402
+
 # Diagnostic file and the 404 document are not indexable pages.
 EXCLUDE = {"_probe.html", "404.html"}
 
@@ -85,7 +88,7 @@ def main():
     ]
     for path in pages:
         changefreq, priority = cadence(path)
-        loc = "{}/{}".format(SITE, path)
+        loc = canonical_url(path)
         lines.append("  <url>")
         lines.append("    <loc>{}</loc>".format(escape(loc)))
         lines.append("    <lastmod>{}</lastmod>".format(escape(lastmod(path))))

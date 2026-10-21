@@ -2,9 +2,14 @@
 """Normalise <head> metadata across the tracked HTML pages.
 
 Adds, only where missing:
-  - <link rel="canonical" href="https://hanews.org/<file>.html">
+  - <link rel="canonical" href="https://hanews.org/<page>">
   - <meta name="robots" content="index, follow">
   - <script src="/ga.js" defer></script>  (only for brief-2026-10-14.html)
+
+Corrects, where present but wrong:
+  - a canonical pointing at `https://hanews.org/<page>.html`. The site is
+    served at extensionless paths and `.html` answers with a 308 redirect,
+    so such a canonical points at a redirect rather than the page.
 
 Existing <meta charset>, <meta name="viewport">, <title>, <meta name="description">,
 <link rel="stylesheet"> and script tags are left exactly as they are. The script
@@ -23,6 +28,10 @@ import sys
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = "https://hanews.org"
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from site_urls import canonical_url  # noqa: E402
+
+
 # Diagnostic file: leave it alone.
 SKIP = {"_probe.html"}
 
@@ -34,6 +43,9 @@ SKIP_404 = {"404.html"}
 NEED_GA = {"brief-2026-10-14.html"}
 
 CANONICAL_RE = re.compile(r'rel=["\']canonical["\']', re.I)
+CANONICAL_HREF_RE = re.compile(
+    r'<link[^>]+rel=["\']canonical["\'][^>]*href=["\']([^"\']+)["\']', re.I
+)
 ROBOTS_RE = re.compile(r'<meta[^>]+name=["\']robots["\']', re.I)
 GA_RE = re.compile(r'src=["\']/ga\.js["\']', re.I)
 
@@ -101,9 +113,19 @@ def process(path, check_only=False):
     changes = []
 
     if not CANONICAL_RE.search(head):
-        canonical = '<link rel="canonical" href="{}/{}">'.format(SITE, path)
+        canonical = '<link rel="canonical" href="{}">'.format(canonical_url(path))
         head = insert_after(head, canonical)
         changes.append("canonical")
+    else:
+        # A canonical is already present. It may still be wrong: an earlier
+        # pass stamped `https://hanews.org/about`, which is a 308
+        # redirect to the real page rather than the page itself. Correct it
+        # in place rather than leaving a redirecting canonical live.
+        expected = canonical_url(path)
+        current = CANONICAL_HREF_RE.search(head)
+        if current and current.group(1) != expected:
+            head = head[: current.start(1)] + expected + head[current.end(1) :]
+            changes.append("canonical-fixed")
 
     if not ROBOTS_RE.search(head):
         head = insert_after(
