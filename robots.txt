@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Subscriber/admin back office is not for crawlers.
+Disallow: /admin
+
+Sitemap: https://hanews.org/sitemap.xml
