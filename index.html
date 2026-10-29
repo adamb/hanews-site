@@ -16,7 +16,7 @@
   <div class="topbar" aria-hidden="true"></div>
   <header class="masthead">
     <div class="masthead__meta">
-      <span class="dateline">Friday, 16 October 2026</span>
+      <span class="dateline">Thursday, 29 October 2026</span>
       <div class="masthead__aside">
         <span class="masthead__edition">Home automation edition</span>
         <button type="button" class="signup-trigger">Get the briefing</button>
@@ -44,21 +44,24 @@
         <section class="sec" aria-labelledby="k-ha">
           <h2 class="kicker" id="k-ha">Home Assistant</h2>
           <ul>
+            <li><a href="brief-2026-10-29.html#lead">Supervisor 2026.10.5: symlink security fix</a></li>
+            <li><a href="brief-2026-10-29.html#beta">Beta: 2026.11 brings HACS in as the Marketplace</a></li>
+            <li><a href="brief-2026-10-29.html#esh">Everything Smart Home joins Works with HA</a></li>
             <li><a href="brief-2026-10-28.html#haos">HAOS 18.4: kernel fixes, signed images</a></li>
-            <li><a href="brief-2026-10-28.html#core">Core 2026.10.4 is the stable default</a></li>
-            <li><a href="brief-2026-10-28.html#supervisor">Supervisor 2026.10.4: log timestamps change</a></li>
             <li><a href="home-assistant-raspberry-pi.html">Guide: Home Assistant on a Raspberry Pi</a></li>
           </ul>
         </section>
         <section class="sec" aria-labelledby="k-esp">
           <h2 class="kicker" id="k-esp">ESPHome</h2>
           <ul>
+            <li><a href="brief-2026-10-29.html#esphome">2026.10.1 fix-only patch</a></li>
             <li><a href="brief-2026-10-28.html#lead">2026.10 stable: native ESP8266, smaller OTA</a></li>
           </ul>
         </section>
         <section class="sec" aria-labelledby="k-radio">
           <h2 class="kicker" id="k-radio">Radios</h2>
           <ul>
+            <li><a href="zigbee-vs-z-wave.html">Explainer: Zigbee vs Z-Wave</a></li>
             <li><a href="brief-2026-10-28.html#zwave">Z-Wave JS UI 11.25.2</a></li>
             <li><a href="brief-2026-10-28.html#z2m">Zigbee2MQTT still 2.14.2</a></li>
             <li><a href="brief-2026-10-28.html#matterjs">matter.js 0.18.0</a></li>
@@ -68,24 +71,24 @@
 
       <div class="col-center">
         <article class="lead" id="lead">
-          <p class="lead-kicker">ESPHome</p>
-          <h1><a href="brief-2026-10-28.html">ESPHome 2026.10 goes stable: native ESP8266 builds and OTA updates a third smaller</a></h1>
-          <p class="dek">2026.10.0 landed 21 Oct and 2026.10.1 on 27 Oct, with 20 new components and four config changes to check before updating. HAOS 18.4 also shipped, fixing 18.3's Realtek VLAN and Bluetooth regressions.</p>
-          <p class="byline">HA News Brief · 28 Oct 2026</p>
-          <p>Also today: Core 2026.10.4 and Supervisor 2026.10.4 are the stable pins, and Z-Wave JS UI 11.25.2 fixes HTTPS certs that Node 24 rejects.</p>
-          <p class="byline">Sources: <a href="https://esphome.io/blog/2026/10/21/esphome-2026-10/">ESPHome blog</a>, <a href="https://github.com/home-assistant/operating-system/releases/tag/18.4">HAOS 18.4</a>, <a href="https://github.com/home-assistant/core/releases/tag/2026.10.4">Core 2026.10.4</a></p>
+          <p class="lead-kicker">Home Assistant / Supervisor</p>
+          <h1><a href="brief-2026-10-29.html">Supervisor 2026.10.5 closes a symlink hole as Core 2026.11 beta brings HACS inside as the Marketplace</a></h1>
+          <p class="dek">Supervisor 2026.10.5 is the new stable Supervisor and fixes GHSA-74w8-9vgx-wqxg. In beta (stable Core remains 2026.10.4), 2026.11.0b0 adds a built-in Marketplace, Matter 1.5 cameras and two-way camera audio in Labs.</p>
+          <p class="byline">HA News Brief · 29 Oct 2026</p>
+          <p>Also today: Everything Smart Home's ESPHome-based presence sensors join Works with Home Assistant, and ESPHome 2026.10.1 is a fix-only patch.</p>
+          <p class="byline">Sources: <a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.5">Supervisor 2026.10.5</a>, <a href="https://rc.home-assistant.io/latest-release-notes">2026.11 beta notes</a>, <a href="https://www.home-assistant.io/blog/2026/10/27/everything-smart-home-joins-works-with-home-assistant/">HA blog</a></p>
         </article>
 
         <div class="secondary">
           <article>
             <p class="kicker">Explainer</p>
-            <h2><a href="home-assistant-raspberry-pi.html">How to install Home Assistant on a Raspberry Pi</a></h2>
-            <p>What to buy, the Imager steps, first boot and troubleshooting. Checked against HAOS 18.4.</p>
+            <h2><a href="zigbee-vs-z-wave.html">Zigbee vs Z-Wave: which should you use with Home Assistant?</a></h2>
+            <p>Radio band, range, device choice, Long Range and which adapter to buy.</p>
           </article>
           <article>
-            <p class="kicker">Home Assistant OS</p>
-            <h2><a href="brief-2026-10-28.html#haos">HAOS 18.4: signed images and kernel 6.18.58</a></h2>
-            <p>Fixes VLAN on Realtek and RTL8761B Bluetooth; all users encouraged to upgrade.</p>
+            <p class="kicker">Explainer</p>
+            <h2><a href="home-assistant-raspberry-pi.html">How to install Home Assistant on a Raspberry Pi</a></h2>
+            <p>What to buy, the Imager steps, first boot and troubleshooting. Checked against HAOS 18.4.</p>
           </article>
         </div>
       </div>
@@ -93,38 +96,15 @@
       <aside class="col-right">
         <section class="briefing" aria-labelledby="briefing-title">
           <h2 id="briefing-title">The Briefing</h2>
-          <p class="brief-date">28 Oct 2026</p>
+          <p class="brief-date">29 Oct 2026</p>
           <ol>
-            <li>
-              <a href="brief-2026-10-28.html#lead">ESPHome 2026.10 stable</a>
-              <p>Native ESP8266; OTA a third smaller.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-28.html#haos">HAOS 18.4</a>
-              <p>Kernel regressions fixed; signed images.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-28.html#core">Core 2026.10.4</a>
-              <p>Stable default; small patch.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-28.html#supervisor">Supervisor 2026.10.4</a>
-              <p>UTC offset in log timestamps.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-28.html#zwave">Z-Wave JS UI 11.25.2</a>
-              <p>Node 24 cert fix.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-28.html#z2m">Zigbee2MQTT 2.14.2</a>
-              <p>1 Oct; nothing since.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-28.html#matterjs">matter.js 0.18.0</a>
-              <p>Tagged 20 Oct.</p>
-            </li>
+            <li><a href="brief-2026-10-29.html#lead">Supervisor 2026.10.5</a><p>Symlink security fix; now stable.</p></li>
+            <li><a href="brief-2026-10-29.html#beta">Core 2026.11.0b0 (beta)</a><p>HACS becomes the Marketplace; Matter 1.5 cameras.</p></li>
+            <li><a href="brief-2026-10-29.html#esh">Everything Smart Home</a><p>Joins Works with Home Assistant.</p></li>
+            <li><a href="brief-2026-10-29.html#esphome">ESPHome 2026.10.1</a><p>Fix-only patch.</p></li>
+            <li><a href="brief-2026-10-29.html#radios">Z-Wave JS UI / Z2M</a><p>11.25.2 / 2.14.2, no change.</p></li>
           </ol>
-          <a class="full-brief" href="brief-2026-10-19.html">Full brief →</a>
+          <a class="full-brief" href="brief-2026-10-29.html">Full brief →</a>
         </section>
 
         <div class="rail-sub">

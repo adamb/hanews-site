@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 29 Oct 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 29 October 2026. Supervisor 2026.10.5 security fix (GHSA-74w8-9vgx-wqxg); Core 2026.11 beta brings HACS in as the Marketplace and Matter 1.5 cameras; Everything Smart Home joins Works with Home Assistant; ESPHome 2026.10.1.">
+  <link rel="canonical" href="https://hanews.org/brief-2026-10-29">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 29 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>29 October 2026</h1>
+        <p class="lede"><strong>Supervisor 2026.10.5</strong> is the new stable Supervisor and fixes a symlink security issue. In beta, <strong>Core 2026.11.0b0</strong> turns HACS into a built-in Marketplace and adds Matter 1.5 cameras. Everything Smart Home joins Works with Home Assistant. New explainer: <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a>.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Home Assistant / Supervisor</p>
+          <h2>Supervisor 2026.10.5 closes a symlink hole in app asset serving</h2>
+          <p><strong>What happened:</strong> Supervisor <strong>2026.10.5</strong> was released 28 Oct and stable.json now lists it as the stable Supervisor. Its security fix stops the Supervisor following symlinks that lead outside a store repository when it serves app assets (advisory <strong>GHSA-74w8-9vgx-wqxg</strong>). It also moves to the new URL of the official apps repository, listens for Core on a Unix socket, clears reboot-required issues after a host reboot, and fixes non-UTF-8 Wi-Fi SSIDs being corrupted, partial OS update bundles left behind after a failed download, and an MTU problem (GwPriority). Brotli also gets a security update.</p>
+          <p><strong>Why it matters:</strong> Supervisor updates itself, so most installs will pick this up without action. If you add third-party app repositories, this is the release that limits what a malicious repository can expose through asset paths. Check Settings → System → Updates if you pin Supervisor.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.5">supervisor 2026.10.5</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="beta">
+          <p class="meta">02 · Home Assistant (beta)</p>
+          <h2>Beta: Core 2026.11.0b0 folds HACS into Home Assistant as the Marketplace</h2>
+          <p><strong>What happened:</strong> This is a <strong>beta</strong>, not a stable release; stable Core is still <strong>2026.10.4</strong>. <strong>2026.11.0b0</strong> was tagged 28 Oct. In the work-in-progress release notes, HACS becomes part of Home Assistant as the new <strong>Marketplace</strong>, under Settings → Marketplace, on every installation type including Container. Admins can browse and install integrations, cards, themes and templates without a GitHub account; a new integration opens its setup flow without a restart, and each installed project gets an update entity. The beta also adds support for <strong>Matter 1.5 cameras</strong> (live video over WebRTC, directly between browser and camera), a Labs preview of <strong>two-way audio</strong> for Matter and Reolink cameras (Reolink over RTSP; needs HTTPS for now), and storing backups and media on local drives.</p>
+          <p><strong>Why it matters:</strong> If you rely on HACS, this is the release to test. The project warns that features may change or not make the final release; the release party is scheduled for 4 November. Don't run betas on a house you depend on.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.11.0b0">core 2026.11.0b0</a>; <a href="https://rc.home-assistant.io/latest-release-notes">beta release notes</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esh">
+          <p class="meta">03 · Works with Home Assistant</p>
+          <h2>Everything Smart Home joins Works with Home Assistant</h2>
+          <p><strong>What happened:</strong> On 27 Oct, Home Assistant added Everything Smart Home, the family business behind the YouTube channel run by Lewis Barclay with his father, Dave, to the Works with Home Assistant program. It brings in the Everything Presence sensors (Lite, One and Pro), all built on ESPHome and designed to keep data local.</p>
+          <p><strong>Why it matters:</strong> Presence sensors are one of the most-requested device types for room automations. Works with Home Assistant certification means the Home Assistant team has tested the devices and the maker has committed to supporting them.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/10/27/everything-smart-home-joins-works-with-home-assistant/">Home Assistant blog</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">04 · ESPHome</p>
+          <h2>ESPHome 2026.10.1 is a fix-only patch</h2>
+          <p><strong>What happened:</strong> <strong>2026.10.1</strong> (27 Oct) fixes the OTA watchdog timeout on esp32_hosted, resends the MQTT fan state when the first publish fails, orders generated lambda code after user includes, and ignores unhandled BLE key GAP events, among others.</p>
+          <p><strong>Why it matters:</strong> This is a safe update if you're already on 2026.10.0. If not, read <a href="brief-2026-10-28#lead">yesterday's notes on the four config changes</a> first.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/esphome/esphome/releases/tag/2026.10.1">esphome 2026.10.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="radios">
+          <p class="meta">05 · Zigbee &amp; Z-Wave</p>
+          <h2>No change: Z-Wave JS UI 11.25.2, Zigbee2MQTT 2.14.2</h2>
+          <p><strong>What happened:</strong> Z-Wave JS UI is still at <strong>v11.25.2</strong> (26 Oct, Node 24 cert fix) and Zigbee2MQTT at <strong>2.14.2</strong> (1 Oct). Not sure which radio to build on? Today's explainer: <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave for Home Assistant</a>.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases">zwave-js-ui releases</a>; <a href="https://github.com/Koenkk/zigbee2mqtt/releases">Zigbee2MQTT releases</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

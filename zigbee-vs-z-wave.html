@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zigbee vs Z-Wave for Home Assistant (2026) — HA News</title>
+  <meta name="description" content="Zigbee vs Z-Wave compared for Home Assistant: radio band, range, device choice, interoperability, Z-Wave Long Range, Matter/Thread, and which adapter to buy.">
+  <link rel="canonical" href="https://hanews.org/zigbee-vs-z-wave">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Zigbee vs Z-Wave for Home Assistant (2026)", "datePublished": "2026-10-29", "dateModified": "2026-10-29", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/zigbee-vs-z-wave"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is Zigbee or Z-Wave better for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Neither is better overall. Zigbee is cheaper and has far more devices. Z-Wave gives you a quieter band, better wall penetration and stricter interoperability. Home Assistant supports both locally, and plenty of homes run both radios side by side."}}, {"@type": "Question", "name": "Can Zigbee and Z-Wave devices talk to each other?", "acceptedAnswer": {"@type": "Answer", "text": "Not directly. The two radios don't share a protocol. Home Assistant bridges them, so an automation can use a Zigbee motion sensor to turn on a Z-Wave switch."}}, {"@type": "Question", "name": "Do I need a hub for Zigbee or Z-Wave?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. You need a coordinator or controller. With Home Assistant that's a USB adapter such as the Connect ZBT-2 for Zigbee or the Connect ZWA-2 for Z-Wave, so you don't need a separate vendor hub."}}, {"@type": "Question", "name": "Does Zigbee interfere with Wi-Fi?", "acceptedAnswer": {"@type": "Answer", "text": "They share 2.4 GHz and can affect each other. Choose a Zigbee channel that doesn't overlap your Wi-Fi channel and keep the adapter away from USB 3 ports and the router."}}, {"@type": "Question", "name": "Are Zigbee and Z-Wave being replaced by Matter?", "acceptedAnswer": {"@type": "Answer", "text": "Matter is growing, but Zigbee and Z-Wave remain widely sold and supported in Home Assistant. Existing devices keep working."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 29 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Explainer · Radios</p>
+        <h1>Zigbee vs Z-Wave: which should you use with Home Assistant?</h1>
+        <p class="byline">HA News · 29 Oct 2026</p>
+        <p class="disclosure">Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page. Prices and stock are on Amazon; we don't quote them here.</p>
+
+        <p>Zigbee and Z-Wave both build a low-power mesh network for battery sensors, switches and locks. Both work well in Home Assistant, and both work locally, with no cloud needed. The differences that matter are radio band, device selection, how strict certification is, and which hub you plug in. Short answer: <strong>pick Zigbee for cheap, plentiful sensors and lights. Pick Z-Wave for locks, wall switches and long-range links in houses where 2.4 GHz is crowded or walls are thick.</strong> Many Home Assistant installs run both.</p>
+
+        <h2>The quick comparison</h2>
+        <table>
+          <thead><tr><th></th><th>Zigbee</th><th>Z-Wave</th></tr></thead>
+          <tbody>
+            <tr><td>Radio</td><td>2.4 GHz (IEEE 802.15.4), same band worldwide</td><td>Sub-GHz; frequency is set by region (e.g. 908.42 MHz in the US, 868.42 MHz in Europe)</td></tr>
+            <tr><td>Interference</td><td>Shares the band with Wi-Fi and Bluetooth; choose channels with care</td><td>Doesn't compete with Wi-Fi; lower frequencies get through walls more easily</td></tr>
+            <tr><td>Standard body</td><td>Connectivity Standards Alliance (the group behind Matter)</td><td>Z-Wave Alliance; certification required to use the Z-Wave mark</td></tr>
+            <tr><td>Devices</td><td>Huge range, including low-cost Aqara, IKEA, Sonoff and Tuya devices</td><td>Fewer devices that tend to cost more, strong in locks, switches and thermostats</td></tr>
+            <tr><td>Interoperability</td><td>Good, but some manufacturer quirks need converters</td><td>Very consistent thanks to mandatory certification</td></tr>
+            <tr><td>Home Assistant</td><td>ZHA integration or Zigbee2MQTT</td><td>Z-Wave JS (integration plus the Z-Wave JS app or Z-Wave JS UI)</td></tr>
+            <tr><td>Buying abroad</td><td>One radio works everywhere</td><td>Buy devices for your region; a US device won't join an EU network</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Radio: crowded 2.4 GHz vs quiet sub-GHz</h2>
+        <p>Zigbee runs on 2.4 GHz, the same band your Wi-Fi uses. That works fine in practice if you put the coordinator on a USB extension cable away from the computer and pick a Zigbee channel that doesn't overlap your Wi-Fi channel (Zigbee 15, 20 and 25 are common choices). Z-Wave sits below 1 GHz, so it avoids Wi-Fi entirely and its signal gets through walls and floors better. Because the frequency differs by region, Z-Wave gear is sold in regional versions.</p>
+
+        <h2>Mesh and range</h2>
+        <p>In both systems, mains-powered devices such as plugs, switches and bulbs repeat signals for the rest of the mesh, while battery devices sleep and don't. A Zigbee or Z-Wave network gets stronger as you add powered devices. Z-Wave also has <strong>Z-Wave Long Range</strong>, a star-topology mode in which supported devices talk directly to the controller over much longer distances. It is useful for a detached garage, a gate or a mailbox. You need both a controller and devices that support Long Range.</p>
+
+        <h2>Devices and price</h2>
+        <p>Zigbee wins on choice and price. Temperature sensors, door contacts, motion sensors and buttons come from dozens of brands, and Zigbee2MQTT supports thousands of models. Z-Wave devices are fewer and usually cost more, but certification means a lock or dimmer from one brand behaves predictably on another brand's controller. For door locks and in-wall dimmers in North America, Z-Wave is still the safe default.</p>
+
+        <h2>What about Matter and Thread?</h2>
+        <p>Thread uses the same IEEE 802.15.4 radio as Zigbee, which is why Home Assistant's Connect ZBT-2 can run either firmware. Matter over Thread is where new devices are heading, but Zigbee and Z-Wave have years of proven devices and aren't going away. Our <a href="article-thread-network">Thread network field report</a> covers the Thread side.</p>
+
+        <h2>Hardware for Home Assistant</h2>
+        <ul>
+          <li><strong>Zigbee:</strong> Home Assistant Connect ZBT-2, Nabu Casa's official Zigbee/Thread adapter (<a href="https://www.amazon.com/s?k=Home+Assistant+Connect+ZBT-2&amp;tag=hanews01-20" rel="sponsored nofollow">Home Assistant Connect ZBT-2 on Amazon</a>), or a SONOFF Zigbee dongle (<a href="https://www.amazon.com/s?k=SONOFF+Zigbee+3.0+USB+Dongle&amp;tag=hanews01-20" rel="sponsored nofollow">SONOFF Zigbee 3.0 USB Dongle on Amazon</a>).</li>
+          <li><strong>Z-Wave:</strong> Home Assistant Connect ZWA-2, the official Z-Wave adapter with Long Range support (<a href="https://www.amazon.com/s?k=Home+Assistant+Connect+ZWA-2&amp;tag=hanews01-20" rel="sponsored nofollow">Home Assistant Connect ZWA-2 on Amazon</a>), or a Zooz 800-series stick (<a href="https://www.amazon.com/s?k=Zooz+800+Series+Z-Wave+Long+Range+USB+stick&amp;tag=hanews01-20" rel="sponsored nofollow">Zooz 800 Series Z-Wave Long Range USB stick on Amazon</a>).</li>
+          <li>Plug either adapter in with a short USB extension cable. It keeps the radio away from USB 3 noise.</li>
+        </ul>
+        <p>New to Home Assistant? Start with <a href="home-assistant-raspberry-pi">installing Home Assistant on a Raspberry Pi</a>, then add a radio.</p>
+
+        <h2>FAQ</h2>
+        <h3>Is Zigbee or Z-Wave better for Home Assistant?</h3>
+        <p>Neither is better overall. Zigbee is cheaper and has far more devices. Z-Wave gives you a quieter band, better wall penetration and stricter interoperability. Home Assistant supports both locally, and plenty of homes run both radios side by side.</p>
+        <h3>Can Zigbee and Z-Wave devices talk to each other?</h3>
+        <p>Not directly. The two radios don't share a protocol. Home Assistant bridges them, so an automation can use a Zigbee motion sensor to turn on a Z-Wave switch.</p>
+        <h3>Do I need a hub for Zigbee or Z-Wave?</h3>
+        <p>Yes. You need a coordinator or controller. With Home Assistant that's a USB adapter such as the Connect ZBT-2 for Zigbee or the Connect ZWA-2 for Z-Wave, so you don't need a separate vendor hub.</p>
+        <h3>Does Zigbee interfere with Wi-Fi?</h3>
+        <p>They share 2.4 GHz and can affect each other. Choose a Zigbee channel that doesn't overlap your Wi-Fi channel and keep the adapter away from USB 3 ports and the router.</p>
+        <h3>Are Zigbee and Z-Wave being replaced by Matter?</h3>
+        <p>Matter is growing, but Zigbee and Z-Wave remain widely sold and supported in Home Assistant. Existing devices keep working.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-10-29">Read today's</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/integrations/zha/">Home Assistant ZHA</a>; <a href="https://www.home-assistant.io/integrations/zwave_js/">Home Assistant Z-Wave</a>; <a href="https://www.zigbee2mqtt.io/">Zigbee2MQTT</a>; <a href="https://z-wavealliance.org/">Z-Wave Alliance</a>; <a href="https://csa-iot.org/all-solutions/zigbee/">CSA: Zigbee</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
