@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 28 Oct 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 28 October 2026. ESPHome 2026.10 stable with native ESP8266 builds and smaller OTA; HAOS 18.4 fixes 18.3 kernel regressions and signs images; Core 2026.10.4; Supervisor 2026.10.4; Z-Wave JS UI 11.25.2.">
+  <link rel="canonical" href="https://hanews.org/brief-2026-10-28">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Wednesday, 28 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>28 October 2026</h1>
+        <p class="lede">After a seven-day pause in this brief, the whole October release train has landed. <strong>ESPHome 2026.10</strong> is stable with native ESP8266 builds and smaller OTA updates, <strong>HAOS 18.4</strong> fixes 18.3's kernel regressions and ships signed images, and Core is at <strong>2026.10.4</strong>. New on the site today is a <a href="home-assistant-raspberry-pi">step-by-step guide to installing Home Assistant on a Raspberry Pi</a>, updated for HAOS 18.4.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · ESPHome</p>
+          <h2>ESPHome 2026.10 is stable: native ESP8266 builds and a third off every OTA</h2>
+          <p><strong>What happened:</strong> ESPHome <strong>2026.10.0</strong> went stable on 21 Oct and the first patch, <strong>2026.10.1</strong>, followed on 27 Oct. The headline changes: ESP8266 builds now use the native Arduino toolchain by default, so they are considerably quicker end to end and no longer need Rosetta on recent Apple Silicon Macs, and OTA updates install about a third smaller on every platform ESPHome supports. There are 20 new components, among them ESPectre Wi-Fi motion sensing, a persistent counter, the STCC4 CO2 sensor, and USB-UART and TCP-UART bridging.</p>
+          <p><strong>Why it matters:</strong> Four config changes need attention before you update. Lights with <code>initial_state</code> now honor it at boot. <code>codec_support_enabled</code> on speaker media players is gone, so remove it or the config will not validate. IR climate devices with <code>supports_heat: false</code> or <code>supports_cool: false</code> lose the combined heat/cool mode unless you add <code>supports_heat_cool: true</code>. Sendspin speakers need Music Assistant 2.10.7 or 2.11.0b4 or newer. 2026.10.1 is a fix-only patch (OTA watchdog on esp32_hosted, MQTT fan state resend, lambda include ordering).</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://esphome.io/blog/2026/10/21/esphome-2026-10/">ESPHome blog: 2026.10.0</a>; <a href="https://github.com/esphome/esphome/releases/tag/2026.10.1">2026.10.1 release notes</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="haos">
+          <p class="meta">02 · Home Assistant OS</p>
+          <h2>HAOS 18.4 ships: kernel regression fixes and signed images</h2>
+          <p><strong>What happened:</strong> <strong>HAOS 18.4</strong> released 27 Oct after two release candidates. It is a bugfix and security release that mainly repairs kernel regressions from 18.3: VLAN networking on Realtek adapters and RTL8761B (0bda:a728) Bluetooth adapters, which broke with kernel 6.18.45, plus several boot and USB storage issues. The kernel moves to 6.18.58. Docker (29.8.2), containerd and Buildroot carry security fixes, and the new CA bundle drops trust in the eMudhra roots tied to compromised intermediates. Release downloads now include <code>SHA256SUMS</code> with a Sigstore bundle, so you can verify images with Cosign.</p>
+          <p><strong>Why it matters:</strong> If 18.3 cost you a Realtek VLAN or a USB Bluetooth stick, this is the fix. On Raspberry Pi, UAS is now disabled for the Argon ONE M.2 and UGREEN CM300 adapters, which should help people booting from USB SSDs. The project says all users should upgrade. stable.json already lists 18.4 for the Pi 5.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/operating-system/releases/tag/18.4">operating-system 18.4</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="core">
+          <p class="meta">03 · Home Assistant</p>
+          <h2>Core 2026.10.3 and 2026.10.4 land; 2026.10.4 is the stable default</h2>
+          <p><strong>What happened:</strong> Two patch releases arrived since our last brief: <strong>2026.10.3</strong> (23 Oct) and <strong>2026.10.4</strong> (24 Oct). 2026.10.4 is small. It raises the aiohttp client header limit to 64 KiB and bumps pylutron-caseta to 0.30.0. stable.json advertises 2026.10.4 as the default.</p>
+          <p><strong>Why it matters:</strong> This is routine patching. If you use Lutron Caséta or ran into header-size errors on integrations that talk to chatty cloud APIs, update.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.10.4">core 2026.10.4</a>; <a href="https://github.com/home-assistant/core/releases/tag/2026.10.3">core 2026.10.3</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="supervisor">
+          <p class="meta">04 · Home Assistant / Supervisor</p>
+          <h2>Supervisor 2026.10.4: log timestamps gain a UTC offset</h2>
+          <p><strong>What happened:</strong> Supervisor moved through 2026.10.3 (19 Oct) to <strong>2026.10.4</strong> (24 Oct), which is now the stable pin. Its one breaking change adds a UTC offset to log timestamps. New features let apps set a default log format and forward the Core user's groups to apps over ingress. Fixes cover Core not starting after a Supervisor restart when its container is missing, and a starting healthcheck being treated as unhealthy.</p>
+          <p><strong>Why it matters:</strong> If you parse Supervisor logs with a script or ship them to a log stack, expect the timestamp format to change.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.4">supervisor 2026.10.4</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">05 · Z-Wave</p>
+          <h2>Z-Wave JS UI 11.25.x: Node 24 in Docker, then a cert fix</h2>
+          <p><strong>What happened:</strong> <strong>v11.25.0</strong> (21 Oct) added an option to enable Configuration CC entities by default and showed min/max/step in value hints, and its Docker image moved to Node 24. <strong>v11.25.2</strong> (26 Oct) regenerates self-signed HTTPS certificates that Node 24 rejects. The driver, node-zwave-js, is at <strong>v15.31.2</strong> (22 Oct).</p>
+          <p><strong>Why it matters:</strong> If you run Z-Wave JS UI in Docker with its own HTTPS and it broke after 11.25.0, skip straight to 11.25.2.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.25.2">zwave-js-ui v11.25.2</a>; <a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.25.0">v11.25.0</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">06 · Zigbee</p>
+          <h2>Zigbee2MQTT still 2.14.2</h2>
+          <p><strong>What happened:</strong> No new tag since <strong>2.14.2</strong> (1 Oct). The usual monthly release would be due around the start of November.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases">Zigbee2MQTT releases</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="matterjs">
+          <p class="meta">07 · Matter &amp; Thread</p>
+          <h2>matter.js 0.18.0 is out</h2>
+          <p><strong>What happened:</strong> <strong>matter.js v0.18.0</strong> tagged 20 Oct. It is the open-source TypeScript implementation of the Matter protocol.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/project-chip/matter.js/releases/tag/v0.18.0">matter.js v0.18.0</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

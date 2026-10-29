@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 20 Oct 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 2026-10-20. matter.js 0.18.0 implements Matter 1.6.1 with Groupcast and the Access Control auxiliary ACL on by default; Supervisor 2026.10.3 makes the pwned-secrets check opt-in; HAOS 18.4.rc1 ships Cosign-signed release images. Aqara Outdoor Plug H2 EU launches; Core 2026.10.2, ESPHome 2026.10.0b5, Z-Wave JS UI 11.24.3, Z2M 2.14.2 unchanged.">
+  <link rel="canonical" href="https://hanews.org/brief-2026-10-20.html">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 20 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+    <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>20 October 2026</h1>
+        <p class="lede">The Matter SDK moved to <strong>Matter 1.6.1</strong> overnight: <code>matter.js 0.18.0</code> went stable with the <strong>Groupcast cluster and the Access Control auxiliary ACL enabled by default</strong>, plus native ML-DSA post-quantum key support. The Supervisor pin moved to <strong>2026.10.3</strong> — its pwned-secrets check is now opt-in — and <strong>HAOS 18.4.rc1</strong> is the first candidate to ship signed release images. Aqara's dual-protocol outdoor plug, the <strong>Outdoor Plug H2 EU</strong>, is live in Europe.</p>
+        <p class="disclosure">Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page. We link only to products covered editorially, and no story placement is sponsored.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Matter &amp; Thread / JavaScript SDK</p>
+          <h2>matter.js 0.18.0 ships Matter 1.6.1 — Groupcast and the auxiliary ACL are on by default</h2>
+          <p><strong>What happened:</strong> The <code>matter.js</code> SDK went stable at <strong>v0.18.0</strong> today, and the headline is the spec version underneath it: <strong>Matter 1.6.1</strong>. The changelog calls the upgrade itself breaking, because 1.6.1 carries specification changes that need code adjustments. Two behavior changes land with it: the <strong>Groupcast cluster</strong> and the <strong>Access Control auxiliary ACL</strong> are now enabled by default for devices and bridges, so controllers that assumed neither exists will have to account for them. The release also adds native <strong>ML-DSA-44 and ML-DSA-65 (FIPS 204)</strong> key creation, signing and verification in <code>@matter/general</code> — post-quantum signing, usable on Node.js where the platform supports it and via <code>@noble/post-quantum</code> otherwise.</p>
+          <p><strong>Why it matters:</strong> <code>matter.js</code> is the engine under Home Assistant's Matter server, so this is the point where Matter 1.6.1 starts being implementable in the ecosystem rather than merely specified. Turning Groupcast on by default is the part to watch: it is a mechanism for one controller to address a group of devices as a unit, and "on by default" means implementations need to handle it whether or not a product explicitly asks for it.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/project-chip/matter.js/releases/tag/v0.18.0">project-chip/matter.js v0.18.0</a>; <a href="https://github.com/project-chip/matter.js/blob/main/CHANGELOG.md">matter.js CHANGELOG</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="supervisor">
+          <p class="meta">02 · Home Assistant / Supervisor</p>
+          <h2>Supervisor 2026.10.3 is the stable pin — the pwned-secrets check is now opt-in</h2>
+          <p><strong>What happened:</strong> <code>stable.json</code> now points at <strong>Supervisor 2026.10.3</strong>, which carries two breaking changes. The <strong>pwned-secrets check becomes opt-in</strong> (#7382) rather than a default, and <strong>log timestamps from the systemd journal are localized</strong> (#7372), with a new timestamp log format and API format selection (#7365). Under the fixes: auth API request parsing for <strong>Bearer tokens</strong> and content types (#7332), revalidation of auth cache mismatches with Home Assistant Core (#7331), <strong>securetar</strong> errors when restoring Core (#7346), and rejection of <strong>control characters in backup filenames</strong> (#7338).</p>
+          <p><strong>Why it matters:</strong> The pwned check going opt-in changes what a fresh install does by default, so a password that was never checked against a breach corpus can now stay unchecked unless you turn it on. Anyone running the Supervisor in a non-English locale will see log timestamps change format. The Bearer-token parsing fix matters if you script against the Supervisor API.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.3">home-assistant/supervisor 2026.10.3</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="haos">
+          <p class="meta">03 · Home Assistant OS</p>
+          <h2>HAOS 18.4.rc1 — the release candidates now ship signed, and 18.3's kernel regressions get fixed</h2>
+          <p><strong>What happened:</strong> <strong>18.4.rc1</strong> is out as a candidate for the next Home Assistant OS release. The notes call it a small bugfix and security release that mainly addresses <strong>kernel regressions introduced in 18.3</strong>, plus VLAN networking on Realtek adapters and several boot and USB storage issues. The notable new artifact: release downloads now include <code>SHA256SUMS</code> and a signature bundle, <code>SHA256SUMS.sigstore.json</code>, so images can be checked with <strong>Cosign</strong> to confirm they came from Home Assistant and were not modified.</p>
+          <p>Underneath: Docker <strong>29.8.2</strong>, containerd <strong>2.3.6</strong>, OS Agent <strong>1.14.0</strong>, Buildroot <strong>2025.02.18</strong>, Linux kernel <strong>6.18.57</strong> on Home Assistant Green, the OVA and generic x86-64, RTL8761CU Bluetooth controller firmware, EROFS deduplication disabled on all boards, and UAS disabled for the Argon ONE M.2 and the UGREEN CM300. Stable boards remain on <strong>18.3</strong>.</p>
+          <p><strong>Why it matters:</strong> The Cosign bundle is the concrete one — it is a step toward verifiable OS images, which matters if you flash HAOS yourself or mirror it internally. And the 18.3 kernel regressions being corrected in a candidate rather than a patch is the reason to run 18.4 when it goes stable if you had network trouble after updating to 18.3.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/operating-system/releases/tag/18.4.rc1">home-assistant/operating-system 18.4.rc1</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+          <dl class="facts buy">
+            <dt>Buy (affiliate)</dt>
+            <dd><a href="https://www.amazon.com/s?k=Home%20Assistant%20Green&tag=hanews01-20">Home Assistant Green — search on Amazon</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="plug">
+          <p class="meta">04 · Devices / Aqara</p>
+          <figure class="figure">
+            <img src="images/aqara-outdoor-plug-h2-eu-1.png" alt="Aqara Outdoor Plug H2 EU mounted on a wall outlet, alongside app screens showing power monitoring and the Thread and Zigbee dual-protocol logos" width="1188" height="1000" loading="lazy">
+            <figcaption>Aqara Outdoor Plug H2 EU — source <a href="https://www.aqara.com/eu/product/outdoor-plug-h2-eu">Aqara product page</a></figcaption>
+          </figure>
+          <h2>Aqara Outdoor Plug H2 EU: one outdoor socket that speaks Matter over Thread and plain Zigbee</h2>
+          <p><strong>What happened:</strong> Aqara's Outdoor Plug H2 EU is live in Europe, and the Matter device database listed it today as <strong>SP-P06E / SP-P06D</strong>, certificate <code>CSA25B92MAT47844-24</code>, certified to <strong>Matter 1.4</strong> as a <strong>Thread router (FTD)</strong> with a Bluetooth radio alongside. Aqara's own product page is explicit about the unusual part: in Thread mode the plug needs no Aqara hub to join third-party Matter ecosystems, while in Zigbee mode it keeps exclusive Aqara functionality and can still be bridged into Matter through an Aqara hub. It is rated <strong>IP44</strong>, handles <strong>16 A / 3680 W</strong>, draws at most <strong>0.4 W</strong> at idle, cuts out at <strong>80 °C</strong> or on overload, has a configurable load limit, a child lock, a configurable status LED, and a configurable 30-minute charging cut-off below 3 W. The LED-indicator configuration is a Zigbee-mode feature for now — Aqara flags Thread support for it as a future update.</p>
+          <p><strong>Why it matters:</strong> Most outdoor Matter plugs are Wi-Fi or Thread-only, and Aqara's own Zigbee ecosystem rarely mixes with Matter. A single socket that can be commissioned over Thread for Google Home or Apple Home and still be paired to an Aqara hub is a genuinely different supply of Zigbee sensors — the same reason the Aqara H2 power plug matters, extended to a weatherproof body.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://matterdevices.io/product/aqara-outdoor-plug-h2-eu/">MatterDevices.io: Aqara Outdoor Plug H2 EU</a>; <a href="https://www.aqara.com/eu/product/outdoor-plug-h2-eu">Aqara EU product page</a></dd>
+          </dl>
+          <dl class="facts buy">
+            <dt>Buy (affiliate)</dt>
+            <dd><a href="https://www.amazon.com/s?k=Aqara%20Outdoor%20Plug%20H2%20EU&tag=hanews01-20">Aqara Outdoor Plug H2 EU — search on Amazon</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="core">
+          <p class="meta">05 · Home Assistant</p>
+          <h2>Core 2026.10.2 is still the stable default</h2>
+          <p><strong>What happened:</strong> No new Core patch this morning — <code>stable.json</code> still advertises <strong>2026.10.2</strong>, released Friday 16 October at 20:04 UTC. The last patch fixed MQTT device triggers and tags firing twice after a reload, a crash on empty groups, Tesla Fleet diagnostics redaction, KNX telegram-store initialization timeouts, and aiohttp 3.14.5.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.10.2">home-assistant/core 2026.10.2</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">06 · ESPHome</p>
+          <h2>ESPHome still on 2026.10.0b5; stable remains 2026.9.0</h2>
+          <p><strong>What happened:</strong> No new tag since <strong>2026.10.0b5</strong> (19 Oct, 01:03 UTC) and the stable channel is still <strong>2026.9.0</strong>. For reference, that beta carried the recommended ESP-IDF bump to 5.5.6, <code>tcp_uart</code>/<code>uart_tcp</code> as new platforms, and <code>usb_uart</code> gaining <code>interface_class</code> and <code>port_number</code>.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/esphome/esphome/releases/tag/2026.10.0b5">esphome 2026.10.0b5</a>; <a href="https://esphome.io/blog/rss.xml">ESPHome blog RSS</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">07 · Z-Wave</p>
+          <h2>Z-Wave JS UI still 11.24.3, node-zwave-js still 15.31.1</h2>
+          <p><strong>What happened:</strong> Latest tags are unchanged: <strong>zwave-js-ui v11.24.3</strong> (9 Oct) and <strong>node-zwave-js v15.31.1</strong> (7 Oct).</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.24.3">zwave-js-ui v11.24.3</a>; <a href="https://github.com/zwave-js/node-zwave-js/releases/tag/v15.31.1">node-zwave-js v15.31.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">08 · Zigbee</p>
+          <h2>Zigbee2MQTT still 2.14.2</h2>
+          <p><strong>What happened:</strong> Latest release remains <strong>2.14.2</strong> (1 Oct). No 2.14.3 on the releases list.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.2">Zigbee2MQTT 2.14.2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="huepro">
+          <p class="meta">09 · Devices / Hue</p>
+          <figure class="figure">
+            <img src="images/hue-play-gradient-strip-pro.jpg" alt="Philips Hue Play gradient strip light pro 65-inch, a two-metre light strip with individually addressable color zones" width="980" height="551" loading="lazy">
+            <figcaption>Philips Hue Play gradient strip light pro 65" — source <a href="https://www.philips-hue.com/en-us/p/lightstrips-philips-hue-play-gradient-strip-light-pro-65/046677611828">Philips Hue product page</a></figcaption>
+          </figure>
+          <h2>Hue Play Gradient Pro 65": still not orderable in the US</h2>
+          <p><strong>What happened:</strong> We re-checked Hue's own US product page for the pro 65" this morning — there is still no way to order it in the US. No change to the standing picture: Amazon listings at <strong>$179.99</strong>, UK page in stock at <strong>£139.99</strong> since late September.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.philips-hue.com/en-us/p/lightstrips-philips-hue-play-gradient-strip-light-pro-65/046677611828">Hue US pro 65" page</a> (checked 20 Oct; not purchasable in the US)</dd>
+          </dl>
+          <dl class="facts buy">
+            <dt>Buy (affiliate)</dt>
+            <dd><a href="https://www.amazon.com/s?k=Philips%20Hue%20Play%20Gradient%20LightStrip%20Pro%2065%20inch&tag=hanews01-20">Philips Hue Play Gradient LightStrip Pro (65") — search on Amazon</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="shelly">
+          <p class="meta">10 · Devices / Shelly</p>
+          <h2>Shelly: no movement on Schneider clearance; ThreadLink still ~December</h2>
+          <p><strong>What happened:</strong> No regulatory decision or company announcement on Schneider's €70/share tender offer for Shelly Group, which the board backed last week. Gen4 <strong>ThreadLink</strong> firmware unchanged — still the IFA framing of roughly December, delivered as an opt-in per-device update.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.shelly.com/blogs/news">Shelly Group IR</a>; <a href="https://www.shelly.com/blogs/media-kit/shelly-unveils-threadlink-ifa-2026">ThreadLink media kit</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="timmerflotte">
+          <p class="meta">11 · Devices / IKEA</p>
+          <h2>IKEA TIMMERFLOTTE — no news</h2>
+          <p><strong>What happened:</strong> No change since Friday: prod-firmware 61 offline drops remain community-sourced, not vendor-confirmed, and no change in the Matter test firmware line.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd>Prior brief <a href="brief-2026-10-19.html#timmerflotte">19 Oct</a>; <a href="brief-2026-09-29.html#timmerflotte">29 Sep brief</a> for the original watch</dd>
+          </dl>
+        </article>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

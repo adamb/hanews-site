@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to Install Home Assistant on a Raspberry Pi (2026 Guide) — HA News</title>
+  <meta name="description" content="Install Home Assistant OS on a Raspberry Pi 5 or 4: what to buy, Raspberry Pi Imager steps, first boot at homeassistant.local, troubleshooting, and SD vs SSD. Updated for HAOS 18.4.">
+  <link rel="canonical" href="https://hanews.org/home-assistant-raspberry-pi">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "How to install Home Assistant on a Raspberry Pi (2026 guide)", "datePublished": "2026-10-28", "dateModified": "2026-10-28", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-assistant-raspberry-pi"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I install Home Assistant on a Raspberry Pi over Wi-Fi?", "acceptedAnswer": {"@type": "Answer", "text": "No. Ethernet is required for installation. Wi-Fi can be configured after Home Assistant is running, but Ethernet is more reliable and is the recommended connection."}}, {"@type": "Question", "name": "Which Raspberry Pi do I need for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "A Raspberry Pi 4 or Raspberry Pi 5 with at least 2 GB of RAM. The Pi 5 is the newer board. During installation you select the HAOS build that matches your board."}}, {"@type": "Question", "name": "What size microSD card do I need?", "acceptedAnswer": {"@type": "Answer", "text": "At least 32 GB, ideally with the Application Class 2 (A2) label. A2 cards perform better on small reads and writes. A card above the minimum, such as 64 GB, also qualifies."}}, {"@type": "Question", "name": "Can I power the Raspberry Pi from a phone charger or a computer USB port?", "acceptedAnswer": {"@type": "Answer", "text": "A phone charger may not deliver full power, and computer USB ports must not be used. A proper power supply is part of the supported hardware list."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Wednesday, 28 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Explainer · Home Assistant</p>
+        <h1>How to install Home Assistant on a Raspberry Pi</h1>
+        <p class="byline">HA News · 28 Oct 2026 · Checked against HAOS 18.4 and Core 2026.10.4</p>
+        <p class="disclosure">Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page. Prices and stock are on Amazon; we don't quote them here.</p>
+<p>This guide walks through how to install Home Assistant on a Raspberry Pi: the hardware to buy, how to write Home Assistant OS to a microSD card with Raspberry Pi Imager, and what to expect on first boot. If you are still deciding on a Raspberry Pi for Home Assistant, the starting facts are these: the Pi 4 and the Pi 5 are the supported boards, 2 GB of RAM is the minimum, and Home Assistant OS (HAOS) is the recommended install type. Version numbers in this article were current as of 28 October 2026: HAOS 18.4 and Core 2026.10.4. The official installation documentation is at <a href="https://www.home-assistant.io/installation/raspberrypi/">home-assistant.io/installation/raspberrypi</a>; this article follows the same path.</p>
+
+<p>The sections below run in order: hardware, the board choice, the image write, first boot, troubleshooting, storage, and the install-type alternatives, with a short FAQ at the end.</p>
+
+<h2>What you need</h2>
+
+<p>This is the complete hardware list for a Home Assistant OS install:</p>
+
+<ul>
+<li><strong>Raspberry Pi 5 or Raspberry Pi 4</strong>, with at least 2 GB of RAM. A 4 GB board clears the minimum. (<a href="https://www.amazon.com/s?k=Raspberry+Pi+5+4GB&amp;tag=hanews01-20" rel="sponsored nofollow">Raspberry Pi 5 4GB on Amazon</a>; <a href="https://www.amazon.com/s?k=Raspberry+Pi+4+4GB&amp;tag=hanews01-20" rel="sponsored nofollow">Raspberry Pi 4 4GB on Amazon</a>)</li>
+<li><strong>A proper power supply.</strong> Phone chargers may not deliver full power, and computer USB ports must not be used. (<a href="https://www.amazon.com/s?k=official+Raspberry+Pi+27W+USB-C+power+supply&amp;tag=hanews01-20" rel="sponsored nofollow">official Raspberry Pi 27W USB-C power supply on Amazon</a>)</li>
+<li><strong>A microSD card, at least 32 GB</strong>, ideally with the Application Class 2 (A2) label. A2 cards perform better on small reads and writes. A 64 GB A2 card meets both requirements. (<a href="https://www.amazon.com/s?k=SanDisk+A2+microSD+64GB&amp;tag=hanews01-20" rel="sponsored nofollow">SanDisk A2 microSD 64GB on Amazon</a>)</li>
+<li><strong>An SD card reader</strong> for writing the image from your computer. (<a href="https://www.amazon.com/s?k=USB+microSD+card+reader&amp;tag=hanews01-20" rel="sponsored nofollow">USB microSD card reader on Amazon</a>)</li>
+<li><strong>An Ethernet cable.</strong> Ethernet is required for installation; Wi-Fi can be configured afterwards, but Ethernet is more reliable and recommended.</li>
+</ul>
+
+<p>The card reader is used only while writing the image; the other items stay with the install.</p>
+
+<h2>Pi 4 or Pi 5?</h2>
+
+<p>Both the Raspberry Pi 4 and the Raspberry Pi 5 are supported, with a minimum of 2 GB of RAM; boards with more memory also meet the requirement. The Pi 5 is the newer board. The choice has one practical consequence during installation: Home Assistant OS ships as separate builds for the Pi 4 and the Pi 5, and you select the matching build when you write the image. Note which board you have before you start.</p>
+
+<h2>Install Home Assistant OS step by step</h2>
+
+<p>Home Assistant OS (HAOS) is the recommended install type: an embedded, minimal operating system that includes Home Assistant Core and the Supervisor. The Supervisor keeps the system updated and supports apps (formerly called add-ons). The steps below run on your computer, with the SD card in the reader; the Pi is not connected yet.</p>
+
+<ol>
+<li>Install <a href="https://www.raspberrypi.com/software">Raspberry Pi Imager</a> from raspberrypi.com/software.</li>
+<li>Click <strong>Choose OS</strong> and select <strong>Other specific-purpose OS &gt; Home automation &gt; Home Assistant</strong>.</li>
+<li>Select the HAOS build that matches your board: the Raspberry Pi 5 build or the Raspberry Pi 4 build.</li>
+<li>Select the SD card. It will be overwritten, so confirm you have the right one.</li>
+<li>Click <strong>Next</strong>, then <strong>Write</strong>.</li>
+<li>When writing completes, click <strong>Finish</strong> and eject the card.</li>
+</ol>
+
+<p>If you would rather not use Raspberry Pi Imager, download the HAOS image from the Home Assistant OS releases on GitHub and write it with Balena Etcher. The current release is HAOS 18.4 (released 27 October 2026), a bugfix and security release on kernel 6.18.58 that fixes the Realtek VLAN and RTL8761B Bluetooth regressions introduced in 18.3. Release downloads now include a SHA256SUMS file with a sigstore signature. The current image files are <code>haos_rpi5-64-18.4.img.xz</code> and <code>haos_rpi4-64-18.4.img.xz</code>; pick the one matching your board.</p>
+
+<h2>First boot and finding homeassistant.local</h2>
+
+<p>With the card written, three steps start the Pi:</p>
+
+<ol>
+<li>Insert the microSD card into the Pi.</li>
+<li>Plug in the Ethernet cable, on the same network as your computer, with internet access.</li>
+<li>Connect the power supply.</li>
+</ol>
+
+<p>From a computer on the same network, browse to <strong>homeassistant.local</strong>. If that address does not load, try <strong>homeassistant.local:8123</strong>, <strong>homeassistant:8123</strong>, or <strong>http://&lt;Pi IP&gt;:8123</strong>, substituting the Pi's IP address. On a Pi 4 or Pi 5 the page should appear within a minute of connecting power. The documented setup involves no keyboard or monitor; everything after power-on happens in your browser.</p>
+
+<h2>If it doesn't come up</h2>
+
+<p>If the page has not appeared after five minutes, the installation documentation lists three remedies:</p>
+
+<ul>
+<li>Reflash the card and try again.</li>
+<li>Try a different microSD card.</li>
+<li>Connect an HDMI monitor to the Pi to see the console.</li>
+</ul>
+
+<p>Before reflashing, check two setup requirements: the Ethernet cable must run to the same network as your computer and have internet access, and the Pi must be on a proper power supply — phone chargers may not deliver full power, and computer USB ports must not be used. If <strong>homeassistant.local</strong> is the only address that fails, work through the alternatives listed above first.</p>
+
+<h2>SD card or SSD?</h2>
+
+<p>A microSD card is the documented installation path for Home Assistant OS on a Raspberry Pi, and it is the path this article follows. If you plan to boot from a USB SSD instead, one change in HAOS 18.4 is relevant: the release disables UAS for two USB adapters on the Raspberry Pi — the Argon ONE M.2 (ASMedia 174c:1156) and the UGREEN CM300 (ASM235CM) — to fix USB storage issues. That matters if your SSD sits behind one of those two adapters. For the card path, the A2 recommendation from the hardware list above applies.</p>
+
+<h2>HAOS vs Container on a Pi</h2>
+
+<p>Two install types are worth knowing about on a Pi:</p>
+
+<ul>
+<li><strong>Home Assistant OS (HAOS)</strong> — the recommended install type. An embedded, minimal OS that includes Core and the Supervisor; the Supervisor keeps the system updated and supports apps.</li>
+<li><strong>Home Assistant Container (Docker)</strong> — runs Home Assistant Core only. No Supervisor, no apps.</li>
+</ul>
+
+<p>Both install types run the same Core; the current Core release is 2026.10.4 (24 October 2026). The difference in practice is the Supervisor and apps: a Container install has neither. This article assumes HAOS throughout.</p>
+
+<h2>What to do next</h2>
+
+<p>When the interface loads, onboarding takes you through three things: create your user, set your location, and review the devices Home Assistant has discovered. After onboarding, the Supervisor keeps the system updated.</p>
+
+<p>Two follow-up reads on HA News cover common next steps: <a href="article-thread-network">what a Thread network looks like in Home Assistant</a> and <a href="article-esphome-starter-kit">the ESPHome Starter Kit</a>. We publish a daily brief on releases across the local stack. <a href="index.html">Read today's</a>.</p>
+
+<h2>FAQ</h2>
+
+<h3>Can I install Home Assistant on a Raspberry Pi over Wi-Fi?</h3>
+<p>No. Ethernet is required for installation. Wi-Fi can be configured after Home Assistant is running, but Ethernet is more reliable and is the recommended connection.</p>
+
+<h3>Which Raspberry Pi do I need for Home Assistant?</h3>
+<p>A Raspberry Pi 4 or Raspberry Pi 5 with at least 2 GB of RAM. The Pi 5 is the newer board. During installation you select the HAOS build that matches your board.</p>
+
+<h3>What size microSD card do I need?</h3>
+<p>At least 32 GB, ideally with the Application Class 2 (A2) label. A2 cards perform better on small reads and writes. A card above the minimum, such as 64 GB, also qualifies.</p>
+
+<h3>Can I power the Raspberry Pi from a phone charger or a computer USB port?</h3>
+<p>A phone charger may not deliver full power, and computer USB ports must not be used. A proper power supply is part of the supported hardware list.</p>
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/installation/raspberrypi/">Home Assistant: Raspberry Pi installation</a>; <a href="https://github.com/home-assistant/operating-system/releases/tag/18.4">HAOS 18.4 release notes</a>; <a href="https://www.raspberrypi.com/software/">Raspberry Pi Imager</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

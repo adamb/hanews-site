@@ -41,34 +41,27 @@
   <main id="main" class="sheet">
     <div class="edition">
       <aside class="col-left" aria-label="Section headlines">
-        <section class="sec" aria-labelledby="k-matter">
-          <h2 class="kicker" id="k-matter">Matter &amp; Thread</h2>
-          <ul>
-            <li><a href="brief-2026-10-19.html#unifi">UniFi Network 11: Matter/Thread monitoring</a></li>
-            <li><a href="brief-2026-10-16.html#lead">Apple Home Collection with LG/Schneider</a></li>
-            <li><a href="brief-2026-10-16.html#homeview">HomeView hub pre-orders open</a></li>
-          </ul>
-        </section>
         <section class="sec" aria-labelledby="k-ha">
           <h2 class="kicker" id="k-ha">Home Assistant</h2>
           <ul>
-            <li><a href="brief-2026-10-19.html#core">Core 2026.10.2 live on stable channel</a></li>
-            <li><a href="brief-2026-10-19.html#supervisor">Supervisor stable pin still 2026.10.2</a></li>
-            <li><a href="brief-2026-10-19.html#haos">HAOS still 18.3</a></li>
-          </ul>
-        </section>
-        <section class="sec" aria-labelledby="k-dev">
-          <h2 class="kicker" id="k-dev">Devices</h2>
-          <ul>
-            <li><a href="brief-2026-10-19.html#huepro">Hue Pro strip: US page still out of stock</a></li>
-            <li><a href="brief-2026-10-19.html#shelly">Shelly/ThreadLink unchanged</a></li>
-            <li><a href="brief-2026-10-19.html#timmerflotte">TIMMERFLOTTE unchanged</a></li>
+            <li><a href="brief-2026-10-28.html#haos">HAOS 18.4: kernel fixes, signed images</a></li>
+            <li><a href="brief-2026-10-28.html#core">Core 2026.10.4 is the stable default</a></li>
+            <li><a href="brief-2026-10-28.html#supervisor">Supervisor 2026.10.4: log timestamps change</a></li>
+            <li><a href="home-assistant-raspberry-pi.html">Guide: Home Assistant on a Raspberry Pi</a></li>
           </ul>
         </section>
         <section class="sec" aria-labelledby="k-esp">
           <h2 class="kicker" id="k-esp">ESPHome</h2>
           <ul>
-            <li><a href="brief-2026-10-19.html#lead">Beta 5 out; 2026.10.0 closer than it looked</a></li>
+            <li><a href="brief-2026-10-28.html#lead">2026.10 stable: native ESP8266, smaller OTA</a></li>
+          </ul>
+        </section>
+        <section class="sec" aria-labelledby="k-radio">
+          <h2 class="kicker" id="k-radio">Radios</h2>
+          <ul>
+            <li><a href="brief-2026-10-28.html#zwave">Z-Wave JS UI 11.25.2</a></li>
+            <li><a href="brief-2026-10-28.html#z2m">Zigbee2MQTT still 2.14.2</a></li>
+            <li><a href="brief-2026-10-28.html#matterjs">matter.js 0.18.0</a></li>
           </ul>
         </section>
       </aside>
@@ -76,27 +69,23 @@
       <div class="col-center">
         <article class="lead" id="lead">
           <p class="lead-kicker">ESPHome</p>
-          <h1><a href="brief-2026-10-19.html">ESPHome beta 5 ships overnight — the 2026.10 stable is closer than Friday's brief suggested</a></h1>
-          <p class="dek">2026.10.0b5 tagged at 01:03 UTC with 24 PRs and an ESP-IDF 5.5.6 bump; two breaking changes stay banked for the .0. Core 2026.10.2 is also live: released Friday, now the stable-channel default.</p>
-          <p class="byline">HA News Brief · 19 Oct 2026</p>
-          <p>Also today: UniFi Network 11 adds Matter device monitoring and folds Thread devices into a real network topology view, with historical mesh state via Time Machine.</p>
-          <p class="byline">Sources: <a href="https://github.com/esphome/esphome/releases/tag/2026.10.0b5">esphome 2026.10.0b5</a>, <a href="https://github.com/home-assistant/core/releases/tag/2026.10.2">Core 2026.10.2</a>, <a href="https://blog.ui.com/article/introducing-unifi-network-11">Ubiquiti blog</a></p>
-          <div class="quote-card">
-            <p>Five betas in twelve days usually means the stable is days out. External components touching selects, lights, or IR protocols: your test window is open.</p>
-            <cite>19 Oct 2026 brief · ESPHome 2026.10.0b5</cite>
-          </div>
+          <h1><a href="brief-2026-10-28.html">ESPHome 2026.10 goes stable: native ESP8266 builds and OTA updates a third smaller</a></h1>
+          <p class="dek">2026.10.0 landed 21 Oct and 2026.10.1 on 27 Oct, with 20 new components and four config changes to check before updating. HAOS 18.4 also shipped, fixing 18.3's Realtek VLAN and Bluetooth regressions.</p>
+          <p class="byline">HA News Brief · 28 Oct 2026</p>
+          <p>Also today: Core 2026.10.4 and Supervisor 2026.10.4 are the stable pins, and Z-Wave JS UI 11.25.2 fixes HTTPS certs that Node 24 rejects.</p>
+          <p class="byline">Sources: <a href="https://esphome.io/blog/2026/10/21/esphome-2026-10/">ESPHome blog</a>, <a href="https://github.com/home-assistant/operating-system/releases/tag/18.4">HAOS 18.4</a>, <a href="https://github.com/home-assistant/core/releases/tag/2026.10.4">Core 2026.10.4</a></p>
         </article>
 
         <div class="secondary">
           <article>
-            <p class="kicker">Home Assistant</p>
-            <h2><a href="brief-2026-10-19.html#core">Core 2026.10.2 live: MQTT double-fire fixed</a></h2>
-            <p>Released Friday 20:04 UTC; now the stable.json default across current boards.</p>
+            <p class="kicker">Explainer</p>
+            <h2><a href="home-assistant-raspberry-pi.html">How to install Home Assistant on a Raspberry Pi</a></h2>
+            <p>What to buy, the Imager steps, first boot and troubleshooting. Checked against HAOS 18.4.</p>
           </article>
           <article>
-            <p class="kicker">Matter &amp; Thread / Ubiquiti</p>
-            <h2><a href="brief-2026-10-19.html#unifi">UniFi Network 11: Thread enters the topology view</a></h2>
-            <p>Matter device metrics, border-router hops, and historical mesh state via Time Machine.</p>
+            <p class="kicker">Home Assistant OS</p>
+            <h2><a href="brief-2026-10-28.html#haos">HAOS 18.4: signed images and kernel 6.18.58</a></h2>
+            <p>Fixes VLAN on Realtek and RTL8761B Bluetooth; all users encouraged to upgrade.</p>
           </article>
         </div>
       </div>
@@ -104,47 +93,35 @@
       <aside class="col-right">
         <section class="briefing" aria-labelledby="briefing-title">
           <h2 id="briefing-title">The Briefing</h2>
-          <p class="brief-date">19 Oct 2026</p>
+          <p class="brief-date">28 Oct 2026</p>
           <ol>
             <li>
-              <a href="brief-2026-10-19.html#lead">ESPHome 2026.10.0b5 ships overnight</a>
-              <p>24 PRs; ESP-IDF 5.5.6; stable still 2026.9.0.</p>
+              <a href="brief-2026-10-28.html#lead">ESPHome 2026.10 stable</a>
+              <p>Native ESP8266; OTA a third smaller.</p>
             </li>
             <li>
-              <a href="brief-2026-10-19.html#core">Core 2026.10.2 is live</a>
-              <p>Released Friday; stable.json default now.</p>
+              <a href="brief-2026-10-28.html#haos">HAOS 18.4</a>
+              <p>Kernel regressions fixed; signed images.</p>
             </li>
             <li>
-              <a href="brief-2026-10-19.html#unifi">UniFi Network 11: Matter/Thread monitoring</a>
-              <p>Topology view plus Time Machine history.</p>
+              <a href="brief-2026-10-28.html#core">Core 2026.10.4</a>
+              <p>Stable default; small patch.</p>
             </li>
             <li>
-              <a href="brief-2026-10-19.html#supervisor">Supervisor still pinned 2026.10.2</a>
-              <p>No new tag since 14 Oct.</p>
+              <a href="brief-2026-10-28.html#supervisor">Supervisor 2026.10.4</a>
+              <p>UTC offset in log timestamps.</p>
             </li>
             <li>
-              <a href="brief-2026-10-19.html#haos">HAOS still 18.3</a>
-              <p>Four weeks; no candidate either.</p>
+              <a href="brief-2026-10-28.html#zwave">Z-Wave JS UI 11.25.2</a>
+              <p>Node 24 cert fix.</p>
             </li>
             <li>
-              <a href="brief-2026-10-19.html#zwave">Z-Wave JS UI 11.24.3</a>
-              <p>9 Oct; nothing since.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-19.html#z2m">Zigbee2MQTT 2.14.2</a>
+              <a href="brief-2026-10-28.html#z2m">Zigbee2MQTT 2.14.2</a>
               <p>1 Oct; nothing since.</p>
             </li>
             <li>
-              <a href="brief-2026-10-19.html#huepro">Hue Pro strip: US page out of stock</a>
-              <p>Re-checked 19 Oct. UK £139.99 in stock.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-19.html#shelly">Shelly: no Tender movement; ThreadLink ~Dec</a>
-              <p>Schneider clearance pending.</p>
-            </li>
-            <li>
-              <a href="brief-2026-10-19.html#timmerflotte">IKEA TIMMERFLOTTE: no news</a>
-              <p>Offline drops still community-sourced.</p>
+              <a href="brief-2026-10-28.html#matterjs">matter.js 0.18.0</a>
+              <p>Tagged 20 Oct.</p>
             </li>
           </ol>
           <a class="full-brief" href="brief-2026-10-19.html">Full brief →</a>
