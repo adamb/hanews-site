@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best Z-Wave hub for Home Assistant (2026) — HA News</title>
+  <meta name="description" content="Which Z-Wave hub to use with Home Assistant: the Connect ZWA-2 specs, Z-Wave Long Range, 800-series USB sticks, regional frequencies, setup and migration.">
+  <link rel="canonical" href="https://hanews.org/z-wave-hub">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best Z-Wave hub for Home Assistant (2026)", "image": "https://hanews.org/images/zwa-2-intro-1280.webp", "datePublished": "2026-10-30", "dateModified": "2026-10-30", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/z-wave-hub"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I need a Z-Wave hub for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "You need a Z-Wave controller, but not a vendor hub. A USB adapter such as the Connect ZWA-2 plugged into your Home Assistant machine is the hub."}}, {"@type": "Question", "name": "What is the best Z-Wave hub for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "The official Home Assistant Connect ZWA-2. It uses the 800-series chip, supports Z-Wave Long Range alongside the normal mesh, and is built by the team behind Home Assistant and Z-Wave JS. An 800-series USB stick is the compact alternative."}}, {"@type": "Question", "name": "Can I use Z-Wave and Z-Wave Long Range at the same time?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, with a controller that supports both. The ZWA-2 runs the two networks at once, and you choose which one each Long Range-capable device joins."}}, {"@type": "Question", "name": "Can I move my existing Z-Wave network to a new adapter?", "acceptedAnswer": {"@type": "Answer", "text": "Usually, yes. Home Assistant says you can migrate automatically from most modern Z-Wave sticks to the ZWA-2. Its documentation lists any special steps."}}, {"@type": "Question", "name": "Will a US Z-Wave adapter work in Europe?", "acceptedAnswer": {"@type": "Answer", "text": "No. Z-Wave frequencies are regional, so the controller and devices must all match your region."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 30 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Z-Wave</p>
+        <h1>The best Z-Wave hub for Home Assistant (2026)</h1>
+        <p class="byline">HA News · 30 Oct 2026</p>
+        <p class="disclosure">Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page. Prices and stock are on Amazon; we don't quote them here.</p>
+
+        <p>Home Assistant doesn't need a separate Z-Wave hub. The "hub" is a USB Z-Wave controller plugged into the machine that runs Home Assistant, driven by the Z-Wave JS integration. That keeps your locks, switches and sensors local, with no vendor cloud. <strong>For most people the best Z-Wave hub for Home Assistant is the official Home Assistant Connect ZWA-2</strong>, an 800-series adapter built by Nabu Casa with a large tuned antenna and Z-Wave Long Range support. A good 800-series USB stick is the compact alternative.</p>
+
+        <figure class="figure">
+          <img src="images/zwa-2-intro-1280.webp" alt="Home Assistant Connect ZWA-2 Z-Wave adapter, a tall white antenna on a round base" width="1280" height="800" loading="lazy">
+          <figcaption>Home Assistant Connect ZWA-2. Source: <a href="https://www.home-assistant.io/connect/zwa-2/">Home Assistant product page</a></figcaption>
+        </figure>
+
+        <h2>What a Z-Wave hub does in Home Assistant</h2>
+        <p>Z-Wave devices form a mesh on a sub-GHz radio, away from the 2.4 GHz band that Wi-Fi, Bluetooth, Zigbee and Thread share. Every network needs one controller. In Home Assistant that controller is a USB adapter, and the Z-Wave JS software talks to it, either through the Z-Wave JS app on Home Assistant OS or through Z-Wave JS UI if you run things yourself. Devices then show up in Home Assistant like any other integration. If you're still choosing a radio, read <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a> first.</p>
+
+        <h2>Our pick: Home Assistant Connect ZWA-2</h2>
+        <table>
+          <thead><tr><th>Spec</th><th>Connect ZWA-2</th></tr></thead>
+          <tbody>
+            <tr><td>Z-Wave chip</td><td>Silicon Labs ZG23, Z-Wave 800 series, certified</td></tr>
+            <tr><td>Protocols</td><td>Z-Wave and Z-Wave Long Range, running at the same time</td></tr>
+            <tr><td>USB bridge</td><td>ESP32-S3 (USB-serial)</td></tr>
+            <tr><td>Power and data</td><td>USB-C, 5 V DC, 1 A; 1.5 m USB cable in the box</td></tr>
+            <tr><td>Antenna</td><td>860-930 MHz, omnidirectional, 3.38 dBi peak gain</td></tr>
+            <tr><td>Regions</td><td>US 908.42/916 MHz mesh and 912/920 MHz LR; EU 868.4/869.85 MHz mesh and 864.0/866.0 MHz LR; AU 919.8/921.4 MHz</td></tr>
+            <tr><td>Use</td><td>Indoors, 0-65 °C, non-condensing humidity</td></tr>
+          </tbody>
+        </table>
+        <p>The ZWA-2 is big on purpose. Nabu Casa says the antenna and base are tuned to Z-Wave's wavelength, while typical USB sticks use tiny antennas that limit range. In its own tests it reached 1.5 km (0.9 mile) with clear line of sight, and Long Range devices connected through several concrete floors. It runs a regular Z-Wave mesh and a Long Range star network at the same time, and when you add a Long Range-capable device the setup wizard asks which network it should join. Firmware updates are one click from Home Assistant, and Nabu Casa says you can migrate automatically from most modern Z-Wave sticks.</p>
+        <p>Buying one also funds the project: Nabu Casa, which builds official Home Assistant hardware, contributes most of its profits to the Open Home Foundation. Check <a href="https://www.amazon.com/s?k=Home+Assistant+Connect+ZWA-2&amp;tag=hanews01-20" rel="sponsored nofollow">Home Assistant Connect ZWA-2 on Amazon</a> for current price and stock.</p>
+
+        <h2>The alternative: an 800-series USB stick</h2>
+        <p>If you want something small that plugs straight into a port, pick a USB stick built on the 800-series chips, which also support Z-Wave Long Range. A Zooz 800 Series Z-Wave Long Range stick (<a href="https://www.amazon.com/s?k=Zooz+800+Series+Z-Wave+Long+Range+USB+stick&amp;tag=hanews01-20" rel="sponsored nofollow">Zooz 800 Series Z-Wave Long Range USB stick on Amazon</a>) is a common choice. Put any stick on a short USB extension cable, away from USB 3 ports and the computer itself, to cut interference. Older 500- and 700-series sticks still work with Z-Wave JS, but if you're buying new, buy 800 series.</p>
+
+        <h2>Buy the right region</h2>
+        <p>Z-Wave frequencies are set by region. A US controller won't talk to EU devices, and the other way round. Buy the controller and every device for the region where you live.</p>
+
+        <h2>Setting it up</h2>
+        <ol>
+          <li>Plug the adapter into the machine running Home Assistant (for example a <a href="home-assistant-raspberry-pi">Raspberry Pi</a> or Home Assistant Green).</li>
+          <li>Home Assistant should discover it. Otherwise go to Settings, then Devices &amp; services, then Add integration, and choose Z-Wave.</li>
+          <li>On Home Assistant OS, let it install the Z-Wave JS app. Create a new network, or migrate an existing one from your old stick.</li>
+          <li>Add devices with their SmartStart QR code or inclusion button. Add mains-powered devices such as switches first so the mesh has repeaters before battery sensors join.</li>
+        </ol>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Do I need a Z-Wave hub for Home Assistant?</h3>
+        <p>You need a Z-Wave controller, but not a vendor hub. A USB adapter such as the Connect ZWA-2 plugged into your Home Assistant machine is the hub.</p>
+        <h3>What is the best Z-Wave hub for Home Assistant?</h3>
+        <p>The official Home Assistant Connect ZWA-2. It uses the 800-series chip, supports Z-Wave Long Range alongside the normal mesh, and is built by the team behind Home Assistant and Z-Wave JS. An 800-series USB stick is the compact alternative.</p>
+        <h3>Can I use Z-Wave and Z-Wave Long Range at the same time?</h3>
+        <p>Yes, with a controller that supports both. The ZWA-2 runs the two networks at once, and you choose which one each Long Range-capable device joins.</p>
+        <h3>Can I move my existing Z-Wave network to a new adapter?</h3>
+        <p>Usually, yes. Home Assistant says you can migrate automatically from most modern Z-Wave sticks to the ZWA-2. Its documentation lists any special steps.</p>
+        <h3>Will a US Z-Wave adapter work in Europe?</h3>
+        <p>No. Z-Wave frequencies are regional, so the controller and devices must all match your region.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-10-30">Read today's</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/connect/zwa-2/">Home Assistant Connect ZWA-2</a>; <a href="https://www.home-assistant.io/integrations/zwave_js/">Home Assistant Z-Wave integration</a>; <a href="https://zwave-js.github.io/zwave-js-ui/">Z-Wave JS UI</a>; <a href="https://z-wavealliance.org/">Z-Wave Alliance</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

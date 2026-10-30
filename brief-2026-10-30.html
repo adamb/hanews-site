@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 30 Oct 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 30 October 2026. Home Assistant Core 2026.11.0b1 beta (ZHA 2.4.2, Apple TV fix); November is the Month of What the Heck; stable Core 2026.10.4, Supervisor 2026.10.5, HAOS 18.4 unchanged.">
+  <link rel="canonical" href="https://hanews.org/brief-2026-10-30">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 30 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>30 October 2026</h1>
+        <p class="lede">A quiet Friday for stable releases. <strong>Core 2026.11.0b1</strong> brings ZHA 2.4.2 and an Apple TV fix to the beta, and Home Assistant opens November as the Month of “What the Heck?!”. New guide: <a href="z-wave-hub">the best Z-Wave hub for Home Assistant</a>.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Home Assistant (beta)</p>
+          <h2>Core 2026.11.0b1: ZHA 2.4.2, an Apple TV fix and a clearer SSL repair</h2>
+          <p><strong>What happened:</strong> The second beta of the November release, <strong>2026.11.0b1</strong>, was tagged 29 Oct. It bumps <strong>ZHA to 2.4.2</strong>, pins srptools below version 2 to fix the <strong>Apple TV</strong> integration, recommends the Intermediate v6 profile and clarifies the HTTP SSL profile repair, and fixes the Shelly outbound WebSocket repair, Control4 setup retries, Withings polling with webhooks and the System Monitor IP sensor. Stable Core is still <strong>2026.10.4</strong>.</p>
+          <p><strong>Why it matters:</strong> If you're testing the beta for the new Marketplace (HACS inside Home Assistant, see <a href="brief-2026-10-29#beta">yesterday's brief</a>), update to b1. The final release is due with the 4 November release party. Don't run betas on a house you depend on.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.11.0b1">core 2026.11.0b1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="wth">
+          <p class="meta">02 · Community</p>
+          <h2>November is the Month of “What the Heck?!” again</h2>
+          <p><strong>What happened:</strong> Home Assistant announced on 29 Oct that all of November is the Month of “What the Heck?!”: post what makes Home Assistant hard, confusing or annoying in the WTH category on the community forum. The project runs it every two years. This year it especially wants to hear from new and non-technical users and from people living in homes where someone else set Home Assistant up.</p>
+          <p><strong>Why it matters:</strong> This is the cheapest way to get a pet peeve in front of the developers. If you run Home Assistant for a household, ask the people you live with what bugs them.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/10/29/what-the-heck-2026-everyone-at-home-gets-a-say/">Home Assistant blog</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="stable">
+          <p class="meta">03 · Stable releases</p>
+          <h2>No change: Core 2026.10.4, Supervisor 2026.10.5, HAOS 18.4, ESPHome 2026.10.1</h2>
+          <p><strong>What happened:</strong> stable.json still lists Core <strong>2026.10.4</strong> and Supervisor <strong>2026.10.5</strong> (<a href="brief-2026-10-29#lead">symlink security fix</a>). Home Assistant OS is <strong>18.4</strong> and ESPHome <strong>2026.10.1</strong>.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://version.home-assistant.io/stable.json">stable.json</a>; <a href="https://github.com/esphome/esphome/releases">ESPHome releases</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="radios">
+          <p class="meta">04 · Zigbee &amp; Z-Wave</p>
+          <h2>No change: Z-Wave JS UI 11.25.2, Z-Wave JS 15.31.2, Zigbee2MQTT 2.14.2</h2>
+          <p><strong>What happened:</strong> Z-Wave JS UI is at <strong>v11.25.2</strong>, the Z-Wave JS driver at <strong>v15.31.2</strong>, Zigbee2MQTT at <strong>2.14.2</strong> and matter.js at <strong>0.18.0</strong>. Choosing a Z-Wave controller? New today: <a href="z-wave-hub">the best Z-Wave hub for Home Assistant</a>.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases">zwave-js-ui</a>; <a href="https://github.com/zwave-js/node-zwave-js/releases">node-zwave-js</a>; <a href="https://github.com/Koenkk/zigbee2mqtt/releases">Zigbee2MQTT</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
