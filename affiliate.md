@@ -42,6 +42,9 @@ page — not a search — gets the tag.
 ### brief-2026-10-16.html#huepro (and prior briefs reusing the same watch item)
 - Philips Hue Play Gradient Strip Pro (65") → Philips Hue Play Gradient LightStrip Pro 65 inch
 
+### brief-2026-10-21.html#lead
+- ESP32 DevKit → ESP32 DevKitC development board
+
 ### article-esphome-starter-kit.html and explainer-esphome-kit.html
 - ESP32 DevKit → ESP32 DevKitC development board
 - Generic ESPHome-capable board (ESP32-S3) → ESP32-S3 development board ESPHome

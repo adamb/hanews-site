@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 23 Oct 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 23 October 2026. Core 2026.10.3 patches nine integrations; HAOS 18.4.rc2 fixes the RTL8761B Bluetooth regression; Z-Wave JS UI 11.25.1 bundles node-zwave-js 15.31.2.">
+  <link rel="canonical" href="https://hanews.org/brief-2026-10-23">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 23 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>23 October 2026</h1>
+        <p class="lede">A Friday of small ships. <strong>Core 2026.10.3</strong> lands as a patch for nine integrations, <strong>HAOS 18.4.rc2</strong> fixes a Bluetooth adapter regression, and <strong>Z-Wave JS UI 11.25.1</strong> bundles this week's Z-Wave driver.</p>
+
+        <article class="story-block" id="core">
+          <p class="meta">01 · Home Assistant</p>
+          <h2>Core 2026.10.3: a Friday patch for nine integration fixes</h2>
+          <p><strong>What happened:</strong> Core tagged <strong>2026.10.3</strong> at 18:50 UTC. The fixes: Proxmox VE update version detection, duplicate access events in UniFi Access, missing Omada controller update fields, a fresh SSL context per connection in the SMTP integration, EnergyZero gas prices before 06:00, errors in Synology DSM button-press actions, the KNX telegram store no longer tripping the bootstrap timeout while it initializes, FRITZ!SmartHome's mixed-up lock and device-lock sensors, and the Home Connect event listener stopping on token-refresh errors. Under the hood: Python 3.14.8, base image 2026.10.1, frontend 20260930.5.</p>
+          <p><strong>Why it matters:</strong> If you run Proxmox VE, UniFi Access, KNX or a FRITZ!SmartHome lock, this patch is worth taking once it reaches your channel. The rest is polish.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.10.3">core 2026.10.3</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="haos">
+          <p class="meta">02 · Home Assistant OS</p>
+          <h2>HAOS 18.4.rc2: kernel 6.18.58 fixes the RTL8761B Bluetooth dropout</h2>
+          <p><strong>What happened:</strong> Home Assistant OS tagged <strong>18.4.rc2</strong> at 21:15 UTC — "another candidate for the 18.4 release," in the project's words. It brings Linux kernel 6.18.58, Buildroot 2025.02.19 and Go 1.27.3, and fixes the regression that broke RTL8761B (0bda:a728) Bluetooth adapters since kernel 6.18.45.</p>
+          <p><strong>Why it matters:</strong> If a Realtek-based Bluetooth adapter went quiet after the 18.3 kernel update, this is where it comes back. Candidates are for testing; 18.3 remains the stable OS.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/operating-system/releases/tag/18.4.rc2">HAOS 18.4.rc2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">03 · Z-Wave</p>
+          <h2>Z-Wave JS UI 11.25.1 bundles node-zwave-js 15.31.2</h2>
+          <p><strong>What happened:</strong> Z-Wave JS UI tagged <strong>11.25.1</strong> at 08:31 UTC. It picks up <a href="brief-2026-10-22#zwave">yesterday's driver release</a>, and the Docker images bump to Node 24.22.1.</p>
+          <p><strong>Why it matters:</strong> The driver fixes from yesterday — the controller-migration device class, preset handling and ten new device presets — are now one click away for UI users.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.25.1">zwave-js-ui 11.25.1</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="rail">
+          <p class="meta">04 · The rest of the rail</p>
+          <h2>No change elsewhere: Zigbee2MQTT 2.14.2, matter.js 0.18.0</h2>
+          <p><strong>What happened:</strong> Zigbee2MQTT is still <strong>2.14.2</strong> — no tag since 1 October — and matter.js holds at <strong>0.18.0</strong> from Tuesday. ESPHome sits at Wednesday's <strong>2026.10.0</strong> stable.</p>
+          <p><strong>Why it matters:</strong> The Friday rhythm: Core patches, the rest of the rail steady. If you're current, there is nothing to do this weekend.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases">Zigbee2MQTT releases</a>; <a href="https://github.com/project-chip/matter.js/releases">matter.js releases</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

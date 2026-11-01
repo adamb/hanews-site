@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 22 Oct 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 22 October 2026. node-zwave-js 15.31.2 fixes controller migration and adds ten device presets; IKEA's €14.99 Matter radiator thermostat reaches Germany in January; nothing else moved.">
+  <link rel="canonical" href="https://hanews.org/brief-2026-10-22">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 22 October 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>22 October 2026</h1>
+        <p class="lede">A quiet Thursday on the release rails: the Z-Wave driver <strong>node-zwave-js 15.31.2</strong> is the day's only tag. Off the wire: IKEA's €14.99 Matter radiator thermostat, the LILLJEBÄGGE, reaches Germany in January.</p>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">01 · Z-Wave</p>
+          <h2>node-zwave-js 15.31.2: controller-migration fix and ten device presets</h2>
+          <p><strong>What happened:</strong> The Z-Wave driver tagged <strong>15.31.2</strong> at 10:35 UTC. Bugfixes: 700- and 800-series controller migrations now set the device class to Static Controller; the driver no longer overrides values in preset objects owned by the application; invalid statuses in a Powerlevel Test Node Report are rejected; nvmedit ignores stale SUC update entry bytes and 0xff padding. New config presets cover the Zipato and Philio PAN04, Vemmio DS100, PAB01, Qubino 3-Phase ZMNHXD, Aeotec Indoor Siren 6, Intermatic PE653, Shelly Wave Shutter QNSH-001P10, Qubino Flush Shutter DC ZMNHCD, Merten 506004 and Springs RSZ1. TypeScript moves to 7.0.2 under the hood.</p>
+          <p><strong>Why it matters:</strong> If you have migrated a Z-Wave network between controller sticks, the corrected device class changes how the controller itself shows up in the network. Z-Wave JS UI users get this with <a href="brief-2026-10-21#zwave">yesterday's UI release</a> line or the next one; standalone driver users can pull it now.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/node-zwave-js/releases/tag/v15.31.2">node-zwave-js 15.31.2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="ikea">
+          <p class="meta">02 · Devices</p>
+          <h2>IKEA LILLJEBÄGGE: a Matter radiator thermostat at €14.99, Germany, January</h2>
+          <figure class="story-fig">
+            <img src="images/ikea-liljebagge.jpg" alt="IKEA LILLJEBAGGE smart radiator thermostat" loading="lazy" width="1200" height="675">
+            <figcaption>IKEA LILLJEBÄGGE radiator thermostat — source: IKEA, via <a href="https://www.heise.de/en/news/Ikea-s-Liljebagge-smart-radiator-thermostat-arrives-in-Germany-in-January-11492618.html">heise report</a></figcaption>
+          </figure>
+          <p><strong>What happened:</strong> heise reported Monday 19 October that IKEA's smart radiator thermostat LILLJEBÄGGE — Matter over Thread — reaches German stores in January 2027 at an expected €14.99. An IKEA spokesperson told heise sales are planned to begin right at the start of the new year; IKEA's German product page lists the €14.99 price, but IKEA has not confirmed it and it could change. The thermostat is already on sale in Sweden at 199 kronor — just under €18.</p>
+          <p><strong>Why it matters:</strong> A Matter-over-Thread radiator valve at IKEA pricing makes whole-apartment heating control realistic without a vendor hub — as a Thread device it needs a Thread border router, which you may already run. It is not on sale yet; there is nothing to buy until January.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.heise.de/en/news/Ikea-s-Liljebagge-smart-radiator-thermostat-arrives-in-Germany-in-January-11492618.html">heise, 19 October 2026</a>; <a href="https://www.ikea.com/se/en/p/liljebagge-radiator-thermostat-white-smart-80622062/">IKEA Sweden product page</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="rail">
+          <p class="meta">03 · The rest of the rail</p>
+          <h2>Nothing else moved</h2>
+          <p><strong>What happened:</strong> Core <strong>2026.10.2</strong> (stable since Friday), Supervisor <strong>2026.10.3</strong>, HAOS <strong>18.3</strong> stable with <strong>18.4.rc1</strong> on the beta channel, ESPHome <strong>2026.10.0</strong> (fresh off Wednesday's stable), Z-Wave JS UI <strong>11.25.0</strong> and Zigbee2MQTT <strong>2.14.2</strong> — all unchanged today.</p>
+          <p><strong>Why it matters:</strong> Quiet days are news too. If your stack matches these pins, you are current.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://version.home-assistant.io/stable.json">version.json (stable channel)</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
