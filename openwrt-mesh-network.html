@@ -3,14 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OpenWrt mesh network without Ethernet: one home's batman-adv, VLAN and Tailscale build — HA News</title>
-  <meta name="description" content="How one concrete home in Puerto Rico runs an OpenWrt mesh network: batman-adv wireless backhaul, IoT VLANs, a Tailscale subnet router and Home Assistant, built from custom firmware.">
+  <title>OpenWrt mesh network in a concrete house: batman-adv, VLANs and Tailscale — HA News</title>
+  <meta name="description" content="An OpenWrt mesh network in a concrete Puerto Rico home: batman-adv mesh with wired backhaul, an IoT VLAN, a Tailscale subnet router and Home Assistant monitoring.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="OpenWrt mesh network in a concrete house: batman-adv, VLANs and Tailscale">
+  <meta property="og:description" content="An OpenWrt mesh network in a concrete Puerto Rico home: batman-adv mesh with wired backhaul, an IoT VLAN, a Tailscale subnet router and Home Assistant monitoring.">
+  <meta property="og:url" content="https://hanews.org/openwrt-mesh-network">
+  <meta property="og:image" content="https://hanews.org/images/pr-mains-voltage-7d.png">
   <link rel="canonical" href="https://hanews.org/openwrt-mesh-network">
   <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="styles.css">
   <script src="/ga.js" defer></script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt mesh network without Ethernet: one home's batman-adv, VLAN and Tailscale build", "datePublished": "2026-11-02", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-mesh-network"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Why put IoT devices on their own VLAN?", "acceptedAnswer": {"@type": "Answer", "text": "Because, as Adam puts it, he doesn't want sketchy IoT devices on the same network as his laptop. On the IoT VLAN they can reach the internet and answer connections the LAN starts, but they can't open connections to laptops or phones. Home Assistant is the one allowed exception."}}, {"@type": "Question", "name": "Does G.hn powerline work in Puerto Rico?", "acceptedAnswer": {"@type": "Answer", "text": "It didn't in this house. Benchmarks showed slow and inconsistent links that got worse as adapters were added, and they dragged down the rest of the mesh. The adapters were retired in June 2026 in favor of real cable. Adam blames Puerto Rico's noisy electricity. Results vary by building and circuit, so test before you commit."}}, {"@type": "Question", "name": "Why use a narrow channel for mesh backhaul?", "acceptedAnswer": {"@type": "Answer", "text": "A 20 MHz channel puts the same transmit power into less spectrum, which helps a link get through concrete. Every mesh node also has to share one channel, so a narrow one is the safe choice. The trade-off is less throughput, which is why the wired nodes carry 5 GHz client Wi-Fi and the mesh radio is kept for backhaul."}}, {"@type": "Question", "name": "Do the APs need Ethernet?", "acceptedAnswer": {"@type": "Answer", "text": "No. The mesh started wireless-only because the house has no in-wall data wiring. But wired links help a lot where you can get them. Here, cables run through a roof pipe, mini-split AC holes and the fiber entry hole carry backhaul on VLAN 99. G.hn powerline adapters were tried and retired in June 2026. batman-adv prefers the wired path and falls back to Wi-Fi if a cable is pulled."}}, {"@type": "Question", "name": "Why does the IoT network use WPA2?", "acceptedAnswer": {"@type": "Answer", "text": "Legacy compatibility. The IoT SSID runs WPA2-PSK with the 802.11r/k/v roaming features disabled; the LAN SSID carries them."}}, {"@type": "Question", "name": "Why would a mesh node fail to join at boot?", "acceptedAnswer": {"@type": "Answer", "text": "Sometimes the radio booted with world regulatory domain 00, which marked ch161 as no-IR \u2014 barring the radio from initiating \u2014 so the node never joined. A boot guard now re-sets the US regulatory domain on every boot."}}, {"@type": "Question", "name": "Where should Tailscale run?", "acceptedAnswer": {"@type": "Answer", "text": "The repo's answer, reached in stages: not on the router. It began as a gateway idea, moved to a Linux server in January 2026, and today an Ubuntu subnet router advertises the LAN and IoT subnets. Approve the routes in the admin console; there is no port forwarding to configure."}}, {"@type": "Question", "name": "How do I measure WiFi airtime in Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Read `iw dev <iface> survey dump` on each OpenWrt radio, take the change in channel busy time divided by the change in channel active time between polls, and publish that percentage as a sensor. Graph it per node and band. In this build, sustained readings above about 70% are flagged for a closer look."}}, {"@type": "Question", "name": "Can Home Assistant monitor the mesh?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dashboards track node TQ, WAN status and Starlink throughput, with automations on top. Since January 2026, the Home Assistant configuration has lived in the same repo as the firmware."}}]}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt mesh network in a concrete house: batman-adv, VLANs and Tailscale", "datePublished": "2026-11-02", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-mesh-network", "description": "An OpenWrt mesh network in a concrete Puerto Rico home: batman-adv mesh with wired backhaul, an IoT VLAN, a Tailscale subnet router and Home Assistant monitoring.", "image": "https://hanews.org/images/pr-mains-voltage-7d.png"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Why put IoT devices on their own VLAN?", "acceptedAnswer": {"@type": "Answer", "text": "Because Adam doesn't want sketchy IoT devices on the same network as his laptop. On their own VLAN, smart devices can reach the internet and answer connections the main network starts, but they can't open connections to laptops or phones. Home Assistant is the one allowed exception."}}, {"@type": "Question", "name": "Do the access points need Ethernet?", "acceptedAnswer": {"@type": "Answer", "text": "No. The mesh started wireless-only because the house has no in-wall data wiring. But wired links help a lot, and here they run through a roof pipe, mini-split AC holes and the fiber entry hole. batman-adv prefers wired and falls back to Wi-Fi if a cable is pulled."}}, {"@type": "Question", "name": "Does powerline networking work in a concrete house?", "acceptedAnswer": {"@type": "Answer", "text": "It didn't here. Benchmarks showed slow, inconsistent links that got worse as adapters were added, and the slow paths dragged down the whole mesh, so the adapters were retired for real cable. Adam blames Puerto Rico's noisy electricity. Results vary by building and circuit, so test before you commit."}}, {"@type": "Question", "name": "Why use a narrow channel for the mesh?", "acceptedAnswer": {"@type": "Answer", "text": "A 20 MHz channel puts the same transmit power into less spectrum, which helps a link get through concrete. Every mesh node has to share one channel anyway, so narrow is the safe choice. The trade-off is throughput, so the wired nodes carry 5 GHz for devices instead."}}, {"@type": "Question", "name": "Why does the IoT network use WPA2?", "acceptedAnswer": {"@type": "Answer", "text": "Legacy compatibility. The IoT network runs WPA2-PSK with the fast-roaming features switched off, because older devices don't handle them; the LAN network carries them."}}, {"@type": "Question", "name": "Why would a mesh node fail to join at boot?", "acceptedAnswer": {"@type": "Answer", "text": "Occasionally a radio woke up with the wrong country setting, which barred it from initiating on the mesh channel, so it never joined. A boot guard now re-sets the US country code on every boot."}}, {"@type": "Question", "name": "Where should Tailscale run?", "acceptedAnswer": {"@type": "Answer", "text": "Not on the router. It began as a gateway idea, moved to a Linux server in January 2026, and today an Ubuntu subnet router advertises the LAN and IoT networks. Approve the routes in the admin console; there's no port forwarding to configure."}}]}]}</script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -43,68 +48,93 @@
     <div class="sheet page-with-rail">
       <div class="page-inner">
 <p class="kicker">Feature · Networking</p>
-<h1>OpenWrt mesh network without Ethernet: one home's batman-adv, VLAN and Tailscale build</h1>
+<h1>OpenWrt mesh network in a concrete house: batman-adv, VLANs and Tailscale</h1>
 <p class="byline">HA News · DRAFT</p>
 <p><em>Draft for review. Not published.</em></p>
-<p>In a concrete house with no in-wall data wiring, an OpenWrt mesh network is not a hobby. It is the only realistic way to move Wi-Fi between rooms, at least until you find a way to sneak a few cables in.</p>
-<p>That is the situation Adam Beguelin — HA News's publisher — found himself in, and his answer is WRTflasher: a private git repository that builds custom OpenWrt firmware and turns small travel routers into mesh nodes that configure themselves. The repo now holds 661 commits spanning just under a year, and it runs a real home in Puerto Rico — three VLANs over batman-adv, multi-WAN failover, Tailscale for remote access, and Home Assistant watching all of it.</p>
-<h2>Three motivations</h2>
-<p>The first is security. Adam puts it plainly: "I don't want sketchy IoT devices on the same network as my laptop." That sentence is the key driver of the whole design. IoT gear gets its own VLAN and an internet-only firewall rule, and most later decisions about that network trace back to it.</p>
-<p>The second is the building: concrete walls, no in-wall data wiring. Pulling cable through the walls was not an option, so a wireless mesh came first. Over time it became a hybrid, with a few wired runs, as the section below on getting wires into the house explains.</p>
-<p>The third is the stack. Adam wanted open source end to end — OpenWrt on the radios, batman-adv underneath, Home Assistant on top. Tailscale "was a game changer" for remote access, but that came later.</p>
+<p>Adam Beguelin, HA News's publisher, lives in a concrete house in Puerto Rico with no data cables in the walls. He wanted the smart gadgets he doesn't fully trust kept off the network his laptop uses. His answer is an OpenWrt mesh network — small routers running OpenWrt, the open-source replacement for factory router firmware — where each mesh node serves your devices and passes traffic along to the next.</p>
+<p>Over the past year he also found sneaky ways to get real cables into the house: up a roof pipe, through the holes used by mini-split air conditioners, and out of the fiber installer's hole to a Cudy node near the guest house. Home Assistant watches it all.</p>
+<p>It all lives in a private repository, WRTflasher, which builds custom firmware and configures each node automatically — 661 commits over just under a year, running a real home with three separate networks, backup internet links, remote access and Home Assistant dashboards.</p>
+<h2>Why Adam built it</h2>
+<p>The first motivation is security. "I don't want sketchy IoT devices on the same network as my laptop," Adam says. IoT gadgets — cameras, plugs, sensors — can be sketchy, so in this house they live on their own IoT VLAN, set up in OpenWrt. A VLAN (a virtual LAN) cuts one physical network into separate ones that can't see each other: the smart devices get internet access, but no path to the laptops.</p>
+<p>The second is the building: concrete walls, no in-wall data wiring. Pulling cable through the walls wasn't an option, so a wireless mesh came first and only later became a hybrid, with a few wired runs.</p>
+<p>The third is open source, end to end: OpenWrt on the routers, Home Assistant on top, and batman-adv — a free, open-source routing layer — underneath, picking the best path between nodes. Tailscale "was a game changer" for remote access, but that came later.</p>
 <p>"I believe in open source," Adam says. "I like that the code can be reviewed, so I feel more secure about it. Open source has changed the world in very positive ways, and I want to support that."</p>
-<pre><code>Internet (fiber primary; Starlink, T-Mobile backup)
-        |
-  OpenWrt One gateway (mwan3 failover, firewall, VLANs 10/20/30)
-        |  wired VLAN 99 where a cable exists, else 5 GHz mesh
-  ===== batman-adv mesh (bat0) on a hidden WPA3 5 GHz backhaul =====
-     |                 |                  |
- GL-MT3000 AP      GL-MT3000 AP       GL-MT3000 AP
- 2.4 GHz: LAN / IoT / Guest SSIDs on each node
-
- Ubuntu box: Tailscale subnet router -&gt; remote access to LAN + IoT
- Home Assistant: mesh dashboards, automations
-</code></pre>
+<h3>From first commit to fiber</h3>
+<p>Six milestones stand out in the commit log:</p>
+<table>
+<thead>
+<tr>
+<th>When</th>
+<th>What happened</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nov 14, 2025</td>
+<td>First commit; the config generator takes shape.</td>
+</tr>
+<tr>
+<td>Dec 26, 2025</td>
+<td>VLANs land; flashed nodes join the mesh on first boot.</td>
+</tr>
+<tr>
+<td>Jan 19, 2026</td>
+<td>First Home Assistant mesh dashboard.</td>
+</tr>
+<tr>
+<td>Feb 26, 2026</td>
+<td>First wired link; powerline adapters get a try.</td>
+</tr>
+<tr>
+<td>Jun 10, 2026</td>
+<td>Powerline retired for real cable.</td>
+</tr>
+<tr>
+<td>Sep 11, 2026</td>
+<td>Fiber becomes the primary internet link.</td>
+</tr>
+</tbody>
+</table>
 <h2>How the OpenWrt mesh network works</h2>
-<p>The gateway is an OpenWrt One (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=OpenWrt+One+router&amp;tag=hanews01-20">check price on Amazon</a> <small>(affiliate link)</small>), handling multi-WAN duty with mwan3. The mesh APs are GL.iNet GL-MT3000 units, sold as the Beryl AX travel router (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=GL.iNet+GL-MT3000+Beryl+AX&amp;tag=hanews01-20">check price on Amazon</a>). Gateway and APs both run MediaTek MT7981 silicon on the mediatek/filogic target, which keeps the whole project on one build setup. A few Cudy single-port APs show up in the fleet too, and a Linksys WRT3200ACM radio swap appears in the repo as an idea that was considered. The firmware is built on OpenWrt 24.10.0, and a move to the OpenWrt 25.12 series is on the project's to-do list.</p>
-<p>Radio work is split by band. Each node's 2.4 GHz radio serves clients with Wi-Fi 6 at HE20 width, assigned per node to the non-overlapping channels 1, 6 and 11. The 5 GHz radio is dedicated to backhaul: a hidden SSID, WPA3-SAE, one channel shared by every node, and a mesh interface MTU of 1532, which leaves room for batman-adv's encapsulation.</p>
-<p>batman-adv rides on top. It prefers a wired link automatically and falls back to Wi-Fi if the cable is pulled. The firmware template sets hop_penalty to 0 on wired interfaces and 40 on the Wi-Fi mesh interface, so wired paths win whenever they exist.</p>
-<p>The OpenWrt VLAN plan puts three networks across the mesh. LAN is VLAN 10, WPA3-SAE mixed, with 802.11r/k/v roaming. IoT is VLAN 20, WPA2-PSK with the roaming features switched off for legacy compatibility. Guest is VLAN 30, fully isolated.</p>
-<p>The firewall lets IoT devices reach the internet and reply to connections initiated from the LAN, but never start one themselves — with a single exception for the Home Assistant host.</p>
-<p>The firmware pipeline is what holds it together. WRTflasher runs the official OpenWrt Image Builder inside Docker. A template script, <code>generate-config.sh</code>, produces the UCI config for each node, and passwords live in a <code>.env</code> file that never enters git. The working principle is "configure once, flash many APs": a newly flashed AP joins the mesh by itself on first boot.</p>
-<h2>From first commit to fiber</h2>
-<p>The git log tells the story: 661 commits between Nov 14, 2025 and Nov 2, 2026.</p>
-<ul>
-<li><strong>Nov 14, 2025</strong> — first commit. Through Nov–Dec, the config generator takes shape.</li>
-<li><strong>Dec 26, 2025</strong> — VLANs land; passwords move into <code>.env</code>; radios are configured on first boot; APs attach to the batman-adv mesh.</li>
-<li><strong>Dec 27, 2025</strong> — multi-WAN failover with mwan3; unique hostnames per AP; <code>mesh-exec.sh</code>, which runs a command on every node.</li>
-<li><strong>Dec 30, 2025</strong> — an SSID toggle and roaming monitor tools.</li>
-<li><strong>Jan 9, 2026</strong> — Tailscale remote access documented.</li>
-<li><strong>Jan 19, 2026</strong> — a mesh monitoring script and the first Home Assistant mesh dashboard.</li>
-<li><strong>Jan 26, 2026</strong> — Home Assistant config and automations move into the repo, which becomes the source of truth for HA too.</li>
-<li><strong>Feb 26 – Mar 4, 2026</strong> — first wired backhaul over VLAN 99; G.hn powerline adapters tried as backhaul; a mesh benchmark script; hop penalty tuning.</li>
-<li><strong>Jun 10, 2026</strong> — G.hn retired in favor of direct Ethernet; monitoring expands to airtime, batman TQ and the T-Mobile WAN.</li>
-<li><strong>Aug 8, 2026</strong> — the gateway now announces its real bandwidth instead of batman-adv's stale default.</li>
-<li><strong>Aug 10, 2026</strong> — the default WAN policy switches to failover, after a Starlink packet-loss investigation.</li>
-<li><strong>Aug 16, 2026</strong> — documentation that mwan3track can wedge offline after a reboot, plus a boot self-heal step.</li>
-<li><strong>Sep 11, 2026</strong> — fiber becomes the primary WAN, with Starlink as failover. The fiber entry hole later carries a cable to a wired outdoor Cudy node.</li>
-<li><strong>Sep 26, 2026</strong> — a conntrack fix, after flows stayed pinned to Starlink even after fiber recovered.</li>
-<li><strong>Sep 27, 2026</strong> — sibling Tuya MACs blocked fleet-wide.</li>
-<li><strong>October 2026</strong> — a startup fix makes every radio set the correct US country code at boot, after a node occasionally came up with the wrong one and failed to rejoin the mesh.</li>
-<li><strong>Nov 2, 2026</strong> — a hostname pin fix, after a reboot reverted a rename.</li>
-</ul>
-<p>The early burst came over the holidays; the rest of the year was hardening.</p>
-<p>Asked to rank them, Adam puts channel tuning first, then moving 5 GHz clients onto the wired access points.</p>
-<h2>Getting wires into a concrete house</h2>
-<p>The mesh worked, but Adam wanted more. "I really wanted a few wired routers," he says. Starlink had already given him one cable route: a wire running up to the dish on the roof.</p>
-<p>The idea came while he was brainstorming with ChatGPT and showed it photos of the pipes on his roof. "I realized that I could run cables up the same pipe to the roof, and then across the house and into rooms by using the same holes that the mini-split ACs use." Those runs reach the center of the house and the main bedroom. "This made a big difference."</p>
-<p>The repo follows the same path. Wired backhaul over a dedicated VLAN 99 is first documented on Feb 26, 2026. A Mar 1 commit splits the batman-adv attach script into separate gateway and access-point versions for wired links. On Sep 1, the wired center node gets a hop penalty of 0. By Sep 21 the main-bedroom node is a Cudy AP3000 on wired backhaul.</p>
-<p>Fiber opened the next route. The repo makes fiber the primary WAN on Sep 11, 2026, with Starlink as failover. "When the installer drilled a hole for that fiber, I realized I could use the same hole and run a cable around the house to the corner nearest the guest house." A Cudy AP3000 Outdoor (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=Cudy+AP3000+Outdoor&amp;tag=hanews01-20">check price on Amazon</a>) went up there on wired backhaul. "That solved a lot of the weaknesses."</p>
-<p>That node sits about 20 feet from the guest house, and it covers the guest house well enough that the guest house no longer needs a mesh node of its own. "Now the guest house doesn't even need a batman node," Adam says. The repo shows the older GL.iNet radio that served the guest house being taken out of the fleet. Its entry was dropped from the network docs on Sep 22, 2026, the same day the outdoor Cudy got its permanent name. Every wireless mesh node sends its own batman-adv routing messages and shares the backhaul channel, so one less node means less overhead on the channel.</p>
-<p>On Sep 29, 2026, the wired access points also got a dedicated 5 GHz IoT SSID on the IoT VLAN. Adam added it so his back-gate camera could connect straight to the wired corner node. That keeps the camera's video stream on the cable instead of relaying it over a wireless hop, "also relieving some of the wireless mesh pressure," as he puts it. Within days, the same SSID was added to two more nodes to anchor other cameras.</p>
-<h3>Why wired backhaul beats wireless hops</h3>
-<p>Every wireless hop in a single-channel mesh costs airtime. A node that relays traffic over Wi-Fi has to receive it and then send it again on the same channel, so throughput drops and latency grows with each hop. A cable takes that relay traffic off the air entirely. That leaves the 5 GHz backhaul channel free for the nodes that still depend on it, and it puts more of the house one hop from the gateway.</p>
-<p>batman-adv makes this easy because it doesn't care what kind of link it uses. Each node adds its wired VLAN 99 interface and its 5 GHz mesh interface to the same bat0 mesh. batman-adv then picks paths by link quality (TQ) adjusted by a per-interface hop penalty. In this build the wired interface gets a penalty of 0 and the Wi-Fi mesh interface a higher one, so the cable wins whenever it's up. If a cable is pulled, the node falls back to Wi-Fi without any change to its config. Since Aug 1, 2026, a Home Assistant alert fires whenever a wired node falls back to Wi-Fi.</p>
+<p>At the center sits the gateway, an OpenWrt One (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=OpenWrt+One+router&amp;tag=hanews01-20">check price on Amazon</a>) running the firewall and the three separate networks. It manages the internet connections too: fiber as the main line, with Starlink and T-Mobile as automatic backups.</p>
+<p>Around it are the mesh nodes: GL.iNet GL-MT3000 travel routers, sold as the Beryl AX (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=GL.iNet+GL-MT3000+Beryl+AX&amp;tag=hanews01-20">check price on Amazon</a>), plus a few Cudy single-port access points. Devices connect on each node's 2.4 GHz radio, with Wi-Fi 6.</p>
+<p>The 5 GHz radio in each node is reserved for the backhaul — the link nodes use to pass traffic to each other and back to the gateway, separate from the Wi-Fi devices use. It's a hidden, WPA3-protected network with every node on one channel.</p>
+<p>Three networks ride across the mesh:</p>
+<table>
+<thead>
+<tr>
+<th>Network</th>
+<th>Who it's for</th>
+<th>Wi-Fi setup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LAN</td>
+<td>Laptops, phones, trusted gear</td>
+<td>WPA3, fast roaming on</td>
+</tr>
+<tr>
+<td>IoT</td>
+<td>Smart devices</td>
+<td>WPA2, roaming off for older devices</td>
+</tr>
+<tr>
+<td>Guest</td>
+<td>Visitors</td>
+<td>Fully isolated</td>
+</tr>
+</tbody>
+</table>
+<p>The firewall gives smart devices internet access and lets them answer connections started from the main network, but they can never start connections themselves — with one narrow exception for the Home Assistant host.</p>
+<p>The glue is the firmware: WRTflasher generates each node's settings from a template and builds custom firmware around one principle — "configure once, flash many APs." A newly flashed node joins the mesh by itself on first boot.</p>
+<h2>Getting wires into a concrete house (wired backhaul)</h2>
+<p>The mesh worked, but Adam wanted more. "I really wanted a few wired routers," he says. Starlink had already shown one route: a wire running up to the dish on the roof.</p>
+<p>The idea came while he was brainstorming with ChatGPT, showing it photos of the pipes on his roof. "I realized that I could run cables up the same pipe to the roof, and then across the house and into rooms by using the same holes that the mini-split ACs use." Those runs reach the center of the house and the main bedroom. "This made a big difference."</p>
+<p>Why do cables matter so much? A node that relays traffic over Wi-Fi has to receive it and send it again on the same channel, so speed drops and lag grows with every hop. A cable takes that relay work off the air entirely, freeing the shared 5 GHz backhaul.</p>
+<p>Fiber opened the next route. "When the installer drilled a hole for that fiber, I realized I could use the same hole and run a cable around the house to the corner nearest the guest house." A Cudy AP3000 Outdoor (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=Cudy+AP3000+Outdoor&amp;tag=hanews01-20">check price on Amazon</a>) went up there on a wired link. "That solved a lot of the weaknesses."</p>
+<p>That node sits about 20 feet from the guest house and covers it well. "Now the guest house doesn't even need a batman node," Adam says. Every wireless node sends its own routing messages and shares the backhaul channel, so one fewer node means less crowding.</p>
+<p>The wired access points also got a 5 GHz network just for smart devices, so the back-gate camera connects straight to the wired corner node — its video stays on the cable, "also relieving some of the wireless mesh pressure," as Adam puts it.</p>
 <blockquote class="tipbox">
 <p><strong>Tip: finding cable routes in a house you can't drill</strong></p>
 <ul>
@@ -112,94 +142,66 @@
 <li>Check existing conduit and roof pipes before drilling anything new.</li>
 <li>On a roof or outside wall, use outdoor-rated, UV-resistant cable. Use direct-burial cable if it runs underground.</li>
 <li>Reseal every penetration you open, with outdoor-rated sealant on the outside and around line-set covers.</li>
-<li>A single wired node at the far edge of the house helps more than any wireless hop. In this build, ceiling- or wall-mount Cudy AP3000 units on PoE fill those spots.</li>
+<li>A single wired node at the far edge of the house helps more than any wireless hop; here, ceiling- or wall-mount Cudy AP3000 units on PoE fill those spots.</li>
 </ul>
 </blockquote>
-<h2>Why G.hn (powerline) didn't work here</h2>
-<p>G.hn sounds ideal on paper. It sends Ethernet over the electrical wiring a house already has, so a concrete house with no in-wall data cable still gets "wired" backhaul. Adam's verdict: great in theory, bad in practice. "PR electricity is just too noisy."</p>
-<p>The repo tells the same story. G.hn powerline adapters began carrying the wired-backhaul VLAN on Feb 26, 2026. On Mar 4, a benchmark compared three adapters on the same circuits with two. G.hn is half-duplex on powerline, so every adapter shares one channel. The results:</p>
-<ul>
-<li><strong>With three adapters</strong>, one link's physical rate fell to 12 Mbps transmit and 2 Mbps receive. Removing the third adapter brought it back to 28/89 Mbps.</li>
-<li><strong>One access point did better on Wi-Fi.</strong> It measured 4.8 Mbps through its own G.hn adapter and 23 to 26 Mbps over the wireless mesh.</li>
-<li><strong>Even with two adapters, throughput swung.</strong> One link ranged from 0.9 to 6.8 Mbps between runs, which the notes put down to poor signal quality on the powerline.</li>
-<li><strong>The slow G.hn paths dragged down the whole mesh.</strong> One Wi-Fi-only node went from 3.6 Mbps to 39 to 54 Mbps once the third adapter was unplugged, likely because batman-adv had been routing some traffic over the slow paths.</li>
-</ul>
-<p>The adapters came out on Jun 10, 2026. The cable runs described above replaced them.</p>
-<p>Powerline rides on the same wires as the grid's noise and voltage swings. The chart below is one week of mains voltage logged by Home Assistant in this house. A smart plug measured between 99.6 V and 123.8 V, against a 120 V nominal supply. The low reading was a single brief dip. Most days swing several volts between about 114 V and 123 V. Outages are frequent, and even when the power is on, the house's CyberPower UPS sometimes switches to battery because the power quality is so poor.</p>
+<h2>Why G.hn powerline didn't work here</h2>
+<p>G.hn is powerline networking: adapters plug into wall outlets and send data over the house's existing electrical wiring. It sounds perfect for a house with no data cables — "wired" links, no drilling. Adam's verdict after trying it: "PR electricity is just too noisy."</p>
+<p>The benchmarks back him up. Powerline is half-duplex — every adapter shares one channel. With three adapters on the same circuits, one link fell to 12 Mbps sending and 2 receiving; removing the third brought it back to 28 and 89. One access point did better over the wireless mesh than through its own powerline adapter, 23 to 26 Mbps versus 4.8.</p>
+<p>And the slow paths dragged the whole mesh down: one Wi-Fi-only node jumped from 3.6 Mbps to 39 and 54 once the third adapter was unplugged, likely because batman-adv had been routing some traffic over them. The adapters came out in June 2026, replaced by the cable runs above.</p>
+<p>Powerline shares its wire with all the electrical noise on it. The chart below shows one week of mains voltage logged by Home Assistant here. A smart plug measured between 99.6 V and 123.8 V against a 120 V nominal supply — the low reading was a single brief dip — and most days swing several volts between about 114 V and 123 V. Outages are frequent, and even with the power on, the house's UPS sometimes runs on battery because the power quality is so poor.</p>
 <p><img loading="lazy" width="1430" height="598" alt="Line chart of one week of mains voltage at a Puerto Rico home, Oct 26 to Nov 2, 2026. Readings swing daily between about 114 and 123 volts around a 120 V nominal line, with one brief dip near 100 V." src="images/pr-mains-voltage-7d.png" /></p>
 <p><em>Mains voltage from two Home Assistant sensors, a smart plug and a UPS input, over seven days. Source: HA News, from the homeowner's Home Assistant history.</em></p>
 <h2>The changes that helped most</h2>
-<p>Asked what made the biggest difference, Adam names three changes. The repo backs up each one.</p>
-<p><strong>1. Channel planning.</strong> Each node's 2.4 GHz client radio gets a fixed channel, 1, 6 or 11, so neighboring nodes don't share one. The per-node plan was built into the firmware template on Jul 13, 2026, and refined on Sep 27 after an RF survey moved the rooftop node from channel 6 to 1 to 11. The 5 GHz mesh stays on a single 20 MHz-wide (HE20) channel that every node shares, because batman-adv needs all mesh radios on the same channel.</p>
-<p><strong>2. Freeing the gateway's radio for clients.</strong> Once enough nodes reached the gateway by cable, the gateway stopped joining the Wi-Fi mesh. Its 5 GHz radio now serves clients only, on a wide 80 MHz channel. The repo documents the gateway as having "no Wi-Fi mesh" by Sep 27, 2026.</p>
-<p><strong>3. Picking which nodes offer 5 GHz to clients.</strong> The mesh uses 5 GHz on a narrow 20 MHz channel. "We use 5 GHz for mesh with narrow band to help with concrete," Adam says. That meant no 5 GHz for phones and laptops at first. On Sep 22, 2026, 5 GHz client Wi-Fi was turned on alongside the mesh, but only on the wired access points. Those nodes don't relay their own traffic over the air. "Starting to select nodes that used 5 GHz for clients helped and made the mesh 5G less busy." The airtime graphs described below are how the house watches that.</p>
-<h2>Lessons learned</h2>
-<ul>
-<li>On wireless-backhaul nodes, don't use <code>wifi reload</code>. <code>uci commit</code> plus a reboot is the house rule.</li>
-<li>Reboots are not free: mwan3track can wedge offline, and a hostname rename can revert. Both now have boot-time fixes.</li>
-<li>batman-adv's default gateway bandwidth announcement is stale. Announce the real number.</li>
-<li>After a Starlink packet-loss investigation, the default WAN policy went to plain failover.</li>
-<li>Failover is not complete until conntrack is handled — otherwise existing flows stay pinned to Starlink after fiber recovers.</li>
-</ul>
-<h2>Build your own</h2>
-<p>Nothing here depends on the private repo. The architecture reproduces with public tools, and the steps are short.</p>
-<ol>
-<li>Pick one target. Gateway and APs on the same SoC family — here MT7981, mediatek/filogic — means one build setup and a few device profiles.</li>
-<li>Run the official OpenWrt Image Builder inside Docker, so builds are repeatable on any host.</li>
-<li>Write a template script that generates UCI config per node. Keep passwords in a <code>.env</code> file outside git.</li>
-<li>Build and flash. Configure once, flash many APs — each node should join the mesh on first boot with no manual steps.</li>
-<li>Verify. A health script that prints the topology sorted by TQ shows immediately whether a node joined.</li>
-<li>Add the OpenWrt VLAN layer: LAN, IoT, Guest. Give IoT an internet-only rule — it may reply to LAN-initiated connections but not start them — with a narrow exception for the Home Assistant host. Isolate the guest network completely.</li>
-<li>Set the radios: 2.4 GHz for clients on the 1/6/11 plan, 5 GHz as a single-channel, hidden, WPA3-SAE backhaul, mesh MTU 1532, hop_penalty 0 on wired and 40 on Wi-Fi.</li>
-<li>Add fleet tools early: a run-a-command-on-every-node script, a roaming monitor, a weak-device list. They pay off the first time a node silently drops.</li>
-<li>Grow in stages: multi-WAN failover, then a Tailscale subnet router, then Home Assistant dashboards.</li>
-</ol>
-<h2>Tailscale was "a game changer"</h2>
-<p>Remote access was the last big problem, and Adam calls Tailscale "a game changer" for it.</p>
-<p>The OpenWrt Tailscale history in the repo has three stages. The first idea was to run it on the gateway. In January 2026 it moved to a Linux server. Today an Ubuntu box acts as a Tailscale subnet router, advertising the LAN and IoT subnets:</p>
+<p>Asked what made the biggest difference, Adam names three changes.</p>
+<p><strong>Channel planning.</strong> Each node's 2.4 GHz radio gets a fixed channel — 1, 6 or 11 — so neighboring nodes don't share one. The 5 GHz mesh stays on a single narrow 20 MHz channel that every node shares.</p>
+<p><strong>Freeing the gateway's radio.</strong> Once enough nodes could reach the gateway by cable, the gateway left the Wi-Fi mesh entirely. Its 5 GHz radio now serves devices only, on a wide 80 MHz channel.</p>
+<p><strong>Choosing which nodes offer 5 GHz to devices.</strong> "We use 5 GHz for mesh with narrow band to help with concrete," Adam says. That left no 5 GHz for phones and laptops at first. Then the wired access points turned on 5 GHz for devices too — they don't relay anything over the air. "Starting to select nodes that used 5 GHz for clients helped and made the mesh 5G less busy."</p>
+<h2>Tailscale subnet router: "a game changer"</h2>
+<p>Remote access was the last big problem, and Adam calls Tailscale "a game changer" for it. Tailscale builds a private network between your devices, wherever they are.</p>
+<p>The setup moved in stages: an idea to run it on the gateway, then a Linux server in January 2026, and today an Ubuntu box acting as a subnet router — Tailscale's name for a device that shares your home networks into your private Tailscale network, so a phone or laptop far away can still reach them. No port forwarding, nothing exposed.</p>
+<p>For Tailscale and Home Assistant together, Adam's day-to-day use comes down to two things: the Home Assistant companion app on his phone, and opening the Home Assistant dashboard from his laptop when he's away from home.</p>
+<h2>Home Assistant keeps watch</h2>
+<p>The mesh and the smart home grew into each other. A monitoring script feeds the dashboards with each node's TQ — batman-adv's link-quality score — plus internet-link status and Starlink throughput, with automations on top. The Home Assistant configuration lives in the same repository as the firmware: one source of truth for the whole house. A Frigate camera system on a GPU box rides the network. New to Home Assistant hardware? See <a href="home-assistant-raspberry-pi">Home Assistant on a Raspberry Pi</a>, plus <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a> and <a href="zigbee-hub">the best Zigbee hub</a>.</p>
+<p>The most interesting number is airtime busy — the percentage of time a Wi-Fi channel is actually occupied. Signal bars won't tell you a channel is crowded; airtime will. "We monitor airtime busy on the Home Assistant graph, so we can tell if things are getting too crowded," Adam says. The graphs cover every node and both bands, grouped by channel. Anything above about 70% busy is worth a closer look, and an alert fires if a wired node falls back to Wi-Fi.</p>
+<h2>For tinkerers</h2>
+<p>Everything below is the deep end — nothing above needs it.</p>
+<h3>The radio plan</h3>
+<p>Devices get Wi-Fi 6 on 2.4 GHz using HE20 channels (20 MHz wide), with nodes pinned to the non-overlapping channels 1, 6 and 11. The 5 GHz backhaul is a hidden, WPA3-SAE network on a single 20 MHz channel shared by every node, because batman-adv needs all mesh radios on the same channel. The mesh interface MTU is 1532, leaving room for batman-adv's encapsulation — the extra header it wraps around each packet.</p>
+<h3>Hop penalty and failover</h3>
+<p>Each node adds its wired interface and its 5 GHz mesh interface to the same batman-adv mesh. Paths are picked by link quality (TQ) with a per-interface hop penalty: 0 on wired, 40 on Wi-Fi. Cable wins whenever it's up; nodes fall back to Wi-Fi with no config change.</p>
+<h3>Measuring airtime</h3>
+<p>On each node, run <code>iw dev &lt;iface&gt; survey dump</code> and read the entry marked <code>[in use]</code>: it reports cumulative channel active time and channel busy time in milliseconds. Poll on a schedule — the monitoring service uses SSH from a server on the network — and compute busy % from the change since the last poll: <code>(busy_now - busy_prev) / (active_now - active_prev) × 100</code>. Lifetime totals hide recent spikes, so use the delta. Publish one sensor per node and band, and graph it.</p>
+<h3>Building the firmware</h3>
+<p>Gateway and nodes share MediaTek MT7981 silicon on the mediatek/filogic target, so one build setup covers everything. WRTflasher runs the official OpenWrt Image Builder inside Docker; a template script generates each node's UCI config, and passwords live in a <code>.env</code> file that never enters git. Flash a node and it joins the mesh on first boot — verify with a health script that prints the topology sorted by TQ. The firmware builds on OpenWrt 24.10.0, with the 25.12 series next on the list.</p>
+<h3>Gotchas</h3>
+<p>On wireless-backhaul nodes, never use <code>wifi reload</code> — <code>uci commit</code> plus a reboot is the house rule. Reboots aren't free either: the multi-WAN tracker (mwan3track) can wedge offline and hostname renames can revert, so both have boot-time fixes. And after a failover, existing connections stay pinned to the backup link until conntrack is handled.</p>
+<h3>The Tailscale command</h3>
 <pre><code>tailscale up --advertise-routes=&lt;lan&gt;/24,&lt;iot&gt;/24
 </code></pre>
-<p>Enable <code>ip_forward</code> on that box and approve the advertised routes in the admin console. From there, SSH and Home Assistant are reachable remotely with no port forwarding — the router never has to expose anything.</p>
-<p>Day to day, Adam uses it for two things: the Home Assistant companion app on his phone, and opening the Home Assistant dashboard from his laptop when he's away from home.</p>
-<h2>Home Assistant and the toolbox</h2>
-<p>The mesh and the smart home grew into each other. On January 19, 2026, a mesh monitoring script fed the first Home Assistant mesh dashboard: node TQ, WAN status and Starlink throughput, with automations on top. A week later, Home Assistant config and automations moved into WRTflasher itself, making the repo a combined OpenWrt Home Assistant source of truth — firmware for the APs in the same place as the configuration that runs the house. A Frigate NVR on a GPU box sits on the network too. New to Home Assistant hardware? See <a href="home-assistant-raspberry-pi">Home Assistant on a Raspberry Pi</a>; for the radios your sensors use, read <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a> and <a href="zigbee-hub">the best Zigbee hub</a>.</p>
-<h3>Watching airtime, not just signal</h3>
-<p>Signal strength won't tell you that a channel is full. Airtime will. "We monitor airtime busy on the Home Assistant graph, so we can tell if things are getting too crowded," Adam says. The mesh dashboard charts busy percentage per node, for both the 2.4 GHz client radios and the 5 GHz backhaul, grouped by channel and kept for seven days of history.</p>
-<p>The method is simple and works on any OpenWrt radio:</p>
-<ol>
-<li>On each node, run <code>iw dev &lt;iface&gt; survey dump</code> and read the entry marked <code>[in use]</code>. It reports cumulative <code>channel active time</code> and <code>channel busy time</code> in milliseconds.</li>
-<li>Poll it on a schedule. WRTflasher's monitoring service uses SSH from a server on the network.</li>
-<li>Compute busy % from the change since the last poll: <code>(busy_now - busy_prev) / (active_now - active_prev) × 100</code>. Lifetime totals hide recent spikes, so use the change between polls.</li>
-<li>Publish the result as a Home Assistant sensor, one per node and band, and graph it with a history or statistics card.</li>
-</ol>
-<p>The dashboard notes that anything above about 70% busy is worth investigating. The repo lists an alert at 2.4 GHz airtime above 70% as planned, not yet built. Airtime history goes back to July 13, 2026.</p>
-<p>The toolbox grew alongside: <code>mesh-health.sh</code> prints the topology sorted by TQ; <code>mesh-exec.sh</code> runs a command on every node; <code>find-device.sh</code>, <code>watch-roaming.sh</code> and <code>weak-devices.sh</code> round out the set.</p>
+<p>Run it on the Ubuntu box, enable ip_forward, then approve the advertised routes in the admin console.</p>
 <aside class="rail-sub article-cta" aria-label="Newsletter">
   <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
   <button type="button" class="signup-trigger">Get the briefing</button>
 </aside>
 <h2>FAQ</h2>
 <h3>Why put IoT devices on their own VLAN?</h3>
-<p>Because, as Adam puts it, he doesn't want sketchy IoT devices on the same network as his laptop. On the IoT VLAN they can reach the internet and answer connections the LAN starts, but they can't open connections to laptops or phones. Home Assistant is the one allowed exception.</p>
-<h3>Does G.hn powerline work in Puerto Rico?</h3>
-<p>It didn't in this house. Benchmarks showed slow and inconsistent links that got worse as adapters were added, and they dragged down the rest of the mesh. The adapters were retired in June 2026 in favor of real cable. Adam blames Puerto Rico's noisy electricity. Results vary by building and circuit, so test before you commit.</p>
-<h3>Why use a narrow channel for mesh backhaul?</h3>
-<p>A 20 MHz channel puts the same transmit power into less spectrum, which helps a link get through concrete. Every mesh node also has to share one channel, so a narrow one is the safe choice. The trade-off is less throughput, which is why the wired nodes carry 5 GHz client Wi-Fi and the mesh radio is kept for backhaul.</p>
-<h3>Do the APs need Ethernet?</h3>
-<p>No. The mesh started wireless-only because the house has no in-wall data wiring. But wired links help a lot where you can get them. Here, cables run through a roof pipe, mini-split AC holes and the fiber entry hole carry backhaul on VLAN 99. G.hn powerline adapters were tried and retired in June 2026. batman-adv prefers the wired path and falls back to Wi-Fi if a cable is pulled.</p>
+<p>Because Adam doesn't want sketchy IoT devices on the same network as his laptop. On their own VLAN, smart devices can reach the internet and answer connections the main network starts, but they can't open connections to laptops or phones. Home Assistant is the one allowed exception.</p>
+<h3>Do the access points need Ethernet?</h3>
+<p>No. The mesh started wireless-only because the house has no in-wall data wiring. But wired links help a lot, and here they run through a roof pipe, mini-split AC holes and the fiber entry hole. batman-adv prefers wired and falls back to Wi-Fi if a cable is pulled.</p>
+<h3>Does powerline networking work in a concrete house?</h3>
+<p>It didn't here. Benchmarks showed slow, inconsistent links that got worse as adapters were added, and the slow paths dragged down the whole mesh, so the adapters were retired for real cable. Adam blames Puerto Rico's noisy electricity. Results vary by building and circuit, so test before you commit.</p>
+<h3>Why use a narrow channel for the mesh?</h3>
+<p>A 20 MHz channel puts the same transmit power into less spectrum, which helps a link get through concrete. Every mesh node has to share one channel anyway, so narrow is the safe choice. The trade-off is throughput, so the wired nodes carry 5 GHz for devices instead.</p>
 <h3>Why does the IoT network use WPA2?</h3>
-<p>Legacy compatibility. The IoT SSID runs WPA2-PSK with the 802.11r/k/v roaming features disabled; the LAN SSID carries them.</p>
+<p>Legacy compatibility. The IoT network runs WPA2-PSK with the fast-roaming features switched off, because older devices don't handle them; the LAN network carries them.</p>
 <h3>Why would a mesh node fail to join at boot?</h3>
-<p>Sometimes the radio booted with world regulatory domain 00, which marked ch161 as no-IR — barring the radio from initiating — so the node never joined. A boot guard now re-sets the US regulatory domain on every boot.</p>
+<p>Occasionally a radio woke up with the wrong country setting, which barred it from initiating on the mesh channel, so it never joined. A boot guard now re-sets the US country code on every boot.</p>
 <h3>Where should Tailscale run?</h3>
-<p>The repo's answer, reached in stages: not on the router. It began as a gateway idea, moved to a Linux server in January 2026, and today an Ubuntu subnet router advertises the LAN and IoT subnets. Approve the routes in the admin console; there is no port forwarding to configure.</p>
-<h3>How do I measure WiFi airtime in Home Assistant?</h3>
-<p>Read <code>iw dev &lt;iface&gt; survey dump</code> on each OpenWrt radio, take the change in channel busy time divided by the change in channel active time between polls, and publish that percentage as a sensor. Graph it per node and band. In this build, sustained readings above about 70% are flagged for a closer look.</p>
-<h3>Can Home Assistant monitor the mesh?</h3>
-<p>Yes. Dashboards track node TQ, WAN status and Starlink throughput, with automations on top. Since January 2026, the Home Assistant configuration has lived in the same repo as the firmware.</p>
+<p>Not on the router. It began as a gateway idea, moved to a Linux server in January 2026, and today an Ubuntu subnet router advertises the LAN and IoT networks. Approve the routes in the admin console; there's no port forwarding to configure.</p>
 <h2>Where it stands</h2>
-<p>One gateway and a handful of travel routers now run a concrete house in Puerto Rico: fiber, Starlink and T-Mobile on the WAN side; three VLANs over a batman-adv mesh; Tailscale for access; Home Assistant on top. The repo is private. The recipe is not.</p>
-<p>What's next? "Hopefully nothing," Adam says. "I just want to enjoy the fast WiFi across the property." The one project on his list is a public dashboard that shows when the power or water is out, because neighbors often text to ask, and a link is easier than a reply.</p>
+<p>One gateway and a handful of travel routers now run the house: fiber, Starlink and T-Mobile on the internet side; three networks over the batman-adv mesh; Tailscale for access; Home Assistant on top. The repo is private. The recipe is not.</p>
+<p>What's next? "Hopefully nothing," Adam says. "I just want to enjoy the fast WiFi across the property." The one project on his list is a public dashboard showing when the power or water is out, because neighbors often text to ask, and a link is easier than a reply.</p>
 <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
 
       </div>
