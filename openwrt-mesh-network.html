@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt mesh network without Ethernet: one home's batman-adv, VLAN and Tailscale build — HA News</title>
+  <meta name="description" content="How one concrete home in Puerto Rico runs an OpenWrt mesh network: batman-adv wireless backhaul, IoT VLANs, a Tailscale subnet router and Home Assistant, built from custom firmware.">
+  <link rel="canonical" href="https://hanews.org/openwrt-mesh-network">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt mesh network without Ethernet: one home's batman-adv, VLAN and Tailscale build", "datePublished": "2026-11-02", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-mesh-network"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Why put IoT devices on their own VLAN?", "acceptedAnswer": {"@type": "Answer", "text": "Because, as Adam puts it, he doesn't want sketchy IoT devices on the same network as his laptop. On the IoT VLAN they can reach the internet and answer connections the LAN starts, but they can't open connections to laptops or phones. Home Assistant is the one allowed exception."}}, {"@type": "Question", "name": "Do the APs need Ethernet?", "acceptedAnswer": {"@type": "Answer", "text": "No. The mesh exists because the house has no data wiring. batman-adv prefers a wired link when one exists \u2014 spare cable runs later carried backhaul on VLAN 99, and G.hn powerline adapters were tried and retired in June 2026 \u2014 but Wi-Fi remains the fallback if a cable is pulled."}}, {"@type": "Question", "name": "Why does the IoT network use WPA2?", "acceptedAnswer": {"@type": "Answer", "text": "Legacy compatibility. The IoT SSID runs WPA2-PSK with the 802.11r/k/v roaming features disabled; the LAN SSID carries them."}}, {"@type": "Question", "name": "Why would a mesh node fail to join at boot?", "acceptedAnswer": {"@type": "Answer", "text": "Sometimes the radio booted with world regulatory domain 00, which marked ch161 as no-IR \u2014 barring the radio from initiating \u2014 so the node never joined. A boot guard now re-sets the US regulatory domain on every boot."}}, {"@type": "Question", "name": "Where should Tailscale run?", "acceptedAnswer": {"@type": "Answer", "text": "The repo's answer, reached in stages: not on the router. It began as a gateway idea, moved to a Linux server in January 2026, and today an Ubuntu subnet router advertises the LAN and IoT subnets. Approve the routes in the admin console; there is no port forwarding to configure."}}, {"@type": "Question", "name": "Can Home Assistant monitor the mesh?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dashboards track node TQ, WAN status and Starlink throughput, with automations on top. Since January 2026, the Home Assistant configuration has lived in the same repo as the firmware."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 2 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+<p class="kicker">Feature · Networking</p>
+<h1>OpenWrt mesh network without Ethernet: one home's batman-adv, VLAN and Tailscale build</h1>
+<p class="byline">HA News · DRAFT</p>
+<p><em>Draft for review. Not published.</em> Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page.</p>
+<p>In a concrete house with no data wiring, an OpenWrt mesh network is not a hobby. It is the only realistic way to move Wi-Fi between rooms.</p>
+<p>That is the situation Adam Beguelin — HA News's publisher — found himself in, and his answer is WRTflasher: a private git repository that builds custom OpenWrt firmware and turns small travel routers into mesh nodes that configure themselves. The repo now holds 661 commits spanning just under a year, and it runs a real home in Puerto Rico — three VLANs over batman-adv, multi-WAN failover, Tailscale for remote access, and Home Assistant watching all of it.</p>
+<h2>Three motivations</h2>
+<p>The first is security. Adam puts it plainly: "I don't want sketchy IoT devices on the same network as my laptop." That sentence is the key driver of the whole design. IoT gear gets its own VLAN and an internet-only firewall rule, and most later decisions about that network trace back to it.</p>
+<p>The second is the building: concrete walls, no data wiring. Running cable was not an option, so mesh was the only option.</p>
+<p>The third is the stack. Adam wanted open source end to end — OpenWrt on the radios, batman-adv underneath, Home Assistant on top. Tailscale "was a game changer" for remote access, but that came later.</p>
+<p>[ADAM: one line on why open source matters to you for the network layer]</p>
+<pre><code>Internet (fiber primary; Starlink, T-Mobile backup)
+        |
+  OpenWrt One gateway (mwan3 failover, firewall, VLANs 10/20/30)
+        |  wired VLAN 99 where a cable exists, else 5 GHz mesh
+  ===== batman-adv mesh (bat0) on a hidden WPA3 5 GHz backhaul =====
+     |                 |                  |
+ GL-MT3000 AP      GL-MT3000 AP       GL-MT3000 AP
+ 2.4 GHz: LAN / IoT / Guest SSIDs on each node
+
+ Ubuntu box: Tailscale subnet router -&gt; remote access to LAN + IoT
+ Home Assistant: mesh dashboards, automations
+</code></pre>
+<h2>How the OpenWrt mesh network works</h2>
+<p>The gateway is an OpenWrt One (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=OpenWrt+One+router&amp;tag=hanews01-20">check price on Amazon</a>), handling multi-WAN duty with mwan3. The mesh APs are GL.iNet GL-MT3000 units, sold as the Beryl AX travel router (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=GL.iNet+GL-MT3000+Beryl+AX&amp;tag=hanews01-20">check price on Amazon</a>). Gateway and APs both run MediaTek MT7981 silicon on the mediatek/filogic target, which keeps the whole project on one build setup. A few Cudy single-port APs show up in the fleet too, and a Linksys WRT3200ACM radio swap appears in the repo as an idea that was considered. The firmware is built on OpenWrt 24.10.0, and a move to the OpenWrt 25.12 series is on the project's to-do list.</p>
+<p>Radio work is split by band. Each node's 2.4 GHz radio serves clients with Wi-Fi 6 at HE20 width, assigned per node to the non-overlapping channels 1, 6 and 11. The 5 GHz radio is dedicated to backhaul: a hidden SSID, WPA3-SAE, one channel shared by every node, and a mesh interface MTU of 1532, which leaves room for batman-adv's encapsulation.</p>
+<p>batman-adv rides on top. It prefers a wired link automatically and falls back to Wi-Fi if the cable is pulled. The firmware template sets hop_penalty to 0 on wired interfaces and 40 on the Wi-Fi mesh interface, so wired paths win whenever they exist.</p>
+<p>The OpenWrt VLAN plan puts three networks across the mesh. LAN is VLAN 10, WPA3-SAE mixed, with 802.11r/k/v roaming. IoT is VLAN 20, WPA2-PSK with the roaming features switched off for legacy compatibility. Guest is VLAN 30, fully isolated.</p>
+<p>The firewall lets IoT devices reach the internet and reply to connections initiated from the LAN, but never start one themselves — with a single exception for the Home Assistant host.</p>
+<p>The firmware pipeline is what holds it together. WRTflasher runs the official OpenWrt Image Builder inside Docker. A template script, <code>generate-config.sh</code>, produces the UCI config for each node, and passwords live in a <code>.env</code> file that never enters git. The working principle is "configure once, flash many APs": a newly flashed AP joins the mesh by itself on first boot.</p>
+<h2>From first commit to fiber</h2>
+<p>The git log tells the story: 661 commits between Nov 14, 2025 and Nov 2, 2026.</p>
+<ul>
+<li><strong>Nov 14, 2025</strong> — first commit. Through Nov–Dec, the config generator takes shape.</li>
+<li><strong>Dec 26, 2025</strong> — VLANs land; passwords move into <code>.env</code>; radios are configured on first boot; APs attach to the batman-adv mesh.</li>
+<li><strong>Dec 27, 2025</strong> — multi-WAN failover with mwan3; unique hostnames per AP; <code>mesh-exec.sh</code>, which runs a command on every node.</li>
+<li><strong>Dec 30, 2025</strong> — an SSID toggle and roaming monitor tools.</li>
+<li><strong>Jan 9, 2026</strong> — Tailscale remote access documented.</li>
+<li><strong>Jan 19, 2026</strong> — a mesh monitoring script and the first Home Assistant mesh dashboard.</li>
+<li><strong>Jan 26, 2026</strong> — Home Assistant config and automations move into the repo, which becomes the source of truth for HA too.</li>
+<li><strong>Feb 26 – Mar 4, 2026</strong> — wired backhaul over VLAN 99 on spare cable runs; G.hn powerline adapters tried as backhaul; a mesh benchmark script; hop penalty tuning.</li>
+<li><strong>Jun 10, 2026</strong> — G.hn retired in favor of direct Ethernet; monitoring expands to airtime, batman TQ and the T-Mobile WAN.</li>
+<li><strong>Aug 8, 2026</strong> — the gateway now announces its real bandwidth instead of batman-adv's stale default.</li>
+<li><strong>Aug 10, 2026</strong> — the default WAN policy switches to failover, after a Starlink packet-loss investigation.</li>
+<li><strong>Aug 16, 2026</strong> — documentation that mwan3track can wedge offline after a reboot, plus a boot self-heal step.</li>
+<li><strong>September 2026</strong> — fiber becomes the primary WAN, with Starlink and T-Mobile as backups.</li>
+<li><strong>Sep 26, 2026</strong> — a conntrack fix, after flows stayed pinned to Starlink even after fiber recovered.</li>
+<li><strong>Sep 27, 2026</strong> — sibling Tuya MACs blocked fleet-wide.</li>
+<li><strong>October 2026</strong> — a boot guard re-sets the US regulatory domain, after radios sometimes booted with world regdom 00, which marked ch161 no-IR so the mesh never joined. A new ops rule lands with it: on wireless-backhaul nodes, don't use <code>wifi reload</code> — <code>uci commit</code> and reboot instead.</li>
+<li><strong>Nov 2, 2026</strong> — a hostname pin fix, after a reboot reverted a rename.</li>
+</ul>
+<p>The early burst came over the holidays; the rest of the year was hardening.</p>
+<p>[ADAM: which of these fixes he considers the most important, and why]</p>
+<h2>Lessons learned</h2>
+<ul>
+<li>A mesh that never joins leaves nothing to read. The regdom 00 bug looked like a dead node; the cause was a radio booting with the world regulatory domain, which made ch161 no-IR. The fix was a boot guard that re-sets the US regdom every time.</li>
+<li>On wireless-backhaul nodes, don't use <code>wifi reload</code>. <code>uci commit</code> plus a reboot is the house rule.</li>
+<li>Reboots are not free: mwan3track can wedge offline, and a hostname rename can revert. Both now have boot-time fixes.</li>
+<li>batman-adv's default gateway bandwidth announcement is stale. Announce the real number.</li>
+<li>After a Starlink packet-loss investigation, the default WAN policy went to plain failover.</li>
+<li>Failover is not complete until conntrack is handled — otherwise existing flows stay pinned to Starlink after fiber recovers.</li>
+</ul>
+<h2>Build your own</h2>
+<p>Nothing here depends on the private repo. The architecture reproduces with public tools, and the steps are short.</p>
+<ol>
+<li>Pick one target. Gateway and APs on the same SoC family — here MT7981, mediatek/filogic — means one build setup and a few device profiles.</li>
+<li>Run the official OpenWrt Image Builder inside Docker, so builds are repeatable on any host.</li>
+<li>Write a template script that generates UCI config per node. Keep passwords in a <code>.env</code> file outside git.</li>
+<li>Build and flash. Configure once, flash many APs — each node should join the mesh on first boot with no manual steps.</li>
+<li>Verify. A health script that prints the topology sorted by TQ shows immediately whether a node joined.</li>
+<li>Add the OpenWrt VLAN layer: LAN, IoT, Guest. Give IoT an internet-only rule — it may reply to LAN-initiated connections but not start them — with a narrow exception for the Home Assistant host. Isolate the guest network completely.</li>
+<li>Set the radios: 2.4 GHz for clients on the 1/6/11 plan, 5 GHz as a single-channel, hidden, WPA3-SAE backhaul, mesh MTU 1532, hop_penalty 0 on wired and 40 on Wi-Fi.</li>
+<li>Add fleet tools early: a run-a-command-on-every-node script, a roaming monitor, a weak-device list. They pay off the first time a node silently drops.</li>
+<li>Grow in stages: multi-WAN failover, then a Tailscale subnet router, then Home Assistant dashboards.</li>
+</ol>
+<h2>Tailscale was "a game changer"</h2>
+<p>Remote access was the last big problem, and Adam calls Tailscale "a game changer" for it.</p>
+<p>The OpenWrt Tailscale history in the repo has three stages. The first idea was to run it on the gateway. In January 2026 it moved to a Linux server. Today an Ubuntu box acts as a Tailscale subnet router, advertising the LAN and IoT subnets:</p>
+<pre><code>tailscale up --advertise-routes=&lt;lan&gt;/24,&lt;iot&gt;/24
+</code></pre>
+<p>Enable <code>ip_forward</code> on that box and approve the advertised routes in the admin console. From there, SSH and Home Assistant are reachable remotely with no port forwarding — the router never has to expose anything.</p>
+<p>[ADAM: what he actually uses remote access for day to day]</p>
+<h2>Home Assistant and the toolbox</h2>
+<p>The mesh and the smart home grew into each other. On January 19, 2026, a mesh monitoring script fed the first Home Assistant mesh dashboard: node TQ, WAN status and Starlink throughput, with automations on top. A week later, Home Assistant config and automations moved into WRTflasher itself, making the repo a combined OpenWrt Home Assistant source of truth — firmware for the APs in the same place as the configuration that runs the house. A Frigate NVR on a GPU box sits on the network too. New to Home Assistant hardware? See <a href="home-assistant-raspberry-pi">Home Assistant on a Raspberry Pi</a>; for the radios your sensors use, read <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a> and <a href="zigbee-hub">the best Zigbee hub</a>.</p>
+<p>The toolbox grew alongside: <code>mesh-health.sh</code> prints the topology sorted by TQ; <code>mesh-exec.sh</code> runs a command on every node; <code>find-device.sh</code>, <code>watch-roaming.sh</code> and <code>weak-devices.sh</code> round out the set.</p>
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+<h2>FAQ</h2>
+<h3>Why put IoT devices on their own VLAN?</h3>
+<p>Because, as Adam puts it, he doesn't want sketchy IoT devices on the same network as his laptop. On the IoT VLAN they can reach the internet and answer connections the LAN starts, but they can't open connections to laptops or phones. Home Assistant is the one allowed exception.</p>
+<h3>Do the APs need Ethernet?</h3>
+<p>No. The mesh exists because the house has no data wiring. batman-adv prefers a wired link when one exists — spare cable runs later carried backhaul on VLAN 99, and G.hn powerline adapters were tried and retired in June 2026 — but Wi-Fi remains the fallback if a cable is pulled.</p>
+<h3>Why does the IoT network use WPA2?</h3>
+<p>Legacy compatibility. The IoT SSID runs WPA2-PSK with the 802.11r/k/v roaming features disabled; the LAN SSID carries them.</p>
+<h3>Why would a mesh node fail to join at boot?</h3>
+<p>Sometimes the radio booted with world regulatory domain 00, which marked ch161 as no-IR — barring the radio from initiating — so the node never joined. A boot guard now re-sets the US regulatory domain on every boot.</p>
+<h3>Where should Tailscale run?</h3>
+<p>The repo's answer, reached in stages: not on the router. It began as a gateway idea, moved to a Linux server in January 2026, and today an Ubuntu subnet router advertises the LAN and IoT subnets. Approve the routes in the admin console; there is no port forwarding to configure.</p>
+<h3>Can Home Assistant monitor the mesh?</h3>
+<p>Yes. Dashboards track node TQ, WAN status and Starlink throughput, with automations on top. Since January 2026, the Home Assistant configuration has lived in the same repo as the firmware.</p>
+<h2>Where it stands</h2>
+<p>One gateway and a handful of travel routers now run a concrete house in Puerto Rico: fiber, Starlink and T-Mobile on the WAN side; three VLANs over a batman-adv mesh; Tailscale for access; Home Assistant on top. The repo is private. The recipe is not.</p>
+<p>[ADAM: what's next — the 25.12 upgrade and beyond]</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
