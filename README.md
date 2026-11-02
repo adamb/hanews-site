@@ -33,7 +33,13 @@ the last 28 days, ending 3 days back because Search Console data lags ~2-3 days.
 - Property matching tries `https://hanews.org/`, `https://hanews.org`, then
   `sc-domain:hanews.org`, so the script works with either property type.
 - Authorize: `python3 scripts/gsc_oauth.py --serve --hours 72 --report-after`
-  then open the printed URL through `ssh -N -L 3000:127.0.0.1:3000 <vps>`.
+  then open the printed URL through an SSH tunnel to the callback port
+  (`ssh -N -L <port>:127.0.0.1:<port> <vps>`; the listener prints the port).
+- **Publish the OAuth app** (Cloud Console → APIs & Services → OAuth consent
+  screen → *Publish app*). While the consent screen is in **Testing**, Google
+  expires the grant — refresh token included — 7 days after consent, which
+  kills any unattended reporting. Publishing is free and needs no verification
+  for a handful of users; the only cost is the "unverified app" warning.
 - Check the grant: `python3 scripts/gsc_oauth.py --status`.
 - Weekly: the hanews cron job `hanews-weekly-search-console` runs
   `gsc_report.py --json` and posts a short digest to bot-chat (Mondays).
