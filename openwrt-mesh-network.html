@@ -90,7 +90,7 @@
 <li><strong>Sep 11, 2026</strong> — fiber becomes the primary WAN, with Starlink as failover. The fiber entry hole later carries a cable to a wired outdoor Cudy node.</li>
 <li><strong>Sep 26, 2026</strong> — a conntrack fix, after flows stayed pinned to Starlink even after fiber recovered.</li>
 <li><strong>Sep 27, 2026</strong> — sibling Tuya MACs blocked fleet-wide.</li>
-<li><strong>October 2026</strong> — a boot guard re-sets the US regulatory domain, after radios sometimes booted with world regdom 00, which marked ch161 no-IR so the mesh never joined. A new ops rule lands with it: on wireless-backhaul nodes, don't use <code>wifi reload</code> — <code>uci commit</code> and reboot instead.</li>
+<li><strong>October 2026</strong> — a startup fix makes every radio set the correct US country code at boot, after a node occasionally came up with the wrong one and failed to rejoin the mesh.</li>
 <li><strong>Nov 2, 2026</strong> — a hostname pin fix, after a reboot reverted a rename.</li>
 </ul>
 <p>The early burst came over the holidays; the rest of the year was hardening.</p>
@@ -135,7 +135,6 @@
 <p><strong>3. Picking which nodes offer 5 GHz to clients.</strong> The mesh uses 5 GHz on a narrow 20 MHz channel. "We use 5 GHz for mesh with narrow band to help with concrete," Adam says. That meant no 5 GHz for phones and laptops at first. On Sep 22, 2026, 5 GHz client Wi-Fi was turned on alongside the mesh, but only on the wired access points. Those nodes don't relay their own traffic over the air. "Starting to select nodes that used 5 GHz for clients helped and made the mesh 5G less busy." The airtime graphs described below are how the house watches that.</p>
 <h2>Lessons learned</h2>
 <ul>
-<li>A mesh that never joins leaves nothing to read. The regdom 00 bug looked like a dead node; the cause was a radio booting with the world regulatory domain, which made ch161 no-IR. The fix was a boot guard that re-sets the US regdom every time.</li>
 <li>On wireless-backhaul nodes, don't use <code>wifi reload</code>. <code>uci commit</code> plus a reboot is the house rule.</li>
 <li>Reboots are not free: mwan3track can wedge offline, and a hostname rename can revert. Both now have boot-time fixes.</li>
 <li>batman-adv's default gateway bandwidth announcement is stale. Announce the real number.</li>
