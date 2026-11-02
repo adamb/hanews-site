@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="/ga.js" defer></script>
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt mesh network without Ethernet: one home's batman-adv, VLAN and Tailscale build", "datePublished": "2026-11-02", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-mesh-network"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Why put IoT devices on their own VLAN?", "acceptedAnswer": {"@type": "Answer", "text": "Because, as Adam puts it, he doesn't want sketchy IoT devices on the same network as his laptop. On the IoT VLAN they can reach the internet and answer connections the LAN starts, but they can't open connections to laptops or phones. Home Assistant is the one allowed exception."}}, {"@type": "Question", "name": "Do the APs need Ethernet?", "acceptedAnswer": {"@type": "Answer", "text": "No. The mesh exists because the house has no data wiring. batman-adv prefers a wired link when one exists \u2014 spare cable runs later carried backhaul on VLAN 99, and G.hn powerline adapters were tried and retired in June 2026 \u2014 but Wi-Fi remains the fallback if a cable is pulled."}}, {"@type": "Question", "name": "Why does the IoT network use WPA2?", "acceptedAnswer": {"@type": "Answer", "text": "Legacy compatibility. The IoT SSID runs WPA2-PSK with the 802.11r/k/v roaming features disabled; the LAN SSID carries them."}}, {"@type": "Question", "name": "Why would a mesh node fail to join at boot?", "acceptedAnswer": {"@type": "Answer", "text": "Sometimes the radio booted with world regulatory domain 00, which marked ch161 as no-IR \u2014 barring the radio from initiating \u2014 so the node never joined. A boot guard now re-sets the US regulatory domain on every boot."}}, {"@type": "Question", "name": "Where should Tailscale run?", "acceptedAnswer": {"@type": "Answer", "text": "The repo's answer, reached in stages: not on the router. It began as a gateway idea, moved to a Linux server in January 2026, and today an Ubuntu subnet router advertises the LAN and IoT subnets. Approve the routes in the admin console; there is no port forwarding to configure."}}, {"@type": "Question", "name": "Can Home Assistant monitor the mesh?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dashboards track node TQ, WAN status and Starlink throughput, with automations on top. Since January 2026, the Home Assistant configuration has lived in the same repo as the firmware."}}]}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt mesh network without Ethernet: one home's batman-adv, VLAN and Tailscale build", "datePublished": "2026-11-02", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-mesh-network"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Why put IoT devices on their own VLAN?", "acceptedAnswer": {"@type": "Answer", "text": "Because, as Adam puts it, he doesn't want sketchy IoT devices on the same network as his laptop. On the IoT VLAN they can reach the internet and answer connections the LAN starts, but they can't open connections to laptops or phones. Home Assistant is the one allowed exception."}}, {"@type": "Question", "name": "Do the APs need Ethernet?", "acceptedAnswer": {"@type": "Answer", "text": "No. The mesh started wireless-only because the house has no in-wall data wiring. But wired links help a lot where you can get them. Here, cables run through a roof pipe, mini-split AC holes and the fiber entry hole carry backhaul on VLAN 99. G.hn powerline adapters were tried and retired in June 2026. batman-adv prefers the wired path and falls back to Wi-Fi if a cable is pulled."}}, {"@type": "Question", "name": "Why does the IoT network use WPA2?", "acceptedAnswer": {"@type": "Answer", "text": "Legacy compatibility. The IoT SSID runs WPA2-PSK with the 802.11r/k/v roaming features disabled; the LAN SSID carries them."}}, {"@type": "Question", "name": "Why would a mesh node fail to join at boot?", "acceptedAnswer": {"@type": "Answer", "text": "Sometimes the radio booted with world regulatory domain 00, which marked ch161 as no-IR \u2014 barring the radio from initiating \u2014 so the node never joined. A boot guard now re-sets the US regulatory domain on every boot."}}, {"@type": "Question", "name": "Where should Tailscale run?", "acceptedAnswer": {"@type": "Answer", "text": "The repo's answer, reached in stages: not on the router. It began as a gateway idea, moved to a Linux server in January 2026, and today an Ubuntu subnet router advertises the LAN and IoT subnets. Approve the routes in the admin console; there is no port forwarding to configure."}}, {"@type": "Question", "name": "Can Home Assistant monitor the mesh?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Dashboards track node TQ, WAN status and Starlink throughput, with automations on top. Since January 2026, the Home Assistant configuration has lived in the same repo as the firmware."}}]}]}</script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -46,11 +46,11 @@
 <h1>OpenWrt mesh network without Ethernet: one home's batman-adv, VLAN and Tailscale build</h1>
 <p class="byline">HA News · DRAFT</p>
 <p><em>Draft for review. Not published.</em> Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page.</p>
-<p>In a concrete house with no data wiring, an OpenWrt mesh network is not a hobby. It is the only realistic way to move Wi-Fi between rooms.</p>
+<p>In a concrete house with no in-wall data wiring, an OpenWrt mesh network is not a hobby. It is the only realistic way to move Wi-Fi between rooms, at least until you find a way to sneak a few cables in.</p>
 <p>That is the situation Adam Beguelin — HA News's publisher — found himself in, and his answer is WRTflasher: a private git repository that builds custom OpenWrt firmware and turns small travel routers into mesh nodes that configure themselves. The repo now holds 661 commits spanning just under a year, and it runs a real home in Puerto Rico — three VLANs over batman-adv, multi-WAN failover, Tailscale for remote access, and Home Assistant watching all of it.</p>
 <h2>Three motivations</h2>
 <p>The first is security. Adam puts it plainly: "I don't want sketchy IoT devices on the same network as my laptop." That sentence is the key driver of the whole design. IoT gear gets its own VLAN and an internet-only firewall rule, and most later decisions about that network trace back to it.</p>
-<p>The second is the building: concrete walls, no data wiring. Running cable was not an option, so mesh was the only option.</p>
+<p>The second is the building: concrete walls, no in-wall data wiring. Pulling cable through the walls was not an option, so a wireless mesh came first. Over time it became a hybrid, with a few wired runs, as the section below on getting wires into the house explains.</p>
 <p>The third is the stack. Adam wanted open source end to end — OpenWrt on the radios, batman-adv underneath, Home Assistant on top. Tailscale "was a game changer" for remote access, but that came later.</p>
 <p>[ADAM: one line on why open source matters to you for the network layer]</p>
 <pre><code>Internet (fiber primary; Starlink, T-Mobile backup)
@@ -82,12 +82,12 @@
 <li><strong>Jan 9, 2026</strong> — Tailscale remote access documented.</li>
 <li><strong>Jan 19, 2026</strong> — a mesh monitoring script and the first Home Assistant mesh dashboard.</li>
 <li><strong>Jan 26, 2026</strong> — Home Assistant config and automations move into the repo, which becomes the source of truth for HA too.</li>
-<li><strong>Feb 26 – Mar 4, 2026</strong> — wired backhaul over VLAN 99 on spare cable runs; G.hn powerline adapters tried as backhaul; a mesh benchmark script; hop penalty tuning.</li>
+<li><strong>Feb 26 – Mar 4, 2026</strong> — first wired backhaul over VLAN 99; G.hn powerline adapters tried as backhaul; a mesh benchmark script; hop penalty tuning.</li>
 <li><strong>Jun 10, 2026</strong> — G.hn retired in favor of direct Ethernet; monitoring expands to airtime, batman TQ and the T-Mobile WAN.</li>
 <li><strong>Aug 8, 2026</strong> — the gateway now announces its real bandwidth instead of batman-adv's stale default.</li>
 <li><strong>Aug 10, 2026</strong> — the default WAN policy switches to failover, after a Starlink packet-loss investigation.</li>
 <li><strong>Aug 16, 2026</strong> — documentation that mwan3track can wedge offline after a reboot, plus a boot self-heal step.</li>
-<li><strong>September 2026</strong> — fiber becomes the primary WAN, with Starlink and T-Mobile as backups.</li>
+<li><strong>Sep 11, 2026</strong> — fiber becomes the primary WAN, with Starlink as failover. The fiber entry hole later carries a cable to a wired outdoor Cudy node.</li>
 <li><strong>Sep 26, 2026</strong> — a conntrack fix, after flows stayed pinned to Starlink even after fiber recovered.</li>
 <li><strong>Sep 27, 2026</strong> — sibling Tuya MACs blocked fleet-wide.</li>
 <li><strong>October 2026</strong> — a boot guard re-sets the US regulatory domain, after radios sometimes booted with world regdom 00, which marked ch161 no-IR so the mesh never joined. A new ops rule lands with it: on wireless-backhaul nodes, don't use <code>wifi reload</code> — <code>uci commit</code> and reboot instead.</li>
@@ -95,6 +95,24 @@
 </ul>
 <p>The early burst came over the holidays; the rest of the year was hardening.</p>
 <p>[ADAM: which of these fixes he considers the most important, and why]</p>
+<h2>Getting wires into a concrete house</h2>
+<p>The mesh worked, but Adam wanted more. "I really wanted a few wired routers," he says. Starlink had already given him one cable route: a wire running up to the dish on the roof.</p>
+<p>The idea came while he was brainstorming with ChatGPT and showed it photos of the pipes on his roof. "I realized that I could run cables up the same pipe to the roof, and then across the house and into rooms by using the same holes that the mini-split ACs use." Those runs reach the center of the house and the main bedroom. "This made a big difference."</p>
+<p>The repo follows the same path. Wired backhaul over a dedicated VLAN 99 is first documented on Feb 26, 2026. A Mar 1 commit splits the batman-adv attach script into separate gateway and access-point versions for wired links. On Sep 1, the wired center node gets a hop penalty of 0. By Sep 21 the main-bedroom node is a Cudy AP3000 on wired backhaul.</p>
+<p>Fiber opened the next route. The repo makes fiber the primary WAN on Sep 11, 2026, with Starlink as failover. "When the installer drilled a hole for that fiber, I realized I could use the same hole and run a cable around the house to the corner nearest the guest house." A Cudy AP3000 Outdoor (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=Cudy+AP3000+Outdoor&amp;tag=hanews01-20">check price on Amazon</a>) went up there on wired backhaul. "That solved a lot of the weaknesses."</p>
+<h3>Why wired backhaul beats wireless hops</h3>
+<p>Every wireless hop in a single-channel mesh costs airtime. A node that relays traffic over Wi-Fi has to receive it and then send it again on the same channel, so throughput drops and latency grows with each hop. A cable takes that relay traffic off the air entirely. That leaves the 5 GHz backhaul channel free for the nodes that still depend on it, and it puts more of the house one hop from the gateway.</p>
+<p>batman-adv makes this easy because it doesn't care what kind of link it uses. Each node adds its wired VLAN 99 interface and its 5 GHz mesh interface to the same bat0 mesh. batman-adv then picks paths by link quality (TQ) adjusted by a per-interface hop penalty. In this build the wired interface gets a penalty of 0 and the Wi-Fi mesh interface a higher one, so the cable wins whenever it's up. If a cable is pulled, the node falls back to Wi-Fi without any change to its config. Since Aug 1, 2026, a Home Assistant alert fires whenever a wired node falls back to Wi-Fi.</p>
+<blockquote class="tipbox">
+<p><strong>Tip: finding cable routes in a house you can't drill</strong></p>
+<ul>
+<li>Reuse existing penetrations: mini-split line-set holes, old satellite or antenna entries, and the hole your fiber or cable installer just drilled.</li>
+<li>Check existing conduit and roof pipes before drilling anything new.</li>
+<li>On a roof or outside wall, use outdoor-rated, UV-resistant cable. Use direct-burial cable if it runs underground.</li>
+<li>Reseal every penetration you open, with outdoor-rated sealant on the outside and around line-set covers.</li>
+<li>A single wired node at the far edge of the house helps more than any wireless hop. In this build, ceiling- or wall-mount Cudy AP3000 units on PoE fill those spots.</li>
+</ul>
+</blockquote>
 <h2>Lessons learned</h2>
 <ul>
 <li>A mesh that never joins leaves nothing to read. The regdom 00 bug looked like a dead node; the cause was a radio booting with the world regulatory domain, which made ch161 no-IR. The fix was a boot guard that re-sets the US regdom every time.</li>
@@ -135,7 +153,7 @@
 <h3>Why put IoT devices on their own VLAN?</h3>
 <p>Because, as Adam puts it, he doesn't want sketchy IoT devices on the same network as his laptop. On the IoT VLAN they can reach the internet and answer connections the LAN starts, but they can't open connections to laptops or phones. Home Assistant is the one allowed exception.</p>
 <h3>Do the APs need Ethernet?</h3>
-<p>No. The mesh exists because the house has no data wiring. batman-adv prefers a wired link when one exists — spare cable runs later carried backhaul on VLAN 99, and G.hn powerline adapters were tried and retired in June 2026 — but Wi-Fi remains the fallback if a cable is pulled.</p>
+<p>No. The mesh started wireless-only because the house has no in-wall data wiring. But wired links help a lot where you can get them. Here, cables run through a roof pipe, mini-split AC holes and the fiber entry hole carry backhaul on VLAN 99. G.hn powerline adapters were tried and retired in June 2026. batman-adv prefers the wired path and falls back to Wi-Fi if a cable is pulled.</p>
 <h3>Why does the IoT network use WPA2?</h3>
 <p>Legacy compatibility. The IoT SSID runs WPA2-PSK with the 802.11r/k/v roaming features disabled; the LAN SSID carries them.</p>
 <h3>Why would a mesh node fail to join at boot?</h3>
@@ -147,6 +165,7 @@
 <h2>Where it stands</h2>
 <p>One gateway and a handful of travel routers now run a concrete house in Puerto Rico: fiber, Starlink and T-Mobile on the WAN side; three VLANs over a batman-adv mesh; Tailscale for access; Home Assistant on top. The repo is private. The recipe is not.</p>
 <p>[ADAM: what's next — the 25.12 upgrade and beyond]</p>
+
       </div>
     </div>
   </main>
