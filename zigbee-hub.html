@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best Zigbee hub for Home Assistant (2026) — HA News</title>
+  <meta name="description" content="Which Zigbee hub or coordinator to use with Home Assistant: Connect ZBT-2 specs, tested third-party sticks, Zigbee vs Thread, setup and migration for ZHA and Zigbee2MQTT.">
+  <link rel="canonical" href="https://hanews.org/zigbee-hub">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best Zigbee hub for Home Assistant (2026)", "image": "https://hanews.org/images/zbt-2-still-life-1280.webp", "datePublished": "2026-11-02", "dateModified": "2026-11-02", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/zigbee-hub"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I need a Zigbee hub for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "You need a Zigbee coordinator, not a vendor hub. A USB adapter such as the Connect ZBT-2 plugged into your Home Assistant machine does the job, and devices pair straight to Home Assistant."}}, {"@type": "Question", "name": "What is the best Zigbee coordinator for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "For a new network, the official Home Assistant Connect ZBT-2. Home Assistant's own ZHA documentation recommends it, and its firmware is maintained and updated from inside Home Assistant."}}, {"@type": "Question", "name": "Does the Connect ZBT-2 work with Zigbee2MQTT?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Nabu Casa says many people use it with Zigbee2MQTT, and Zigbee2MQTT documents how to migrate to a new adapter."}}, {"@type": "Question", "name": "Can one adapter run Zigbee and Thread?", "acceptedAnswer": {"@type": "Answer", "text": "Not the ZBT-2. You choose Zigbee or Thread for each adapter. Nabu Casa found multiprotocol unreliable and recommends one adapter per protocol."}}, {"@type": "Question", "name": "Can I move my Zigbee network to a new adapter?", "acceptedAnswer": {"@type": "Answer", "text": "Usually, yes. Home Assistant has a migration wizard that handles most adapters; some, such as ConBee sticks, need specific firmware first."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 2 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Zigbee</p>
+        <h1>The best Zigbee hub for Home Assistant (2026)</h1>
+        <p class="byline">HA News · 2 Nov 2026</p>
+        <p class="disclosure">Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page. Prices and stock are on Amazon; we don't quote them here.</p>
+
+        <p>Home Assistant doesn't need a vendor Zigbee hub or bridge. The "hub" is a Zigbee coordinator: a USB adapter plugged into the machine that runs Home Assistant, driven by the built-in Zigbee Home Automation (ZHA) integration or by Zigbee2MQTT. Your sensors, bulbs and switches then talk to Home Assistant locally. <strong>For a new network the best Zigbee hub for Home Assistant is the official Home Assistant Connect ZBT-2</strong>, which the ZHA documentation calls "the one to get". Several third-party sticks are known to work well too.</p>
+
+        <figure class="figure">
+          <img src="images/zbt-2-still-life-1280.webp" alt="Home Assistant Connect ZBT-2 Zigbee and Thread adapter, a white antenna on a round base" width="1280" height="887" loading="lazy">
+          <figcaption>Home Assistant Connect ZBT-2. Source: <a href="https://www.home-assistant.io/connect/zbt-2/">Home Assistant product page</a></figcaption>
+        </figure>
+
+        <h2>What a Zigbee coordinator does</h2>
+        <p>A Zigbee network has exactly one coordinator. Mains-powered devices such as plugs and bulbs act as routers and extend the mesh; battery devices such as remotes and motion sensors are end devices. Every Zigbee device joins one network only. Because the coordinator is just a radio, you can pair devices from many brands, including Hue and IKEA, directly to Home Assistant and drop their separate bridges. Still deciding on a radio? Read <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a>.</p>
+
+        <h2>Our pick: Home Assistant Connect ZBT-2</h2>
+        <table>
+          <thead><tr><th>Spec</th><th>Connect ZBT-2</th></tr></thead>
+          <tbody>
+            <tr><td>Radio chip</td><td>Silicon Labs MG24</td></tr>
+            <tr><td>USB bridge</td><td>ESP32-S3 (USB-serial)</td></tr>
+            <tr><td>Protocols</td><td>Zigbee 3.0 or Thread (one at a time)</td></tr>
+            <tr><td>Adapter speed</td><td>460,800 baud (ZBT-1: 115,200)</td></tr>
+            <tr><td>Power and data</td><td>USB-C, 5 V DC, 500 mA; 1.5 m USB-C cable in the box</td></tr>
+            <tr><td>Antenna</td><td>2400-2483.5 MHz, omnidirectional, 4.16 dBi peak gain; 10 dBm transmit (Europe), 8 dBm elsewhere</td></tr>
+            <tr><td>Size and weight</td><td>83 × 83 × 179 mm, 157 g</td></tr>
+            <tr><td>Use</td><td>Indoors, 0-65 °C, non-condensing humidity</td></tr>
+          </tbody>
+        </table>
+        <p>The ZBT-2 replaces the discontinued Connect ZBT-1 (formerly SkyConnect). Nabu Casa moved to the MG24 chip, a tuned external antenna and a four-times faster serial link, which it says makes devices more responsive. The Zigbee firmware is maintained by the Home Assistant team responsible for ZHA and can be updated from inside Home Assistant, and a setup wizard migrates most existing Zigbee or Thread networks. It also works with Zigbee2MQTT. Nabu Casa contributes most of its profits to the Open Home Foundation. Check <a href="https://www.amazon.com/s?k=Home+Assistant+Connect+ZBT-2&amp;tag=hanews01-20" rel="sponsored nofollow">Home Assistant Connect ZBT-2 on Amazon</a> for current price and stock.</p>
+
+        <h2>Zigbee or Thread, not both</h2>
+        <p>You dedicate a ZBT-2 to either Zigbee or Thread. Nabu Casa tested running both at once ("multiprotocol") on the ZBT-1, found it unreliable and doesn't plan to support it. If you want a Thread network for Matter devices as well, use a second adapter.</p>
+
+        <h2>Other tested coordinators</h2>
+        <p>The ZHA documentation lists these third-party adapters as tested and working well. Home Assistant doesn't update their firmware, so use the maker's tools.</p>
+        <ul>
+          <li><strong>SONOFF Zigbee 3.0 USB Dongle Plus, model ZBDongle-E</strong> (Silicon Labs EFR32MG21): <a href="https://www.amazon.com/s?k=SONOFF+ZBDongle-E&amp;tag=hanews01-20" rel="sponsored nofollow">SONOFF ZBDongle-E on Amazon</a></li>
+          <li><strong>SMLIGHT SLZB-07</strong> (EFR32MG21 USB dongle): <a href="https://www.amazon.com/s?k=SMLIGHT+SLZB-07&amp;tag=hanews01-20" rel="sponsored nofollow">SMLIGHT SLZB-07 on Amazon</a></li>
+          <li><strong>dresden elektronik ConBee III</strong>: <a href="https://www.amazon.com/s?k=ConBee+III&amp;tag=hanews01-20" rel="sponsored nofollow">ConBee III on Amazon</a></li>
+          <li>Texas Instruments CC2652P/R/RB and CC1352P/R USB adapters flashed with Z-Stack coordinator firmware</li>
+        </ul>
+        <p>Zigbee2MQTT recommends adapters on the same families: Texas Instruments zStack, Silicon Labs EmberZNet and dresden elektronik deCONZ. Avoid running a coordinator over Wi-Fi or a VPN; both ZHA and Zigbee2MQTT warn that the serial link can't cope with dropped packets. If the radio must sit away from the server, use a wired Ethernet adapter.</p>
+
+        <h2>Setting it up</h2>
+        <ol>
+          <li>Plug the adapter into the Home Assistant machine on a USB extension cable, away from USB 3 ports. Home Assistant Green has no built-in Zigbee radio, so it needs one.</li>
+          <li>Home Assistant should discover it. Otherwise go to Settings, then Devices &amp; services, then Add integration, and choose Zigbee Home Automation.</li>
+          <li>Create a new network or migrate one from your old adapter.</li>
+          <li>Pair mains-powered routers first, then battery sensors.</li>
+        </ol>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Do I need a Zigbee hub for Home Assistant?</h3>
+        <p>You need a Zigbee coordinator, not a vendor hub. A USB adapter such as the Connect ZBT-2 plugged into your Home Assistant machine does the job, and devices pair straight to Home Assistant.</p>
+        <h3>What is the best Zigbee coordinator for Home Assistant?</h3>
+        <p>For a new network, the official Home Assistant Connect ZBT-2. Home Assistant's own ZHA documentation recommends it, and its firmware is maintained and updated from inside Home Assistant.</p>
+        <h3>Does the Connect ZBT-2 work with Zigbee2MQTT?</h3>
+        <p>Yes. Nabu Casa says many people use it with Zigbee2MQTT, and Zigbee2MQTT documents how to migrate to a new adapter.</p>
+        <h3>Can one adapter run Zigbee and Thread?</h3>
+        <p>Not the ZBT-2. You choose Zigbee or Thread for each adapter. Nabu Casa found multiprotocol unreliable and recommends one adapter per protocol.</p>
+        <h3>Can I move my Zigbee network to a new adapter?</h3>
+        <p>Usually, yes. Home Assistant has a migration wizard that handles most adapters; some, such as ConBee sticks, need specific firmware first.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-11-02">Read today's</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/connect/zbt-2/">Home Assistant Connect ZBT-2</a>; <a href="https://www.home-assistant.io/integrations/zha/">Home Assistant ZHA integration</a>; <a href="https://www.zigbee2mqtt.io/guide/adapters/">Zigbee2MQTT supported adapters</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

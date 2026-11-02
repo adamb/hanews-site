@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 2 Nov 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 2 November 2026. Zigbee2MQTT 2.14.3 deprecates 32-bit platforms; Home Assistant Core 2026.11.0b2 beta; stable Core 2026.10.4, Supervisor 2026.10.5, HAOS 18.4 unchanged.">
+  <link rel="canonical" href="https://hanews.org/brief-2026-11-02">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 2 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>2 November 2026</h1>
+        <p class="lede">Over the weekend <strong>Zigbee2MQTT 2.14.3</strong> put 32-bit installs on notice, and <strong>Core 2026.11.0b2</strong> landed ahead of Wednesday's expected 2026.11 release. Stable Core is still 2026.10.4. New guide: <a href="zigbee-hub">the best Zigbee hub for Home Assistant</a>.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Zigbee2MQTT</p>
+          <h2>Zigbee2MQTT 2.14.3 deprecates 32-bit platforms</h2>
+          <p><strong>What happened:</strong> Zigbee2MQTT 2.14.3 was released on 1 Nov and marks 32-bit platforms as deprecated. Support ends when the minimum Node.js version becomes v24, which happens when Node.js 22 reaches end of life in April 2027. Node.js 24 has no official 32-bit builds, so the linux/386, linux/arm/v6 and linux/arm/v7 Docker images will not be updated any more. Version 2.14.3 adds a heating system mode for Danfoss Ally eTRV0103, power and energy readings for Sinopé TH1500ZB, OTA support for SONOFF SNZT-03P and SNZT-04P, and an action for the Aqara MCCGQ13LM.</p>
+          <p><strong>Why it matters:</strong> If you run Zigbee2MQTT on a Raspberry Pi 1, a Zero or an older 32-bit Raspberry Pi OS install, plan a move to 64-bit OS or hardware before support ends in April 2027.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.3">Zigbee2MQTT 2.14.3</a>; <a href="https://github.com/Koenkk/zigbee2mqtt/issues/33552">issue #33552</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="beta">
+          <p class="meta">02 · Home Assistant (beta)</p>
+          <h2>Core 2026.11.0b2: ZBT-2 over ESPHome serial proxies, Marketplace update fix</h2>
+          <p><strong>What happened:</strong> Home Assistant Core 2026.11.0b2 was tagged on 30 Oct and is listed in beta.json, with the final 2026.11 release expected on Wednesday 4 Nov. The beta shows ZBT-2 and ZBT-1 connections via ESPHome serial proxies, updates Marketplace update entities when a repository is refreshed from its page, and prefers cloud custom domains in get_url. It also closes shared modbus connections when Home Assistant stops or restarts, adds Govee light local temperature ranges, and no longer ends a truncated entity ID with an underscore. Library bumps include py-synologydsm-api 2.11.1, midea-local 15.0.0 and arcam-fmj 3.1.1.</p>
+          <p><strong>Why it matters:</strong> The final 2026.11 release is not out yet, so if the listed changes touch your setup, review the b2 notes before Wednesday 4 Nov. Don't run betas on a house you depend on.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.11.0b2">core 2026.11.0b2</a>; <a href="https://version.home-assistant.io/beta.json">beta.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="stable">
+          <p class="meta">03 · Stable releases</p>
+          <h2>No change: Core 2026.10.4, Supervisor 2026.10.5, HAOS 18.4, ESPHome 2026.10.1</h2>
+          <p><strong>What happened:</strong> stable.json still shows Core 2026.10.4, Supervisor 2026.10.5 and HAOS 18.4. ESPHome remains at 2026.10.1, Z-Wave JS UI at 11.25.2, Z-Wave JS at 15.31.2 and matter.js at 0.18.0. Picking a Zigbee radio? New today: <a href="zigbee-hub">the best Zigbee hub for Home Assistant</a>.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://version.home-assistant.io/stable.json">stable.json</a>; <a href="https://github.com/esphome/esphome/releases">ESPHome</a>; <a href="https://github.com/zwave-js/zwave-js-ui/releases">zwave-js-ui</a>; <a href="https://github.com/project-chip/matter.js/releases">matter.js</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

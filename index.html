@@ -16,7 +16,7 @@
   <div class="topbar" aria-hidden="true"></div>
   <header class="masthead">
     <div class="masthead__meta">
-      <span class="dateline">Friday, 30 October 2026</span>
+      <span class="dateline">Monday, 2 November 2026</span>
       <div class="masthead__aside">
         <span class="masthead__edition">Home automation edition</span>
         <button type="button" class="signup-trigger">Get the briefing</button>
@@ -44,7 +44,7 @@
         <section class="sec" aria-labelledby="k-ha">
           <h2 class="kicker" id="k-ha">Home Assistant</h2>
           <ul>
-            <li><a href="brief-2026-10-30.html#lead">Beta 2026.11.0b1: ZHA 2.4.2, Apple TV fix</a></li>
+            <li><a href="brief-2026-11-02.html#beta">Beta 2026.11.0b2: ZBT-2 via ESPHome serial proxies</a></li>
             <li><a href="brief-2026-10-30.html#wth">November is the Month of “What the Heck?!”</a></li>
             <li><a href="brief-2026-10-29.html#lead">Supervisor 2026.10.5: symlink security fix</a></li>
             <li><a href="brief-2026-10-29.html#beta">Beta: 2026.11 brings HACS in as the Marketplace</a></li>
@@ -61,34 +61,35 @@
         <section class="sec" aria-labelledby="k-radio">
           <h2 class="kicker" id="k-radio">Radios</h2>
           <ul>
+            <li><a href="brief-2026-11-02.html#lead">Zigbee2MQTT 2.14.3 deprecates 32-bit</a></li>
+            <li><a href="zigbee-hub.html">Guide: the best Zigbee hub for Home Assistant</a></li>
             <li><a href="z-wave-hub.html">Guide: the best Z-Wave hub for Home Assistant</a></li>
             <li><a href="zigbee-vs-z-wave.html">Explainer: Zigbee vs Z-Wave</a></li>
             <li><a href="brief-2026-10-28.html#zwave">Z-Wave JS UI 11.25.2</a></li>
-            <li><a href="brief-2026-10-28.html#matterjs">matter.js 0.18.0</a></li>
           </ul>
         </section>
       </aside>
 
       <div class="col-center">
         <article class="lead" id="lead">
-          <p class="lead-kicker">Home Assistant (beta)</p>
-          <h1><a href="brief-2026-10-30.html">Core 2026.11.0b1 brings ZHA 2.4.2 and an Apple TV fix as November becomes the Month of “What the Heck?!”</a></h1>
-          <p class="dek">The second beta of the November release lands while stable Core stays at 2026.10.4. Home Assistant wants to hear what confuses everyone at home, not just the admin.</p>
-          <p class="byline">HA News Brief · 30 Oct 2026</p>
-          <p>Also today: no change to Supervisor 2026.10.5, HAOS 18.4, ESPHome 2026.10.1, Z-Wave JS UI or Zigbee2MQTT.</p>
-          <p class="byline">Sources: <a href="https://github.com/home-assistant/core/releases/tag/2026.11.0b1">Core 2026.11.0b1</a>, <a href="https://www.home-assistant.io/blog/2026/10/29/what-the-heck-2026-everyone-at-home-gets-a-say/">HA blog</a></p>
+          <p class="lead-kicker">Zigbee2MQTT</p>
+          <h1><a href="brief-2026-11-02.html">Zigbee2MQTT 2.14.3 puts 32-bit installs on notice as Core 2026.11.0b2 lands</a></h1>
+          <p class="dek">32-bit support ends when Node.js 22 reaches end of life in April 2027. Home Assistant's November beta adds ZBT-2 connections over ESPHome serial proxies ahead of Wednesday's expected release.</p>
+          <p class="byline">HA News Brief · 2 Nov 2026</p>
+          <p>Also today: no change to stable Core 2026.10.4, Supervisor 2026.10.5, HAOS 18.4, ESPHome 2026.10.1 or Z-Wave JS UI.</p>
+          <p class="byline">Sources: <a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.3">Zigbee2MQTT 2.14.3</a>, <a href="https://github.com/home-assistant/core/releases/tag/2026.11.0b2">Core 2026.11.0b2</a></p>
         </article>
 
         <div class="secondary">
           <article>
             <p class="kicker">Guide</p>
-            <h2><a href="z-wave-hub.html">The best Z-Wave hub for Home Assistant</a></h2>
-            <p>Connect ZWA-2 specs, Long Range, 800-series sticks, regions and setup.</p>
+            <h2><a href="zigbee-hub.html">The best Zigbee hub for Home Assistant</a></h2>
+            <p>Connect ZBT-2 specs, tested third-party sticks, Zigbee vs Thread and setup.</p>
           </article>
           <article>
-            <p class="kicker">Explainer</p>
-            <h2><a href="zigbee-vs-z-wave.html">Zigbee vs Z-Wave: which should you use with Home Assistant?</a></h2>
-            <p>Radio band, range, device choice, Long Range and which adapter to buy.</p>
+            <p class="kicker">Guide</p>
+            <h2><a href="z-wave-hub.html">The best Z-Wave hub for Home Assistant</a></h2>
+            <p>Connect ZWA-2 specs, Long Range, 800-series sticks, regions and setup.</p>
           </article>
         </div>
       </div>
@@ -96,14 +97,13 @@
       <aside class="col-right">
         <section class="briefing" aria-labelledby="briefing-title">
           <h2 id="briefing-title">The Briefing</h2>
-          <p class="brief-date">30 Oct 2026</p>
+          <p class="brief-date">2 Nov 2026</p>
           <ol>
-            <li><a href="brief-2026-10-30.html#lead">Core 2026.11.0b1 (beta)</a><p>ZHA 2.4.2, Apple TV fix, SSL repair.</p></li>
-            <li><a href="brief-2026-10-30.html#wth">What the Heck?! month</a><p>All of November on the forum.</p></li>
-            <li><a href="brief-2026-10-30.html#stable">Stable releases</a><p>Core 2026.10.4, Supervisor 2026.10.5, HAOS 18.4.</p></li>
-            <li><a href="brief-2026-10-30.html#radios">Z-Wave JS UI / Z2M</a><p>11.25.2 / 2.14.2, no change.</p></li>
+            <li><a href="brief-2026-11-02.html#lead">Zigbee2MQTT 2.14.3</a><p>32-bit deprecated; ends April 2027.</p></li>
+            <li><a href="brief-2026-11-02.html#beta">Core 2026.11.0b2 (beta)</a><p>ZBT-2 via ESPHome serial proxies.</p></li>
+            <li><a href="brief-2026-11-02.html#stable">Stable releases</a><p>Core 2026.10.4, Supervisor 2026.10.5, HAOS 18.4.</p></li>
           </ol>
-          <a class="full-brief" href="brief-2026-10-30.html">Full brief →</a>
+          <a class="full-brief" href="brief-2026-11-02.html">Full brief →</a>
         </section>
 
         <div class="rail-sub">
