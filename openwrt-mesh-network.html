@@ -52,7 +52,7 @@
 <p>The first is security. Adam puts it plainly: "I don't want sketchy IoT devices on the same network as my laptop." That sentence is the key driver of the whole design. IoT gear gets its own VLAN and an internet-only firewall rule, and most later decisions about that network trace back to it.</p>
 <p>The second is the building: concrete walls, no in-wall data wiring. Pulling cable through the walls was not an option, so a wireless mesh came first. Over time it became a hybrid, with a few wired runs, as the section below on getting wires into the house explains.</p>
 <p>The third is the stack. Adam wanted open source end to end — OpenWrt on the radios, batman-adv underneath, Home Assistant on top. Tailscale "was a game changer" for remote access, but that came later.</p>
-<p>[ADAM: one line on why open source matters to you for the network layer]</p>
+<p>"I believe in open source," Adam says. "I like that the code can be reviewed, so I feel more secure about it. Open source has changed the world in very positive ways, and I want to support that."</p>
 <pre><code>Internet (fiber primary; Starlink, T-Mobile backup)
         |
   OpenWrt One gateway (mwan3 failover, firewall, VLANs 10/20/30)
@@ -94,7 +94,7 @@
 <li><strong>Nov 2, 2026</strong> — a hostname pin fix, after a reboot reverted a rename.</li>
 </ul>
 <p>The early burst came over the holidays; the rest of the year was hardening.</p>
-<p>[ADAM: which of these fixes he considers the most important, and why]</p>
+<p>Asked to rank them, Adam puts channel tuning first, then moving 5 GHz clients onto the wired access points.</p>
 <h2>Getting wires into a concrete house</h2>
 <p>The mesh worked, but Adam wanted more. "I really wanted a few wired routers," he says. Starlink had already given him one cable route: a wire running up to the dish on the roof.</p>
 <p>The idea came while he was brainstorming with ChatGPT and showed it photos of the pipes on his roof. "I realized that I could run cables up the same pipe to the roof, and then across the house and into rooms by using the same holes that the mini-split ACs use." Those runs reach the center of the house and the main bedroom. "This made a big difference."</p>
@@ -125,7 +125,7 @@
 <li><strong>The slow G.hn paths dragged down the whole mesh.</strong> One Wi-Fi-only node went from 3.6 Mbps to 39 to 54 Mbps once the third adapter was unplugged, likely because batman-adv had been routing some traffic over the slow paths.</li>
 </ul>
 <p>The adapters came out on Jun 10, 2026. The cable runs described above replaced them.</p>
-<p>Powerline rides on the same wires as the grid's noise and voltage swings. The chart below is one week of mains voltage logged by Home Assistant in this house. A smart plug measured between 99.6 V and 123.8 V, against a 120 V nominal supply. The low reading was a single brief dip. Most days swing several volts between about 114 V and 123 V. [ADAM: one line on what the grid is like day to day: brownouts, outages, the generator or battery]</p>
+<p>Powerline rides on the same wires as the grid's noise and voltage swings. The chart below is one week of mains voltage logged by Home Assistant in this house. A smart plug measured between 99.6 V and 123.8 V, against a 120 V nominal supply. The low reading was a single brief dip. Most days swing several volts between about 114 V and 123 V. Outages are frequent, and even when the power is on, the house's CyberPower UPS sometimes switches to battery because the power quality is so poor.</p>
 <p><img loading="lazy" width="1430" height="598" alt="Line chart of one week of mains voltage at a Puerto Rico home, Oct 26 to Nov 2, 2026. Readings swing daily between about 114 and 123 volts around a 120 V nominal line, with one brief dip near 100 V." src="images/pr-mains-voltage-7d.png" /></p>
 <p><em>Mains voltage from two Home Assistant sensors, a smart plug and a UPS input, over seven days. Source: HA News, from the homeowner's Home Assistant history.</em></p>
 <h2>The changes that helped most</h2>
@@ -160,7 +160,7 @@
 <pre><code>tailscale up --advertise-routes=&lt;lan&gt;/24,&lt;iot&gt;/24
 </code></pre>
 <p>Enable <code>ip_forward</code> on that box and approve the advertised routes in the admin console. From there, SSH and Home Assistant are reachable remotely with no port forwarding — the router never has to expose anything.</p>
-<p>[ADAM: what he actually uses remote access for day to day]</p>
+<p>Day to day, Adam uses it for two things: the Home Assistant companion app on his phone, and opening the Home Assistant dashboard from his laptop when he's away from home.</p>
 <h2>Home Assistant and the toolbox</h2>
 <p>The mesh and the smart home grew into each other. On January 19, 2026, a mesh monitoring script fed the first Home Assistant mesh dashboard: node TQ, WAN status and Starlink throughput, with automations on top. A week later, Home Assistant config and automations moved into WRTflasher itself, making the repo a combined OpenWrt Home Assistant source of truth — firmware for the APs in the same place as the configuration that runs the house. A Frigate NVR on a GPU box sits on the network too. New to Home Assistant hardware? See <a href="home-assistant-raspberry-pi">Home Assistant on a Raspberry Pi</a>; for the radios your sensors use, read <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a> and <a href="zigbee-hub">the best Zigbee hub</a>.</p>
 <h3>Watching airtime, not just signal</h3>
@@ -199,7 +199,7 @@
 <p>Yes. Dashboards track node TQ, WAN status and Starlink throughput, with automations on top. Since January 2026, the Home Assistant configuration has lived in the same repo as the firmware.</p>
 <h2>Where it stands</h2>
 <p>One gateway and a handful of travel routers now run a concrete house in Puerto Rico: fiber, Starlink and T-Mobile on the WAN side; three VLANs over a batman-adv mesh; Tailscale for access; Home Assistant on top. The repo is private. The recipe is not.</p>
-<p>[ADAM: what's next — the 25.12 upgrade and beyond]</p>
+<p>What's next? "Hopefully nothing," Adam says. "I just want to enjoy the fast WiFi across the property." The one project on his list is a public dashboard that shows when the power or water is out, because neighbors often text to ask, and a link is easier than a reply.</p>
 <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
 
       </div>
