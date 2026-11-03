@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best water leak sensor for Home Assistant (2026) — HA News</title>
+  <meta name="description" content="Best water leak sensor for Home Assistant in 2026: Aqara T1 and ThirdReality on Zigbee, Zooz ZSE42 on Z-Wave, Shelly Flood on Wi-Fi, plus how to pair each one and trigger a shut-off valve.">
+  <link rel="canonical" href="https://hanews.org/best-water-leak-sensor">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best water leak sensor for Home Assistant (2026)", "image": "https://hanews.org/images/aqara-water-leak-sensor-t1.jpg", "datePublished": "2026-11-03", "dateModified": "2026-11-03", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/best-water-leak-sensor"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the best water leak sensor for Home Assistant in 2026?", "acceptedAnswer": {"@type": "Answer", "text": "For a Zigbee network, the Aqara Water Leak Sensor T1 is the smallest and simplest choice and pairs straight to ZHA. On Z-Wave, the Zooz ZSE42 is the equivalent pick, and it is designed to pair with a Z-Wave valve actuator. With no radio at all, the Shelly Flood runs on Wi-Fi and needs no hub."}}, {"@type": "Question", "name": "Do I need a hub for a Zigbee water leak sensor, or does ZHA pair it directly?", "acceptedAnswer": {"@type": "Answer", "text": "No vendor hub is needed. Zigbee sensors pair through the Zigbee Home Automation integration, which talks directly to a USB or network Zigbee coordinator. The Aqara hub is only required if you use Aqara's own app."}}, {"@type": "Question", "name": "Zigbee or Z-Wave water leak sensor — which reaches further?", "acceptedAnswer": {"@type": "Answer", "text": "Both are mesh radios, so reach depends on the mains-powered devices already in your house. Zooz claims up to 1300 feet for the ZSE42 with a hub that supports Z-Wave Long Range. In a house that already has one radio, staying on it costs nothing and avoids a second network."}}, {"@type": "Question", "name": "Will an Aqara leak sensor work in Home Assistant without the Aqara hub?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, as a Zigbee sensor it joins ZHA or Zigbee2MQTT through your own coordinator. Aqara's T1 product page does not publish battery life or IP rating in its HTML, so confirm those on the printed manual or the device page in ZHA or Zigbee2MQTT."}}, {"@type": "Question", "name": "How do I make a water leak sensor close a shut-off valve automatically?", "acceptedAnswer": {"@type": "Answer", "text": "Pair the sensor with a valve controller on the same radio and drive it from a Home Assistant automation. Aqara makes the Valve Controller T1, and Zooz positions the ZSE42 to work with a Z-Wave valve actuator such as its Titan. Detection and shut-off stay local, with no cloud round trip."}}, {"@type": "Question", "name": "How long do water leak sensor batteries last?", "acceptedAnswer": {"@type": "Answer", "text": "Shelly rates the Flood at up to 18 months on one CR123A, which the vendor does not include and says must not be a rechargeable. The Zooz ZSE42 uses a single CR2032. Aqara and ThirdReality do not publish a battery figure on the pages we read, so check the manual before planning a replacement schedule."}}, {"@type": "Question", "name": "Can a leak sensor sit in a sump pit or under a water heater where it might get submerged?", "acceptedAnswer": {"@type": "Answer", "text": "Not with these sensors. Zooz states plainly that the ZSE42 is sealed but not submersible and cannot be used in pools or aquariums, and the Aqara and ThirdReality pages do not claim submersion ratings at all. Put the sensor on the floor beside the hazard, not in standing water."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 2 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html" aria-current="page">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Sensors</p>
+        <h1>The best water leak sensor for Home Assistant (2026)</h1>
+        <p class="byline">HA News · 3 Nov 2026</p>
+
+        <p>A water leak sensor is the cheapest insurance in a smart home, and it's the one device where reaction time matters more than features: either Home Assistant knows the laundry feed is dripping, or it doesn't. <strong>If you already run Zigbee, the best water leak sensor for Home Assistant is the Aqara Water Leak Sensor T1</strong> — small enough to slide under a dishwasher, and it pairs straight into ZHA with no Aqara hub. On Z-Wave, the Zooz ZSE42 is the equivalent pick. If you have no radio at all, the Shelly Flood runs on Wi-Fi and needs nothing in the middle.</p>
+
+        <p>The advice below follows the radio decision, not the brand. Pick the sensor that speaks a protocol your house already has, then spend the effort on placement and on making something close the valve.</p>
+
+        <figure class="figure">
+          <img src="images/aqara-water-leak-sensor-t1.jpg" alt="Aqara Water Leak Sensor T1, a small white puck with two metal probe contacts on the base" width="2560" height="2491" loading="lazy">
+          <figcaption>Aqara Water Leak Sensor T1. Photo: <a href="https://www.aqara.com/en/product/water-leak-sensor-t1/">Aqara</a></figcaption>
+        </figure>
+
+        <h2>The short list</h2>
+        <table>
+          <caption>Four sensors, three radios</caption>
+          <thead><tr><th>Sensor</th><th>Radio</th><th>How it lands in Home Assistant</th><th>Best for</th></tr></thead>
+          <tbody>
+            <tr><td>Aqara Water Leak Sensor T1</td><td>Zigbee</td><td>ZHA or Zigbee2MQTT, via your own coordinator</td><td>Smallest footprint, existing Zigbee mesh</td></tr>
+            <tr><td>ThirdReality Smart Water Leak Sensor</td><td>Zigbee</td><td>ZHA or Zigbee2MQTT</td><td>A local 120 dB alarm that works with the hub down</td></tr>
+            <tr><td>Zooz ZSE42 Water Leak XS</td><td>Z-Wave (800 series)</td><td>Z-Wave JS app plus the Z-Wave integration</td><td>An existing Z-Wave network and a valve on the same radio</td></tr>
+            <tr><td>Shelly Flood</td><td>Wi-Fi 2.4 GHz</td><td>Shelly integration or MQTT</td><td>No hub, and a Wi-Fi access point near the leak</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Zigbee pick: Aqara Water Leak Sensor T1</h2>
+        <p>Aqara lists the T1 under Sensors on its global site alongside the Door and Window Sensor P2 and the Motion Sensor P1, which is the company telling you it's a mainstream part of the line rather than a one-off. It's a Zigbee device: the two probe contacts on the base bridge when water reaches them, and the sensor reports.</p>
+        <p>Two things are worth saying plainly. First, you don't need the Aqara hub. The Zigbee Home Automation integration talks directly to a USB or network coordinator and pairs devices itself, and Aqara's hub only matters if you want Aqara's app. Second, Aqara's product page renders its spec tab in the browser, so battery life and any IP rating are not in the page HTML. That's not a reason to avoid the sensor, but it is a reason to check the printed manual or the device page in ZHA or Zigbee2MQTT rather than trusting a review's number. <a href="https://www.amazon.com/s?k=Aqara+Water+Leak+Sensor+T1&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Water Leak Sensor T1 on Amazon</a>.</p>
+
+        <h2>Zigbee alternative: ThirdReality Smart Water Leak Sensor</h2>
+        <p>The ThirdReality sensor is also Zigbee, and it carries a 120 dB onboard alarm. That matters more than it sounds: if Home Assistant is restarting, or the coordinator is unplugged, the sensor still makes noise in the room where the water is. The vendor sells it direct in single and multi-pack variants, and confirms Zigbee rather than Wi-Fi. If you want a sensor that shouts before the automation even runs, this is the one. <a href="https://www.amazon.com/s?k=ThirdReality+Water+Leak+Sensor&amp;tag=hanews01-20" rel="sponsored nofollow">ThirdReality Water Leak Sensor on Amazon</a>.</p>
+
+        <figure class="figure">
+          <img src="images/thirdreality-water-leak-sensor.jpg" alt="ThirdReality Smart Water Leak Sensor, a white rectangular Zigbee sensor with a probe plate on top" width="1080" height="1080" loading="lazy">
+          <figcaption>ThirdReality Smart Water Leak Sensor. Photo: <a href="https://thirdreality.com/products/water-leak-sensor">ThirdReality</a></figcaption>
+        </figure>
+
+        <h2>Z-Wave pick: Zooz ZSE42 Water Leak XS</h2>
+        <p>Zooz's ZSE42 is the sensor you buy because your house already speaks Z-Wave. It runs on a single CR2032 coin cell, uses an 800-series chip, and is 0.3 inches thick — thin enough to sit under a fridge or a washing machine without lifting anything. Pairing is SmartStart: scan the QR code, enter the PIN, and the Z-Wave JS app adds it.</p>
+        <p>The range claim is the interesting one. Zooz says that with a hub supporting Z-Wave Long Range the signal can extend to 1300 feet. That's a marketing number measured in ideal conditions, not a promise about your basement, but on a large property it's the reason to prefer Z-Wave over a Wi-Fi sensor at the far end of a garden room. Zooz also registers the ZSE42 for a five-year warranty. See <a href="z-wave-hub">the Z-Wave hub guide</a> if you're still choosing an adapter. <a href="https://www.amazon.com/s?k=Zooz+ZSE42+Water+Leak+XS&amp;tag=hanews01-20" rel="sponsored nofollow">Zooz ZSE42 on Amazon</a>.</p>
+
+        <figure class="figure">
+          <img src="images/zooz-zse42-water-leak-xs.jpeg" alt="Zooz ZSE42 Water Leak XS sensor, a flat white Z-Wave sensor with a small logo" width="1024" height="683" loading="lazy">
+          <figcaption>Zooz ZSE42 Water Leak XS. Photo: <a href="https://www.getzooz.com/zooz-zse42-water-leak-xs-sensor/">Zooz</a></figcaption>
+        </figure>
+
+        <h2>No-hub pick: Shelly Flood</h2>
+        <p>The Shelly Flood is a Wi-Fi sensor — 802.11 b/g/n on 2.4 GHz — so there is no coordinator to buy and nothing to flash. It takes one CR123A 3 V lithium cell, which Shelly does not include and says must not be a rechargeable, and rates battery life at up to 18 months. It also reports temperature: operational range is -40 to +40 °C, with measurement from -40 to 60 °C at ±1 °C. The body is 70 mm by 19 mm.</p>
+        <p>On the software side it's unusually open for a consumer sensor: an embedded web server, plus MQTT, CoAP and REST. In Home Assistant that means the Shelly integration or MQTT, and either way you're not dependent on a vendor cloud. The tradeoff is honest and stated in the spec sheet: Wi-Fi means you need 2.4 GHz coverage where the leak would happen, and a battery Wi-Fi device that talks every so often will not last as long as a Zigbee sensor that whispers to a coordinator in the next room. <a href="https://www.amazon.com/s?k=Shelly+Flood+water+sensor&amp;tag=hanews01-20" rel="sponsored nofollow">Shelly Flood on Amazon</a>.</p>
+
+        <figure class="figure">
+          <img src="images/shelly-flood.png" alt="Shelly Flood Wi-Fi water leak sensor, a white rounded rectangle with the Shelly logo" width="1000" height="1000" loading="lazy">
+          <figcaption>Shelly Flood. Photo: <a href="https://www.shelly.com/products/shelly-flood">Shelly</a></figcaption>
+        </figure>
+
+        <h2>How each one pairs with Home Assistant</h2>
+        <p>The three radios mean three different setup paths, and knowing which one you're on saves an hour of confusion.</p>
+        <ul>
+          <li><strong>Zigbee (Aqara, ThirdReality).</strong> The <a href="https://www.home-assistant.io/integrations/zha/">ZHA integration</a> talks directly to a USB or network coordinator, with no vendor hub. The documentation covers adding devices, router devices, OTA firmware updates and a network-topology view. Choose your coordinator from <a href="zigbee-hub">the Zigbee hub guide</a>.</li>
+          <li><strong>Z-Wave (Zooz).</strong> You need a Z-Wave adapter plus the Z-Wave JS app and server, then the Z-Wave integration adds devices. SmartStart inclusion is by QR code, and the integration exposes notification and event entities and supports firmware updates from the UI — see the <a href="https://www.home-assistant.io/integrations/zwave_js/">Z-Wave JS documentation</a>.</li>
+          <li><strong>Wi-Fi (Shelly).</strong> The Flood arrives through the Shelly integration or MQTT. No radio coordinator involved, and no cloud account required to keep it working locally.</li>
+        </ul>
+        <p>Still weighing radios generally? <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a> covers the mesh behaviour that decides which sensors report quickly in a real house.</p>
+
+        <h2>Making the sensor close the valve</h2>
+        <p>A notification at 3 a.m. is worth having. Water off is worth more. Both vendors in this roundup treat shut-off as the natural pairing rather than an add-on: Zooz explicitly positions the ZSE42 to work with a Z-Wave valve actuator such as its Titan, and Aqara sells the Valve Controller T1, a motorised ball-valve controller listed under its Controllers.</p>
+        <p>The automation itself is short. Trigger on the sensor's leak event, action on the valve entity, plus a notification so you know why the water stopped. Keeping sensor and actuator on the same radio keeps the whole chain local — no cloud round trip between the puddle and the valve. <a href="https://www.amazon.com/s?k=Aqara+Valve+Controller+T1&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Valve Controller T1 on Amazon</a>.</p>
+
+        <h2>Setup, in order</h2>
+        <ol>
+          <li>Decide the radio first: Zigbee if you run ZHA or Zigbee2MQTT, Z-Wave if you run Z-Wave JS, Wi-Fi if you run neither and have coverage.</li>
+          <li>Plug a Zigbee coordinator on a USB extension cable, away from USB 3 ports, or attach a network coordinator by Ethernet. Home Assistant Green has no built-in Zigbee radio.</li>
+          <li>For Z-Wave, attach the adapter, install the Z-Wave JS app, then add the integration and pair by QR code and PIN.</li>
+          <li>Add the sensor in Home Assistant and give it a name that says where it is — "Kitchen sink" beats "Water leak sensor 2".</li>
+          <li>Test it with a wet paper towel on the contacts rather than guessing. Note how long the notification takes.</li>
+          <li>Only then add the valve automation, so you know the trigger works before it can shut your water off by mistake.</li>
+        </ol>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>Gotchas worth knowing before you buy</h2>
+        <p><strong>None of these are submersible.</strong> Zooz states it outright: the ZSE42 is sealed but cannot be used in pools or aquariums, or submerged. Aqara and ThirdReality don't claim a submersion rating at all. A sump pit that fills is exactly the case where the sensor floats and stops reporting.</p>
+        <p><strong>Battery figures are thinner than reviews suggest.</strong> Shelly publishes 18 months for the Flood and Zooz names the cell but not a runtime. Aqara and ThirdReality were not in the HTML of their product pages, which render specs client-side. Verify against the manual or the device page in ZHA or Zigbee2MQTT before you commit to a yearly swap.</p>
+        <p><strong>Zigbee2MQTT's old Aqara slug is dead.</strong> There is no device page at the legacy Aqara leak-sensor URL, so don't follow a link from an old forum post — look the device up inside Zigbee2MQTT itself.</p>
+        <p><strong>Battery sensors are listeners, not routers.</strong> They sleep between reports, so reaction time depends on the device's reporting behaviour, which none of these vendors publish on the pages above. Test the actual delay with water; don't assume the mesh makes it instant.</p>
+
+        <h2>FAQ</h2>
+        <h3>What is the best water leak sensor for Home Assistant in 2026?</h3>
+        <p>For a Zigbee network, the Aqara Water Leak Sensor T1 is the smallest and simplest choice and pairs straight to ZHA. On Z-Wave, the Zooz ZSE42 is the equivalent pick, and it is designed to pair with a Z-Wave valve actuator. With no radio at all, the Shelly Flood runs on Wi-Fi and needs no hub.</p>
+        <h3>Do I need a hub for a Zigbee water leak sensor, or does ZHA pair it directly?</h3>
+        <p>No vendor hub is needed. Zigbee sensors pair through the Zigbee Home Automation integration, which talks directly to a USB or network Zigbee coordinator. The Aqara hub is only required if you use Aqara's own app.</p>
+        <h3>Zigbee or Z-Wave water leak sensor — which reaches further?</h3>
+        <p>Both are mesh radios, so reach depends on the mains-powered devices already in your house. Zooz claims up to 1300 feet for the ZSE42 with a hub that supports Z-Wave Long Range. In a house that already has one radio, staying on it costs nothing and avoids a second network.</p>
+        <h3>Will an Aqara leak sensor work in Home Assistant without the Aqara hub?</h3>
+        <p>Yes, as a Zigbee sensor it joins ZHA or Zigbee2MQTT through your own coordinator. Aqara's T1 product page does not publish battery life or IP rating in its HTML, so confirm those on the printed manual or the device page in ZHA or Zigbee2MQTT.</p>
+        <h3>How do I make a water leak sensor close a shut-off valve automatically?</h3>
+        <p>Pair the sensor with a valve controller on the same radio and drive it from a Home Assistant automation. Aqara makes the Valve Controller T1, and Zooz positions the ZSE42 to work with a Z-Wave valve actuator such as its Titan. Detection and shut-off stay local, with no cloud round trip.</p>
+        <h3>How long do water leak sensor batteries last?</h3>
+        <p>Shelly rates the Flood at up to 18 months on one CR123A, which the vendor does not include and says must not be a rechargeable. The Zooz ZSE42 uses a single CR2032. Aqara and ThirdReality do not publish a battery figure on the pages we read, so check the manual before planning a replacement schedule.</p>
+        <h3>Can a leak sensor sit in a sump pit or under a water heater where it might get submerged?</h3>
+        <p>Not with these sensors. Zooz states plainly that the ZSE42 is sealed but not submersible and cannot be used in pools or aquariums, and the Aqara and ThirdReality pages do not claim submersion ratings at all. Put the sensor on the floor beside the hazard, not in standing water.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-11-02">Read today's</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.aqara.com/en/product/water-leak-sensor-t1/">Aqara Water Leak Sensor T1</a>; <a href="https://www.aqara.com/en/product/valve-controller-t1/">Aqara Valve Controller T1</a>; <a href="https://www.getzooz.com/zooz-zse42-water-leak-xs-sensor/">Zooz ZSE42 Water Leak XS</a>; <a href="https://www.shelly.com/products/shelly-flood">Shelly Flood</a>; <a href="https://thirdreality.com/products/water-leak-sensor">ThirdReality Smart Water Leak Sensor</a>; <a href="https://www.home-assistant.io/integrations/zha/">Home Assistant ZHA integration</a>; <a href="https://www.home-assistant.io/integrations/zwave_js/">Home Assistant Z-Wave JS integration</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

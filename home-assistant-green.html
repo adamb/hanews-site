@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Assistant Green: what it is and who should buy one (2026) — HA News</title>
+  <meta name="description" content="Home Assistant Green explained: the official pre-built hub from Nabu Casa, its Rockchip RK3566 specs, no built-in Zigbee or Thread radio, setup steps, and how it compares with a Raspberry Pi and the discontinued Yellow.">
+  <link rel="canonical" href="https://hanews.org/home-assistant-green">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Home Assistant Green: what it is and who should buy one (2026)", "image": "https://hanews.org/images/ha-green-front.jpg", "datePublished": "2026-11-03", "dateModified": "2026-11-03", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-assistant-green"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is the Home Assistant Green worth it compared with a Raspberry Pi?", "acceptedAnswer": {"@type": "Answer", "text": "Green trades flexibility for time. A Raspberry Pi 4 or 5 needs a power supply, a microSD card, a case and a HAOS image flashed with Raspberry Pi Imager before it runs Home Assistant. Green arrives with Home Assistant OS installed and boots from 32 GB of eMMC instead of a card, at the cost of the Pi's GPIO header and its upgrade path."}}, {"@type": "Question", "name": "Does Home Assistant Green have Zigbee or Thread built in?", "acceptedAnswer": {"@type": "Answer", "text": "No. Green has no Zigbee or Thread radio. You add a Home Assistant Connect ZBT-2 over USB for either protocol, and it runs one of the two at a time, not both. Z-Wave needs a separate USB stick such as the Connect ZWA-2."}}, {"@type": "Question", "name": "What do I need to add to the Home Assistant Green to control Zigbee devices?", "acceptedAnswer": {"@type": "Answer", "text": "One USB coordinator, such as the Connect ZBT-2, on a short extension cable away from USB 3 ports. Home Assistant usually discovers it automatically; otherwise add the Zigbee Home Automation integration and create a network."}}, {"@type": "Question", "name": "What is Home Assistant, in one paragraph, and do I need a subscription?", "acceptedAnswer": {"@type": "Answer", "text": "Home Assistant is open-source home automation software that runs on your own hardware and keeps automations local. It is free; a Nabu Casa cloud subscription is optional and only buys remote access and voice-assistant cloud hooks. Green does not include a subscription."}}, {"@type": "Question", "name": "Can I still buy the Home Assistant Yellow, and how does it differ from Green?", "acceptedAnswer": {"@type": "Answer", "text": "Nabu Casa now lists Yellow as no longer in production but still receiving software updates, and it is out of stock. Yellow was a Compute Module 4 board with an M.2 SSD slot and Zigbee built in; Green is the only pre-built Nabu Casa hub still sold new."}}, {"@type": "Question", "name": "Does Home Assistant Green work without an internet connection?", "acceptedAnswer": {"@type": "Answer", "text": "Yes after setup. Nabu Casa says internet is needed for initial setup only, and that Home Assistant itself keeps running locally afterwards. Remote access from outside the house and cloud services such as Nabu Casa remote UI do need connectivity."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 3 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Hardware · Home Assistant</p>
+        <h1>Home Assistant Green: what it is and who should buy one</h1>
+        <p class="byline">HA News · 3 Nov 2026</p>
+
+        <p><strong>Home Assistant Green is the official pre-built hub from Nabu Casa: a small fanless box that arrives with Home Assistant OS already installed, so the setup is a power cable, an Ethernet cable and an onboarding wizard.</strong> It is aimed at people who want a working local smart home this afternoon rather than a weekend project. The trade is a closed, modest spec sheet — a Rockchip RK3566 with 4 GB of RAM and no radio of any kind inside — and that second part surprises more buyers than any other detail, because Green cannot talk to a Zigbee bulb or a Thread sensor on its own.</p>
+
+        <p>This page covers what the hardware actually is, what comes in the box, how setup runs, which add-ons you need for Zigbee, Thread, Matter and Z-Wave, and how Green compares with a Raspberry Pi build and with the now-discontinued Yellow. Specs are taken from Nabu Casa's product page and Home Assistant's installation docs; nothing here was benchmarked in our hands, and no prices are quoted — retail moves by region, so check the vendor and retailer pages.</p>
+
+        <figure class="figure">
+          <img src="images/ha-green-front.jpg" alt="Home Assistant Green hub, a dark semi-transparent square box with an aluminium heatsink on top" width="1536" height="1024" loading="lazy">
+          <figcaption>The Home Assistant Green hub. Source: <a href="https://www.home-assistant.io/green/">Nabu Casa / Home Assistant product page</a></figcaption>
+        </figure>
+
+        <h2>What Home Assistant Green is</h2>
+        <p>Green is designed by Nabu Casa — the company behind Home Assistant — and engineered by Seeed Studio. The model number is NC-GREEN-1175, it carries CE and FCC marks, and it is made in the PRC. Nabu Casa describes it as "the easiest way to start using Home Assistant", and the installation docs list it as the path where you "start right away", with no assembly and nothing to flash.</p>
+        <p>The software is the standard Home Assistant OS image, not a locked-down appliance build. Everything you would do on any other install — HACS, add-ons, the file editor, SSH — is available, which is the main reason the box has stayed recommendable as the ecosystem has grown. If you are still working out what the software is for, our <a href="ha.html">Home Assistant section</a> covers the basics: one local server that holds your devices, automations and history.</p>
+        <p><strong>In the box:</strong> the Green hub, a Gigabit Ethernet cable, a universal 12 V DC 1 A power supply with EU, US and UK plug adapters, a quick start guide, and the warranty and safety sheet. No microSD card, no USB radio, no HDMI cable — the HDMI port is for diagnostics, not for a display you live with.</p>
+
+        <h2>Specifications</h2>
+        <p>All figures below are from the official product page.</p>
+        <table>
+          <thead><tr><th>Spec</th><th>Home Assistant Green</th></tr></thead>
+          <tbody>
+            <tr><td>SoC</td><td>Rockchip RK3566, quad-core Arm Cortex-A55 at 1.8 GHz</td></tr>
+            <tr><td>Memory</td><td>4 GB LPDDR4X</td></tr>
+            <tr><td>Storage</td><td>32 GB eMMC</td></tr>
+            <tr><td>Networking</td><td>Single Gigabit Ethernet port; no Wi-Fi radio</td></tr>
+            <tr><td>USB</td><td>2x USB 2.0 Type-A host, 5 V up to 2 A combined</td></tr>
+            <tr><td>Other ports</td><td>HDMI (diagnostic only), microSD (recovery only)</td></tr>
+            <tr><td>Power</td><td>12 V 1 A over 5.5 x 2.1 mm DC barrel</td></tr>
+            <tr><td>Consumption</td><td>~1.7 W idle at 12 V, ~3 W under load</td></tr>
+            <tr><td>Size and weight</td><td>112 x 112 x 32 mm, 340 g</td></tr>
+            <tr><td>Cooling</td><td>Fanless; anodized aluminium heatsink in a polycarbonate shell</td></tr>
+            <tr><td>Environment</td><td>0-40 °C, non-condensing, indoor use</td></tr>
+            <tr><td>Battery</td><td>Optional CR2032 for the RTC — not included</td></tr>
+          </tbody>
+        </table>
+        <p>Read that table with two things in mind. First, 4 GB of RAM and 32 GB of eMMC is a comfortable baseline for a normal house: a few dozen to a few hundred entities, a handful of add-ons, a year of recorder history. It is not a machine for running Frigate with several camera streams plus a local LLM; that workload wants x86 and a real SSD. Second, the 3 W load figure and the absence of a fan are the practical reasons people put Green in a closet or on a shelf and forget it — there is no noise and very little heat.</p>
+
+        <h2>Setup: power, Ethernet, wizard</h2>
+        <ol>
+          <li>Connect the Ethernet cable to your router and the power supply to the barrel jack. There is nothing to flash and no card to image.</li>
+          <li>Internet access is required for the initial setup only. Nabu Casa states that Home Assistant itself keeps working locally afterwards.</li>
+          <li>Finish onboarding in the Home Assistant mobile app or the web app. Once you are signed in, the system starts auto-discovering devices it can see on the network.</li>
+          <li>If the name resolves, the box answers at <code>homeassistant.local</code> — or <code>homeassistant.local:8123</code> if port 80 is already taken by something else on the machine.</li>
+          <li>Set up backups early. The Backup integration creates and restores backups on every installation type, and automatic backups are configured from the interface rather than by hand-writing an automation.</li>
+        </ol>
+        <p>The order matters a little: because Green ships with no radio, the first-run experience is onboarding plus network discovery, not device pairing. Zigbee and Z-Wave arrive later, when you plug in the adapters described below. Expect to spend more time on the first dashboard than on the hardware.</p>
+
+        <h2>Radios: what Green does not have</h2>
+        <p>This is the section to read before buying. Green is a computer, not a bridge. It has no Zigbee radio and no Thread radio inside.</p>
+        <ul>
+          <li><strong>Zigbee and Thread</strong> both need a Home Assistant Connect ZBT-2 plugged into a USB-A port. That adapter uses a Silicon Labs MG24 radio behind an ESP32-S3 USB-serial bridge, USB-C powered at 5 V 500 mA, and speaks Zigbee 3.0 or Thread.</li>
+          <li><strong>One protocol per adapter.</strong> The ZBT-2 runs Zigbee <em>or</em> Thread, not both at once. If you want a Zigbee mesh and a Thread border router on the same box, that is two adapters.</li>
+          <li><strong>Matter over Wi-Fi or Ethernet</strong> works on Green once the Matter integration and Matter Server are set up — no radio required, because the device is already on your IP network. Matter over Thread needs a Thread border router first, which Home Assistant can become with a Thread-capable radio like the ZBT-2.</li>
+          <li><strong>Z-Wave</strong> needs a separate USB stick, for example the Connect ZWA-2, in the second USB-A port. Green has exactly two, and the pair is rated for 2 A combined, so a bus-powered SSD on one of them is a bad idea.</li>
+        </ul>
+        <p>Budget for the adapter in the total cost. For Zigbee device choice and coordinator comparison, see <a href="zigbee-hub">the best Zigbee hub for Home Assistant</a>; for the other mesh, <a href="z-wave-hub">the Z-Wave hub guide</a>; for the IP-based standard, our <a href="matter.html">Matter and Thread section</a>.</p>
+
+        <h2>Green versus a Raspberry Pi</h2>
+        <p>The Pi route is the classic Home Assistant build and it is still well supported. Per the official installation docs, a Raspberry Pi 4 or 5 needs at minimum 2 GB of RAM, a proper power supply, a microSD card, and an Ethernet connection, and you flash Home Assistant OS onto the card with Raspberry Pi Imager before first boot. The docs are blunt about the usual failure points: flashing overwrites the card, phone chargers and computer USB ports may not deliver enough power, and you should install over Ethernet and only move to Wi-Fi afterwards. The current image referenced in that guide is HAOS 18.4.</p>
+        <p>Green removes every one of those steps, and it removes the SD card from the reliability conversation entirely by using 32 GB of eMMC. You also do not buy a case, a heatsink or a PSU separately, and the unit is fanless. What you give up is the Pi's GPIO header, its camera connector, and the ability to swap the board for a faster one later. If your plan involves soldering a sensor to GPIO pins, the Pi is the right answer and Green is not. If your plan involves 40 Zigbee devices and a dashboard, the Pi's flexibility is mostly unused, and Green gets you to the same place without a card that dies in eighteen months. The full walkthrough of the DIY path is in <a href="home-assistant-raspberry-pi">Home Assistant on a Raspberry Pi</a>.</p>
+
+        <h2>Green versus Yellow</h2>
+        <p>Buyers searching for Green often find Yellow in the same results and assume it is the newer, better model. It is the older one. Nabu Casa's Yellow page now says the product "is no longer in production, but continues to receive software updates", and points buyers to Green; it shows as out of stock.</p>
+        <p>Yellow was a Compute Module 4 board with an M.2 slot for an SSD and Zigbee built in, with Thread listed as coming soon. Kits required you to supply your own CM4, and the PoE variant needed your own PoE source — which is why the total was rarely the sticker figure. For existing owners, Yellow remains a good machine and keeps getting updates. For anyone buying new, Green is the only pre-built Nabu Casa hub still sold, so the comparison is mostly academic unless you find a used Yellow at a price you like and are comfortable sourcing a CM4.</p>
+
+        <h2>What to buy</h2>
+        <p>Three paths, depending on what you already own. Links go to Amazon search results; HA News takes a commission on qualifying purchases.</p>
+        <ul>
+          <li><strong>Home Assistant Green</strong> — the box this page is about. RK3566, 4 GB RAM, 32 GB eMMC, Gigabit Ethernet, two USB-A ports, no radio. Ships with Home Assistant OS installed. <a href="https://www.amazon.com/s?k=Home+Assistant+Green&amp;tag=hanews01-20" rel="sponsored nofollow">Home Assistant Green on Amazon</a></li>
+          <li><strong>Home Assistant Connect ZBT-2</strong> — add this if you want Zigbee or Thread. Home Assistant discovers it for the ZHA or Thread integrations. One protocol at a time. <a href="https://www.amazon.com/s?k=Home+Assistant+Connect+ZBT-2&amp;tag=hanews01-20" rel="sponsored nofollow">Connect ZBT-2 on Amazon</a></li>
+          <li><strong>Raspberry Pi 4 or 5 starter kit</strong> — the DIY alternative, 2 GB of RAM minimum, plus a microSD card and a decent PSU; you flash HAOS 18.4 yourself. <a href="https://www.amazon.com/s?k=Raspberry+Pi+5+starter+kit&amp;tag=hanews01-20" rel="sponsored nofollow">Raspberry Pi starter kit on Amazon</a></li>
+          <li><strong>x86-64 mini PC</strong> — the path for more headroom: camera detection, big databases, many add-ons. Home Assistant installs on generic x86-64 hardware, and you can see current boxes in our <a href="devices.html">Devices section</a>. <a href="https://www.amazon.com/s?k=mini+PC+16GB+RAM+SSD&amp;tag=hanews01-20" rel="sponsored nofollow">Mini PCs on Amazon</a></li>
+        </ul>
+
+        <h2>Gotchas worth knowing up front</h2>
+        <ul>
+          <li><strong>Ethernet only.</strong> There is no Wi-Fi radio in Green. If the only place you can put it has no cable, plan a switch or powerline adapter, not a USB Wi-Fi dongle.</li>
+          <li><strong>Two USB ports, shared power.</strong> A Zigbee stick and a Z-Wave stick fill the machine. Use short extension cables to get the radios away from the chassis and away from USB 3 interference.</li>
+          <li><strong>No GPIO.</strong> Anything that needs to be wired directly to pins — a relay board, a DS18B20 string, a doorbell contact — is an ESPHome job instead. Green can host ESPHome; it cannot be the ESPHome device.</li>
+          <li><strong>Backups are yours to configure.</strong> The Backup integration is built in, but automatic backups are a setting you turn on, not a default you inherit. Do it before you build the dashboard you would hate to lose.</li>
+          <li><strong>Cloud is optional.</strong> Home Assistant runs locally and Green ships without a Nabu Casa subscription. Remote access and the voice-assistant cloud hooks are what the subscription adds; automation, dashboards and device control do not need it.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Is the Home Assistant Green worth it compared with a Raspberry Pi?</h3>
+        <p>Green trades flexibility for time. A Raspberry Pi 4 or 5 needs a power supply, a microSD card, a case and a HAOS image flashed with Raspberry Pi Imager before it runs Home Assistant. Green arrives with Home Assistant OS installed and boots from 32 GB of eMMC instead of a card, at the cost of the Pi's GPIO header and its upgrade path.</p>
+        <h3>Does Home Assistant Green have Zigbee or Thread built in?</h3>
+        <p>No. Green has no Zigbee or Thread radio. You add a Home Assistant Connect ZBT-2 over USB for either protocol, and it runs one of the two at a time, not both. Z-Wave needs a separate USB stick such as the Connect ZWA-2.</p>
+        <h3>What do I need to add to the Home Assistant Green to control Zigbee devices?</h3>
+        <p>One USB coordinator, such as the Connect ZBT-2, on a short extension cable away from USB 3 ports. Home Assistant usually discovers it automatically; otherwise add the Zigbee Home Automation integration and create a network.</p>
+        <h3>What is Home Assistant, in one paragraph, and do I need a subscription?</h3>
+        <p>Home Assistant is open-source home automation software that runs on your own hardware and keeps automations local. It is free; a Nabu Casa cloud subscription is optional and only buys remote access and voice-assistant cloud hooks. Green does not include a subscription.</p>
+        <h3>Can I still buy the Home Assistant Yellow, and how does it differ from Green?</h3>
+        <p>Nabu Casa now lists Yellow as no longer in production but still receiving software updates, and it is out of stock. Yellow was a Compute Module 4 board with an M.2 SSD slot and Zigbee built in; Green is the only pre-built Nabu Casa hub still sold new.</p>
+        <h3>Does Home Assistant Green work without an internet connection?</h3>
+        <p>Yes after setup. Nabu Casa says internet is needed for initial setup only, and that Home Assistant itself keeps running locally afterwards. Remote access from outside the house and cloud services such as Nabu Casa remote UI do need connectivity.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-11-02">Read the latest</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/green/">Home Assistant Green product page</a>; <a href="https://www.home-assistant.io/installation/">Home Assistant installation docs</a>; <a href="https://www.home-assistant.io/installation/raspberrypi">Raspberry Pi install guide</a>; <a href="https://www.home-assistant.io/connect/zbt-2/">Home Assistant Connect ZBT-2</a>; <a href="https://www.home-assistant.io/yellow/">Home Assistant Yellow</a>; <a href="https://www.home-assistant.io/integrations/backup/">Backup integration</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
