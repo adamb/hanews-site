@@ -16,7 +16,7 @@
   <div class="topbar" aria-hidden="true"></div>
   <header class="masthead">
     <div class="masthead__meta">
-      <span class="dateline">Monday, 2 November 2026</span>
+      <span class="dateline">Tuesday, 3 November 2026</span>
       <div class="masthead__aside">
         <span class="masthead__edition">Home automation edition</span>
         <button type="button" class="signup-trigger">Get the briefing</button>
@@ -44,6 +44,8 @@
         <section class="sec" aria-labelledby="k-ha">
           <h2 class="kicker" id="k-ha">Home Assistant</h2>
           <ul>
+            <li><a href="brief-2026-11-03.html#lead">Core 2026.11.0b3: third November beta</a></li>
+            <li><a href="brief-2026-11-03.html#wth">Month of “What the Heck?!” is open</a></li>
             <li><a href="brief-2026-11-02.html#beta">Beta 2026.11.0b2: ZBT-2 via ESPHome serial proxies</a></li>
             <li><a href="brief-2026-10-30.html#wth">November is the Month of “What the Heck?!”</a></li>
             <li><a href="brief-2026-10-29.html#lead">Supervisor 2026.10.5: symlink security fix</a></li>
@@ -54,6 +56,7 @@
         <section class="sec" aria-labelledby="k-esp">
           <h2 class="kicker" id="k-esp">ESPHome</h2>
           <ul>
+            <li><a href="brief-2026-11-03.html#esphome">2026.10.2 patch release</a></li>
             <li><a href="brief-2026-10-29.html#esphome">2026.10.1 fix-only patch</a></li>
             <li><a href="brief-2026-10-21.html#lead">2026.10 stable: native ESP8266, smaller OTA</a></li>
           </ul>
@@ -61,6 +64,7 @@
         <section class="sec" aria-labelledby="k-radio">
           <h2 class="kicker" id="k-radio">Radios</h2>
           <ul>
+            <li><a href="brief-2026-11-03.html#z2m">Zigbee2MQTT 2.14.3 bug-fix release</a></li>
             <li><a href="brief-2026-11-02.html#lead">Zigbee2MQTT 2.14.3 deprecates 32-bit</a></li>
             <li><a href="openwrt-mesh-network.html">Feature: an OpenWrt mesh network in a concrete house</a></li>
             <li><a href="zigbee-hub.html">Guide: the best Zigbee hub for Home Assistant</a></li>
@@ -73,12 +77,12 @@
 
       <div class="col-center">
         <article class="lead" id="lead">
-          <p class="lead-kicker">Zigbee2MQTT</p>
-          <h1><a href="brief-2026-11-02.html">Zigbee2MQTT 2.14.3 puts 32-bit installs on notice as Core 2026.11.0b2 lands</a></h1>
-          <p class="dek">32-bit support ends when Node.js 22 reaches end of life in April 2027. Home Assistant's November beta adds ZBT-2 connections over ESPHome serial proxies ahead of Wednesday's expected release.</p>
-          <p class="byline">HA News Brief · 2 Nov 2026</p>
-          <p>Also today: no change to stable Core 2026.10.4, Supervisor 2026.10.5, HAOS 18.4, ESPHome 2026.10.1 or Z-Wave JS UI.</p>
-          <p class="byline">Sources: <a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.3">Zigbee2MQTT 2.14.3</a>, <a href="https://github.com/home-assistant/core/releases/tag/2026.11.0b2">Core 2026.11.0b2</a></p>
+          <p class="lead-kicker">Home Assistant</p>
+          <h1><a href="brief-2026-11-03.html">Core 2026.11.0b3 is the third November beta; stable stays 2026.10.4</a></h1>
+          <p class="dek">The November cycle is in testers' hands. Two patch releases shipped on stable channels over the weekend: ESPHome 2026.10.2 and Zigbee2MQTT 2.14.3.</p>
+          <p class="byline">HA News Brief · 3 Nov 2026</p>
+          <p>Also today: the Month of “What the Heck?!” is open, and Everything Smart Home and LEDVANCE joined Works with Home Assistant.</p>
+          <p class="byline">Sources: <a href="https://github.com/home-assistant/core/releases/tag/2026.11.0b3">Core 2026.11.0b3</a>, <a href="https://version.home-assistant.io/stable.json">stable.json</a>, <a href="https://github.com/esphome/esphome/releases/tag/2026.10.2">ESPHome 2026.10.2</a></p>
         </article>
 
         <div class="secondary">
@@ -103,13 +107,14 @@
       <aside class="col-right">
         <section class="briefing" aria-labelledby="briefing-title">
           <h2 id="briefing-title">The Briefing</h2>
-          <p class="brief-date">2 Nov 2026</p>
+          <p class="brief-date">3 Nov 2026</p>
           <ol>
-            <li><a href="brief-2026-11-02.html#lead">Zigbee2MQTT 2.14.3</a><p>32-bit deprecated; ends April 2027.</p></li>
-            <li><a href="brief-2026-11-02.html#beta">Core 2026.11.0b2 (beta)</a><p>ZBT-2 via ESPHome serial proxies.</p></li>
-            <li><a href="brief-2026-11-02.html#stable">Stable releases</a><p>Core 2026.10.4, Supervisor 2026.10.5, HAOS 18.4.</p></li>
+            <li><a href="brief-2026-11-03.html#lead">Core 2026.11.0b3 (beta)</a><p>Third November beta; stable stays 2026.10.4.</p></li>
+            <li><a href="brief-2026-11-03.html#esphome">ESPHome 2026.10.2</a><p>Patch release on the October build.</p></li>
+            <li><a href="brief-2026-11-03.html#z2m">Zigbee2MQTT 2.14.3</a><p>Bug-fix bump on the 2.14 line.</p></li>
+            <li><a href="brief-2026-11-03.html#versions">Version table</a><p>Core, Supervisor, HAOS, ESPHome, Z-Wave, Matter.</p></li>
           </ol>
-          <a class="full-brief" href="brief-2026-11-02.html">Full brief →</a>
+          <a class="full-brief" href="brief-2026-11-03.html">Full brief →</a>
         </section>
 
         <div class="rail-sub">

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 3 Nov 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 3 November 2026. Core 2026.11.0b3 is the third November beta while stable stays 2026.10.4; ESPHome 2026.10.2 patch; Zigbee2MQTT 2.14.3; the Month of What the Heck?! is open.">
+  <link rel="canonical" href="https://hanews.org/brief-2026-11-03">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 3 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>3 November 2026</h1>
+        <p class="lede">The November cycle is in testers' hands: <strong>Core 2026.11.0b3</strong> is the third beta, and stable stays at <strong>2026.10.4</strong>. ESPHome shipped <strong>2026.10.2</strong> and Zigbee2MQTT <strong>2.14.3</strong>, both patch releases. Also today: the Month of &ldquo;What the Heck?!&rdquo; is open, and two vendors joined Works with Home Assistant.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Home Assistant (beta)</p>
+          <h2>Core 2026.11.0b3 — third beta of the November release</h2>
+          <p><strong>What happened:</strong> Home Assistant tagged Core 2026.11.0b3 on 2 Nov, the third beta build of the November cycle. The stable channel has not moved: stable.json still lists Core 2026.10.4, Supervisor 2026.10.5 and HAOS 18.4.</p>
+          <p><strong>Why it matters:</strong> Betas are pre-release builds for testers. If you run a house on Home Assistant, stay on 2026.10.4 and wait for the final November release; nothing in a beta belongs on a system your household depends on.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.11.0b3">core 2026.11.0b3</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">02 · ESPHome</p>
+          <h2>ESPHome 2026.10.2 — patch release for the October build</h2>
+          <p><strong>What happened:</strong> ESPHome shipped 2026.10.2 on 2 Nov, a point release on top of 2026.10.1.</p>
+          <p><strong>Why it matters:</strong> Patch releases carry fixes rather than new features, so this is a routine reflash for the devices you manage — worth doing on a spare slot and a device you can physically reach, not on the one board that runs the heating.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/esphome/esphome/releases/tag/2026.10.2">ESPHome 2026.10.2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="z2m">
+          <p class="meta">03 · Zigbee2MQTT</p>
+          <h2>Zigbee2MQTT 2.14.3 — bug-fix release</h2>
+          <p><strong>What happened:</strong> Zigbee2MQTT moved from 2.14.2 to 2.14.3 on 1 Nov, a maintenance bump on the 2.14 line.</p>
+          <p><strong>Why it matters:</strong> Read the release notes for the specific device and coordinator fixes before updating a large mesh. A coordinator restart re-forms the network, and on a house with dozens of routers that is a bad time to discover a regression.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.3">Zigbee2MQTT 2.14.3</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="wth">
+          <p class="meta">04 · Home Assistant</p>
+          <h2>The Month of &ldquo;What the Heck?!&rdquo; 2026 is open — and it wants non-technical users</h2>
+          <p><strong>What happened:</strong> Home Assistant's annual feedback month is running through November. Users post what is hard, confusing or annoying in the WTH category on the community forum. This year the project is explicitly courting new and non-technical residents, including people who live in a home someone else set up.</p>
+          <p><strong>Why it matters:</strong> If you administer a house for other people — a partner, a tenant, family — this is the month to file the things they hit and you have learned to work around. Those complaints are the ones that change the product.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/10/29/what-the-heck-2026-everyone-at-home-gets-a-say/">&ldquo;What the Heck?!&rdquo; 2026: Everyone at home gets a say</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="wwha">
+          <p class="meta">05 · Works with Home Assistant</p>
+          <h2>Everything Smart Home and LEDVANCE join the Works with Home Assistant programme</h2>
+          <p><strong>What happened:</strong> Home Assistant announced on 27 Oct that Everything Smart Home joined Works with Home Assistant, following LEDVANCE on 13 Oct.</p>
+          <p><strong>Why it matters:</strong> Works with Home Assistant is the project's own certification: the badge means a device is tested for local control and does not need a vendor cloud to work. Two more vendors in the programme widens the list of hardware you can buy without checking a cloud dependency first.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/10/27/everything-smart-home-joins-works-with-home-assistant/">Everything Smart Home joins Works with Home Assistant</a>; <a href="https://www.home-assistant.io/blog/2026/10/13/ledvance-joins-works-with-home-assistant/">LEDVANCE joins Works with Home Assistant</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="versions">
+          <p class="meta">06 · The stack</p>
+          <h2>Version table: where every moving part sits this morning</h2>
+          <p><strong>What happened:</strong> Three things changed since yesterday's check: Core moved from 2026.11.0b0 to 2026.11.0b3 in beta, ESPHome from 2026.10.1 to 2026.10.2, and Zigbee2MQTT from 2.14.2 to 2.14.3. Everything else is where it was.</p>
+          <p><strong>Why it matters:</strong> This is the update-or-wait answer in one place. Two of today's three changes are patch releases on stable channels; the third is a beta and should be ignored by anyone who is not testing.</p>
+          <table>
+            <caption>Stable versions, 3 November 2026</caption>
+            <thead>
+              <tr><th scope="col">Component</th><th scope="col">Stable</th><th scope="col">Released</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Home Assistant Core</td><td>2026.10.4</td><td>2026-10-24</td></tr>
+              <tr><td>Core (beta)</td><td>2026.11.0b3</td><td>2026-11-02</td></tr>
+              <tr><td>Supervisor</td><td>2026.10.5</td><td>2026-10-28</td></tr>
+              <tr><td>Home Assistant OS</td><td>18.4</td><td>2026-10-27</td></tr>
+              <tr><td>ESPHome</td><td>2026.10.2</td><td>2026-11-02</td></tr>
+              <tr><td>Z-Wave JS UI</td><td>v11.25.2</td><td>2026-10-26</td></tr>
+              <tr><td>Z-Wave JS</td><td>v15.31.2</td><td>2026-10-22</td></tr>
+              <tr><td>Zigbee2MQTT</td><td>2.14.3</td><td>2026-11-01</td></tr>
+              <tr><td>matter.js</td><td>v0.18.0</td><td>2026-10-20</td></tr>
+            </tbody>
+          </table>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://version.home-assistant.io/stable.json">stable.json</a>; <a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.5">Supervisor 2026.10.5</a>; <a href="https://github.com/home-assistant/operating-system/releases/tag/18.4">HAOS 18.4</a>; <a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.25.2">zwave-js-ui v11.25.2</a>; <a href="https://github.com/zwave-js/zwave-js/releases/tag/v15.31.2">zwave-js v15.31.2</a>; <a href="https://github.com/matter-js/matter.js/releases/tag/v0.18.0">matter.js v0.18.0</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
