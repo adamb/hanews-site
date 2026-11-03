@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best OpenWrt router to buy in 2026 — HA News</title>
+  <meta name="description" content="Best OpenWrt router: how to pick OpenWrt compatible routers, which GL.iNet Flint models are worth the money, Wi-Fi 7 driver caveats, RAM limits and how to verify support on the Table of Hardware before buying.">
+  <link rel="canonical" href="https://hanews.org/best-openwrt-router">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best OpenWrt router to buy in 2026", "image": "https://hanews.org/images/flint2-mt6000.png", "datePublished": "2026-11-03", "dateModified": "2026-11-03", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/best-openwrt-router"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the best router for OpenWrt right now?", "acceptedAnswer": {"@type": "Answer", "text": "For most people the GL.iNet Flint 2 (GL-MT6000) is the sane starting point: MediaTek MT7986 silicon, 1 GB of RAM, two 2.5G ports and an OpenWrt-based stock firmware you can replace. The catch is that official support has to be confirmed per model on the OpenWrt Table of Hardware before you flash anything."}}, {"@type": "Question", "name": "Which OpenWrt compatible routers are actually worth buying?", "acceptedAnswer": {"@type": "Answer", "text": "Buy hardware with a recent MediaTek or Qualcomm SoC, at least 1 GB of RAM, and a supported flash layout. Among current GL.iNet boxes that points at the Flint 2 for Wi-Fi 6, the Flint 4 if you need 2 GB of RAM and 10G ports, and the Flint 3 only if you accept that Wi-Fi 7 support in mainline OpenWrt is still thin."}}, {"@type": "Question", "name": "Does OpenWrt support Wi-Fi 7 yet?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on the driver, not the radio spec sheet. MediaTek's mt76 path is further along than Qualcomm's ath12k for 802.11be, and 6 GHz behaviour varies by model. Check the device's Table of Hardware entry and the release notes for the exact model before assuming a BE-class router works in mainline OpenWrt."}}, {"@type": "Question", "name": "Is the GL.iNet Flint 2 still the best OpenWrt router, or should I get a Flint 3?", "acceptedAnswer": {"@type": "Answer", "text": "The Flint 2 is the safer buy: MediaTek silicon that is widely ported, 1 GB RAM and multi-gig Ethernet at Wi-Fi 6 speeds. The Flint 3 adds tri-band Wi-Fi 7 and three 2.5G LAN ports, but it runs a Qualcomm platform whose OpenWrt support is newer and thinner, so treat it as unproven for a mainline flash."}}, {"@type": "Question", "name": "Can I flash stock OpenWrt on a GL.iNet router, or am I stuck with the vendor firmware?", "acceptedAnswer": {"@type": "Answer", "text": "GL.iNet ships its own OpenWrt-based build, which is not the same thing as stock OpenWrt. On models with an official Table of Hardware entry you can flash the release image, but some vendor boxes cannot be sysupgraded to mainline at all. Verify both the device page and the release notes for your exact model first."}}, {"@type": "Question", "name": "Do I need 2 GB of RAM for an OpenWrt router?", "acceptedAnswer": {"@type": "Answer", "text": "Not for plain routing and a handful of packages: 1 GB is comfortable there. Step up to 2 GB if you plan to run AdGuard Home, Docker containers or a VPN server on the same box, because those services and their lists eat memory that the routing stack also wants."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 3 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Networking</p>
+        <h1>The best OpenWrt router to buy in 2026</h1>
+        <p class="byline">HA News · 3 Nov 2026</p>
+
+        <p>If you are shopping for the best OpenWrt router, the useful answer is not a model name — it is a filter. OpenWrt runs on hundreds of boxes, but only a subset can be flashed to stock OpenWrt, keep working through a sysupgrade, and drive their radios properly. <strong>The short version: the GL.iNet Flint 2 (GL-MT6000) is the safest pick for most people</strong>, because it sits on MediaTek's MT7986 platform, one of the most actively ported targets in OpenWrt, with 1 GB of RAM and two 2.5G ports. Above it, the Flint 4 buys you 2 GB of RAM and 10G ports. The Flint 3 buys Wi-Fi 7 on a Qualcomm chip whose OpenWrt story is newer and thinner.</p>
+
+        <p>One caveat up front, because it matters more than any spec table. openwrt.org was behind a proof-of-work bot wall throughout this pass, so the Table of Hardware entries for these three models could not be re-verified here. Nothing below should be read as a confirmed statement that a given model runs mainline OpenWrt today. The hardware figures come from GL.iNet's own product pages; the support question you have to check yourself, and we show you how below.</p>
+
+        <h2>What "best OpenWrt router" actually means</h2>
+        <p>Three things separate a good OpenWrt box from a router that merely mentions OpenWrt on the box.</p>
+        <ul>
+          <li><strong>An official device page.</strong> The Table of Hardware lists the exact model, the install method and the image to use. A vendor fork of OpenWrt is not the same as stock OpenWrt.</li>
+          <li><strong>A flash layout you can sysupgrade.</strong> Some vendor boxes ship a partition scheme or bootloader that cannot be moved to mainline. If the release notes don't describe a sysupgrade path for your model, assume you are staying on the vendor build.</li>
+          <li><strong>A supported radio driver.</strong> This is where Wi-Fi 7 gets interesting. The 802.11be number on the box says nothing about whether the 6 GHz radio works in mainline.</li>
+        </ul>
+        <p>Everything else — port count, form factor, antennas — is preference. If you are still deciding between the whole family of local-first routers and hubs, <a href="devices.html">our devices section</a> covers the hardware we track.</p>
+
+        <h2>The picks at a glance</h2>
+        <table>
+          <thead><tr><th>Model</th><th>Wi-Fi</th><th>SoC</th><th>RAM / storage</th><th>Wired</th></tr></thead>
+          <tbody>
+            <tr><td>GL.iNet Flint 2 (GL-MT6000)</td><td>Wi-Fi 6, AX6000</td><td>MediaTek quad-core 2.0 GHz</td><td>1 GB DDR4 / 8 GB eMMC</td><td>1 × 2.5G WAN, 1 × 2.5G WAN/LAN, 4 × 1G LAN</td></tr>
+            <tr><td>GL.iNet Flint 4 (GL-BE14000)</td><td>Wi-Fi 7, BE14000</td><td>MediaTek quad-core Cortex-A73 1.8 GHz</td><td>2 GB DDR4 / 64 GB eMMC</td><td>10G RJ45, 10G SFP+, 2.5G WAN/LAN, 3 × 2.5G LAN, 4 × 1G LAN</td></tr>
+            <tr><td>GL.iNet Flint 3 (GL-BE9300)</td><td>Wi-Fi 7, BE9300</td><td>Qualcomm quad-core 1.5 GHz</td><td>1 GB DDR4 / 8 GB eMMC</td><td>1 × 2.5G WAN, 1 × 2.5G WAN/LAN, 3 × 2.5G LAN</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Pick one: GL.iNet Flint 2 (GL-MT6000)</h2>
+        <figure class="figure">
+          <img src="images/flint2-mt6000.png" alt="GL.iNet Flint 2 (GL-MT6000) Wi-Fi 6 router, upright black chassis with external antennas" width="1200" height="1200" loading="lazy">
+          <figcaption>GL.iNet Flint 2 (GL-MT6000). Image: <a href="https://www.gl-inet.com/products/gl-mt6000/">GL.iNet</a></figcaption>
+        </figure>
+        <p>The Flint 2 is a dual-band AX6000 box: 1148 Mbps on 2.4 GHz and 4804 Mbps on 5 GHz, across 802.11a/b/g/n/ac/ax, per <a href="https://www.gl-inet.com/products/gl-mt6000/">GL.iNet's product page</a>. Inside is a MediaTek quad-core at 2.0 GHz with 1 GB DDR4 and 8 GB eMMC. Ports are one 2.5G WAN, one 2.5G WAN/LAN, four 1G LAN and USB 3.0. It draws under 20 W from a 12V/4A DC5521 supply, measures 233 × 137 × 53 mm and weighs 761 g, fanless, rated 0-40 °C.</p>
+        <p>Why this one first: the MT7986 platform is the target OpenWrt developers have spent the most effort on among current consumer silicon, and the vendor firmware is itself an OpenWrt-based build, so the mental model (LuCI, opkg, uci) carries over. Multi-WAN, dual Ethernet WAN, a VPN client and server, DFS and an AdGuard Home option are in the stock feature set.</p>
+        <p>The honest limitation is age: it is Wi-Fi 6, and its 2.5G WAN is only useful if the switch behind it can carry more than a gigabit. Check <a href="https://www.amazon.com/s?k=GL.iNet+Flint+2+GL-MT6000&amp;tag=hanews01-20" rel="sponsored nofollow">GL.iNet Flint 2 on Amazon</a> for current price and stock.</p>
+
+        <h2>Pick two: GL.iNet Flint 4 (GL-BE14000) for RAM and 10G</h2>
+        <figure class="figure">
+          <img src="images/flint4-be14000.png" alt="GL.iNet Flint 4 (GL-BE14000) tri-band Wi-Fi 7 router with multi-gig ports" width="1000" height="1000" loading="lazy">
+          <figcaption>GL.iNet Flint 4 (GL-BE14000). Image: <a href="https://www.gl-inet.com/products/gl-be14000/">GL.iNet</a></figcaption>
+        </figure>
+        <p>The Flint 4 is the only one of the three with 2 GB of DDR4, and the only one with 64 GB of eMMC — the difference between a router that runs a VPN server comfortably and one that starts swapping. It is tri-band BE14000: 688 Mbps at 2.4 GHz, 4323 Mbps at 5 GHz, 8646 Mbps at 6 GHz, on 802.11a/b/g/n/ac/ax/be, per <a href="https://www.gl-inet.com/products/gl-be14000/">GL.iNet</a>. The SoC is a MediaTek quad-core Cortex-A73 at 1.8 GHz.</p>
+        <p>The port list is the real argument: one 10G RJ45 WAN/LAN, one 10G SFP+ WAN/LAN, one 2.5G WAN/LAN, three 2.5G LAN, four 1G LAN, plus USB 3.0 Type-A and Type-C. Power is 12V/4A, under 25 W idle and under 45 W with a USB load. It is a bigger box at 293 × 172 × 76 mm and 1166 g, so plan shelf space.</p>
+        <p>MediaTek silicon is the friendlier of the two Wi-Fi 7 paths for OpenWrt, but no Table of Hardware entry for this model could be verified in this pass. If you buy it, buy it for the ports and the RAM and treat the mainline flash as a project, not a promise. <a href="https://www.amazon.com/s?k=GL.iNet+Flint+4+GL-BE14000&amp;tag=hanews01-20" rel="sponsored nofollow">GL.iNet Flint 4 on Amazon</a>.</p>
+
+        <h2>Pick three: GL.iNet Flint 3 (GL-BE9300), with a caveat</h2>
+        <figure class="figure">
+          <img src="images/flint3-be9300.png" alt="GL.iNet Flint 3 (GL-BE9300) tri-band Wi-Fi 7 router" width="1200" height="1200" loading="lazy">
+          <figcaption>GL.iNet Flint 3 (GL-BE9300). Image: <a href="https://www.gl-inet.com/products/gl-be9300/">GL.iNet</a></figcaption>
+        </figure>
+        <p>Tri-band BE9300: 688 Mbps at 2.4 GHz, 2882 Mbps at 5 GHz, 5765 Mbps at 6 GHz. A Qualcomm quad-core at 1.5 GHz with 1 GB DDR4 and 8 GB eMMC. Every Ethernet port is multi-gig — one 2.5G WAN, one 2.5G WAN/LAN, three 2.5G LAN — with no 1G-only ports, plus USB 3.0. Power is 12V/4A at under 25 W idle, under 37.2 W with a USB load; 240 × 157 × 74 mm, 848 g. MLO and DFS are in the feature set. Source: <a href="https://www.gl-inet.com/products/gl-be9300/">GL.iNet</a>.</p>
+        <p>Here is the caveat, and it is the reason this sits third. Qualcomm's ath12k driver is newer and thinner in OpenWrt than MediaTek's mt76, so "OpenWrt on Flint 3" should be treated as unproven until the Table of Hardware says otherwise. As a stock-firmware router it is fine hardware. As an OpenWrt project box, it is the one to be cautious about. <a href="https://www.amazon.com/s?k=GL.iNet+Flint+3+GL-BE9300&amp;tag=hanews01-20" rel="sponsored nofollow">GL.iNet Flint 3 on Amazon</a>.</p>
+
+        <h2>How to verify support before you pay</h2>
+        <ol>
+          <li>Find your exact model in the OpenWrt Table of Hardware, including the hardware revision and regional variant. Sister models are not interchangeable.</li>
+          <li>Open the device page and read the install method: some boxes need a vendor-specific image, a TFTP recovery, or an OEM bootloader step.</li>
+          <li>Read the release notes for the OpenWrt version you intend to run and confirm your model is listed with working radios.</li>
+          <li>Check what breaks. 6 GHz, MLO and hardware offload are the usual casualties on new silicon.</li>
+          <li>Only then buy. If the device page does not exist for your model, you are buying a vendor router, not an OpenWrt router.</li>
+        </ol>
+
+        <h2>Gotchas worth knowing</h2>
+        <ul>
+          <li><strong>"Runs OpenWrt" is not "officially supported".</strong> Many vendor boxes ship a fork that cannot be sysupgraded to stock OpenWrt.</li>
+          <li><strong>RAM is the quiet constraint.</strong> 1 GB is fine for routing plus a few packages. AdGuard Home, Docker or a VPN server on the same box wants 2 GB.</li>
+          <li><strong>Multi-gig only helps end to end.</strong> A 2.5G WAN into a 1G switch buys nothing.</li>
+          <li><strong>Wi-Fi 7 is a driver question.</strong> ath12k versus mt76 matters more than the BE number on the box.</li>
+        </ul>
+
+        <h2>If you are new to OpenWrt</h2>
+        <p>OpenWrt is a router operating system, not a Home Assistant add-on, but the two live well together: a box you control means local DNS, VLANs for IoT devices, and a firewall you can actually read. If your interest is the Zigbee or Z-Wave side of the network rather than Ethernet, the <a href="zigbee-hub.html">Zigbee hub guide</a> covers coordinators, and the <a href="ha.html">Home Assistant section</a> tracks the rest. When a flash goes wrong, the recovery is the vendor's bootloader, not a support ticket — read that procedure before you start, not after.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>What is the best router for OpenWrt right now?</h3>
+        <p>For most people the GL.iNet Flint 2 (GL-MT6000) is the sane starting point: MediaTek MT7986 silicon, 1 GB of RAM, two 2.5G ports and an OpenWrt-based stock firmware you can replace. The catch is that official support has to be confirmed per model on the OpenWrt Table of Hardware before you flash anything.</p>
+        <h3>Which OpenWrt compatible routers are actually worth buying?</h3>
+        <p>Buy hardware with a recent MediaTek or Qualcomm SoC, at least 1 GB of RAM, and a supported flash layout. Among current GL.iNet boxes that points at the Flint 2 for Wi-Fi 6, the Flint 4 if you need 2 GB of RAM and 10G ports, and the Flint 3 only if you accept that Wi-Fi 7 support in mainline OpenWrt is still thin.</p>
+        <h3>Does OpenWrt support Wi-Fi 7 yet?</h3>
+        <p>It depends on the driver, not the radio spec sheet. MediaTek's mt76 path is further along than Qualcomm's ath12k for 802.11be, and 6 GHz behaviour varies by model. Check the device's Table of Hardware entry and the release notes for the exact model before assuming a BE-class router works in mainline OpenWrt.</p>
+        <h3>Is the GL.iNet Flint 2 still the best OpenWrt router, or should I get a Flint 3?</h3>
+        <p>The Flint 2 is the safer buy: MediaTek silicon that is widely ported, 1 GB RAM and multi-gig Ethernet at Wi-Fi 6 speeds. The Flint 3 adds tri-band Wi-Fi 7 and three 2.5G LAN ports, but it runs a Qualcomm platform whose OpenWrt support is newer and thinner, so treat it as unproven for a mainline flash.</p>
+        <h3>Can I flash stock OpenWrt on a GL.iNet router, or am I stuck with the vendor firmware?</h3>
+        <p>GL.iNet ships its own OpenWrt-based build, which is not the same thing as stock OpenWrt. On models with an official Table of Hardware entry you can flash the release image, but some vendor boxes cannot be sysupgraded to mainline at all. Verify both the device page and the release notes for your exact model first.</p>
+        <h3>Do I need 2 GB of RAM for an OpenWrt router?</h3>
+        <p>Not for plain routing and a handful of packages: 1 GB is comfortable there. Step up to 2 GB if you plan to run AdGuard Home, Docker containers or a VPN server on the same box, because those services and their lists eat memory that the routing stack also wants.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.gl-inet.com/products/gl-mt6000/">GL.iNet Flint 2 (GL-MT6000)</a>; <a href="https://www.gl-inet.com/products/gl-be14000/">GL.iNet Flint 4 (GL-BE14000)</a>; <a href="https://www.gl-inet.com/products/gl-be9300/">GL.iNet Flint 3 (GL-BE9300)</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
