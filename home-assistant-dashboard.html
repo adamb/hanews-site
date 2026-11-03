@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to build a Home Assistant dashboard (2026 guide) — HA News</title>
+  <meta name="description" content="Build a Home Assistant dashboard from scratch: taking control of the Overview, choosing Sections, Masonry, Panel or Sidebar views, adding cards and badges, themes, and who sees what.">
+  <link rel="canonical" href="https://hanews.org/home-assistant-dashboard">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "How to build a Home Assistant dashboard (2026 guide)", "datePublished": "2026-11-03", "dateModified": "2026-11-03", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-assistant-dashboard"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the difference between a dashboard and a view in Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "A dashboard is a whole screen with its own entry in the sidebar; a view is a tab inside that dashboard. One dashboard can hold several views, and each view has its own layout type, icon, theme and visibility settings."}}, {"@type": "Question", "name": "Which view type should I pick: Sections, Masonry, Panel, or Sidebar?", "acceptedAnswer": {"@type": "Answer", "text": "Sections is the default and the right choice for most people, because it groups cards into sections without horizontal and vertical stack cards. Masonry suits older layouts, Panel gives one card the full width, and Sidebar puts a narrow column beside the main content."}}, {"@type": "Question", "name": "How do I apply a theme to a whole dashboard versus a single card?", "acceptedAnswer": {"@type": "Answer", "text": "Themes come from the frontend integration and are defined as a map of theme names to CSS variables. You can set a theme on a view through the view settings, and individual cards can carry their own theme setting as well."}}, {"@type": "Question", "name": "What is a good dashboard setup for a wall-mounted tablet?", "acceptedAnswer": {"@type": "Answer", "text": "A separate dashboard with a small number of Sections views, badges for the states you glance at, and a theme that reads well in daylight. Home Assistant supports several dashboards at once, so the tablet can have its own without disturbing the one on your phone."}}, {"@type": "Question", "name": "Can I hide cards or whole views from guests and other users?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. A view has a Visibility tab for hiding it from specific users, and badges and cards support conditional visibility. Sections can also be shown conditionally or per user."}}, {"@type": "Question", "name": "What does taking control of the default dashboard actually change?", "acceptedAnswer": {"@type": "Answer", "text": "It stops Home Assistant from auto-updating that dashboard with new elements. The change cannot be undone for that dashboard, though you can create a new default dashboard and start again."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 3 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html" aria-current="page">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Home Assistant</p>
+        <h1>How to build a Home Assistant dashboard</h1>
+        <p class="byline">HA News · 3 Nov 2026</p>
+
+        <p>Home Assistant ships with a dashboard already built for you. It is called Overview, it assembles itself from the devices you add, and it needs no configuration at all. For a lot of homes that is enough. The moment it stops being enough is usually the same moment: the house has grown past one screen, and the thing you actually want on a kitchen tablet is buried three scrolls down.</p>
+
+        <p>The fix is not YAML. Since the Sections layout became the default, dashboards are built by drag and drop in the browser or the app, and the page you end up with is the page your family taps. Per Home Assistant's documentation, a single tap on a dashboard can dim lights, start a robot vacuum or arm an alarm. It is the layer between the automations you configured and the people who never open Settings.</p>
+
+        <p>This guide walks through the parts that matter, in the order you will meet them. It is written against the dashboard documentation current at 2026.10.4; the sections below link to the pages they draw from. For the wider Home Assistant picture, start at our <a href="ha.html">Home Assistant section</a>.</p>
+
+        <h2>The three nouns: dashboard, view, card</h2>
+        <p>Almost every confusion about Home Assistant dashboards is a confusion about these three words.</p>
+        <p>A <strong>dashboard</strong> is a screen with its own entry in the sidebar. A <strong>view</strong> is a tab inside that dashboard. A <strong>card</strong> is a single block — a light, a gauge, a camera, a button — placed inside a view. The <a href="https://www.home-assistant.io/dashboards/cards/">cards documentation</a> describes cards as the building blocks: you arrange them freely across views, resize them in the Sections layout, and give each one actions, features and conditional visibility.</p>
+        <p>Everything else in this article is a setting on one of those three.</p>
+
+        <h2>Step one: decide whether to take control</h2>
+        <p>The first time you edit the default Overview, Home Assistant shows an "Edit dashboard" dialog. Confirming it means you <em>take control</em>. From that point the dashboard is yours, and it is no longer auto-updated with new dashboard elements as you add devices. You also cannot put that specific dashboard back into auto-update mode.</p>
+        <p>That is a one-way door, and it is worth understanding before you click. If you want the auto-generated view to keep improving itself while you experiment, make a second dashboard and leave Overview alone. Home Assistant supports several dashboards at once, each addable to the sidebar, so there is no cost to keeping the automatic one around.</p>
+        <p>If you do take control and later regret it, the escape route is to create a new default dashboard rather than trying to restore the old one.</p>
+
+        <h2>Step two: pick the view type</h2>
+        <p>A view is a tab, and every view has a layout type. There are four, per the <a href="https://www.home-assistant.io/dashboards/views/">views documentation</a>: Sections (the default), Masonry, Panel and Sidebar.</p>
+        <ul>
+          <li><strong>Sections</strong> is a grid and the only one worth choosing for a new dashboard. It groups cards into sections, which means you no longer need horizontal and vertical stack cards just to keep related things together.</li>
+          <li><strong>Masonry</strong> is the old default: columns of cards that fill in whatever order they fit. Fine if you built one years ago and like it.</li>
+          <li><strong>Panel</strong> gives a single card the full width of the screen — useful for a map or a camera wall and almost nothing else.</li>
+          <li><strong>Sidebar</strong> puts a narrow column beside the main content, for a control strip next to something bigger.</li>
+        </ul>
+        <p>Two of these carry a limitation worth knowing: Sidebar and Panel views do not support badges.</p>
+
+        <h2>Step three: understand Sections before you build</h2>
+        <p>Sections is where most of the design decisions now live. Per the <a href="https://www.home-assistant.io/dashboards/sections/">Sections documentation</a>, the layout is a grid that groups cards into sections without stack cards, and its settings include "Max number of sections wide" and "Dense section placement". Dense placement auto-fills horizontal gaps in the layout, which buys you a tighter page at the cost of controlling card order yourself. Leave it off while you are still arranging things; turn it on when the arrangement is settled.</p>
+        <p>Creating a section automatically adds a Heading card at its top. The heading is deletable, but it is usually the right place for the section title — and its header supports Markdown with templating, so a heading can carry live information rather than a fixed label. Badges can sit in the header too, and sections can be shown conditionally or per user.</p>
+        <p>One rule that catches people out: you cannot migrate a Sections view into another layout type. Migration runs the other way only. Moving an existing Masonry view into a Sections view is non-destructive — Home Assistant creates an additional view rather than converting in place — but once you are on Sections, you are on Sections.</p>
+
+        <h2>Step four: add cards</h2>
+        <p>Adding a card starts at Settings, then Dashboards, then the dashboard, then the view, then the edit button. In a Sections layout the add control is a plus inside the section; in other layouts it is an "Add card" button at the bottom right. There are two paths from there. <strong>By entity</strong> lets you pick entities first and see a card preview, with anything not yet placed appearing under "Unassigned". <strong>By card</strong> browses every card type, and people on Sections layouts are pointed at the Tile card under Suggested cards. Cards can also be added from a device's own page, which is often faster when you are setting up a new sensor.</p>
+        <p>As a rule of thumb, a section with four to eight tiles is readable at arm's length, and a screen of six to nine sections is about what a tablet shows without scrolling.</p>
+
+        <h2>Step five: start with Tile</h2>
+        <p>The <a href="https://www.home-assistant.io/dashboards/tile/">Tile card</a> is the one Home Assistant steers new dashboards toward, and it earns that. It is a compact entity overview row with tap actions plus optional "features" — for example bottom-aligned controls for a climate entity. Entities with a richer state, such as climate or person, get a badge inside the tile, and a circular icon background tells you a tap action exists.</p>
+        <p>Its options are deliberately small: <code>type: tile</code>, <code>entity</code>, <code>name</code> (a string, a map or a list), <code>icon</code>, <code>color</code> — which defaults to <code>state</code> and accepts a colour token or a hex value — and <code>show_entity_picture</code>. That is enough to build a whole dashboard, and it is why it is the recommended starting point.</p>
+
+        <h2>Step six: badges for the at-a-glance states</h2>
+        <p>Badges sit at the top of a view, above every card, and exist for the things you want to see without reading: temperatures, open windows, who is home. To add one, go to Settings, Dashboards, open the view, edit, press plus and pick an entity, per the <a href="https://www.home-assistant.io/dashboards/badges/">badges documentation</a>.</p>
+        <p>An entity badge in YAML is short — <code>type: entity</code> and <code>entity: light.living_room</code> — and its options are worth knowing because the defaults hide things. <code>show_name</code> defaults to false, <code>show_icon</code> to true, <code>show_state</code> to true. <code>state_content</code> accepts state, last_changed or last_updated, or any attribute, and <code>time_format</code> takes relative, total, date, time or datetime. Badge visibility conditions are the same set the conditional card uses, so a badge can appear only when the garage door is open.</p>
+
+        <h2>Step seven: one dashboard per person, and per screen</h2>
+        <p>The documentation makes the case for multiple dashboards directly: a focused one for the kitchen tablet, a simple one for guests, a detailed one for yourself. Manage them under Settings, Dashboards, which lists your dashboards alongside Home Assistant's built-in ones. Each can be added to the sidebar, which lets you build separate control surfaces for different parts of the house.</p>
+        <p>The built-in dashboards come with a constraint: they cannot be deleted and have limited editability, and you cannot add views to them. Home Assistant ships Activity, Climate, Energy, History, Lights, Maintenance, Overview, Security and To-do lists. The sidebar defaults show Home, Activity, Energy, History and To-do lists. Map is the exception — it ships out of the box but is freely editable, so it counts as user-created. Lights, Security, Climate, Energy and Maintenance appear in the dashboard list but not the sidebar by default, and Maintenance highlights low batteries.</p>
+        <p>That matters for the guest dashboard: build it as a new dashboard rather than trying to prune a built-in one.</p>
+
+        <h2>Themes, and the per-card override</h2>
+        <p>Themes come from the <a href="https://www.home-assistant.io/integrations/frontend/">frontend integration</a>, which is enabled by default through <code>default_config:</code>. A theme is defined under <code>themes:</code> as a map of theme name to CSS variables; <code>extra_module_url</code> loads extra JavaScript if you need it. The frontend integration also carries <code>development_repo</code>, <code>development_pr</code> and <code>github_token</code> for frontend development, which you can ignore unless you are building custom cards.</p>
+        <p>The useful part is granularity: a theme can be set on a view through the view settings, and individual cards can carry their own theme, so a dark camera panel can sit on an otherwise light dashboard without a second page.</p>
+
+        <h2>View settings worth setting once</h2>
+        <p>Each view carries more than a layout. Alongside the title there is an icon picked from Material icons, and an icon-only display mode where the title becomes a tooltip through the "Show icon and title" toggle. There is a URL link field, a theme selector, a background image tab, and a Visibility tab for hiding the view from specific users. The Subview toggle turns the view into a subview — reachable by link and by navigation actions, but not shown as a tab — which is the clean way to build detail pages that a dashboard links into.</p>
+
+        <h2>Gotchas</h2>
+        <ul>
+          <li><strong>Taking control removes auto-update.</strong> There is no undo for that dashboard.</li>
+          <li><strong>Built-in dashboards reject new views.</strong> If a plus button is missing, that is why.</li>
+          <li><strong>Sidebar and Panel views drop badges.</strong> Use Sections if badges matter.</li>
+          <li><strong>Migration is one-way.</strong> Sections views cannot become another type; older types can become Sections, non-destructively.</li>
+          <li><strong>Dense section placement fights you</strong> while you are arranging cards. Turn it on last.</li>
+          <li><strong>Hiding is not securing.</strong> Visibility settings tidy a screen for other users; they are not an access control boundary.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>What is the difference between a dashboard and a view in Home Assistant?</h3>
+        <p>A dashboard is a whole screen with its own entry in the sidebar; a view is a tab inside that dashboard. One dashboard can hold several views, and each view has its own layout type, icon, theme and visibility settings.</p>
+        <h3>Which view type should I pick: Sections, Masonry, Panel, or Sidebar?</h3>
+        <p>Sections is the default and the right choice for most people, because it groups cards into sections without horizontal and vertical stack cards. Masonry suits older layouts, Panel gives one card the full width, and Sidebar puts a narrow column beside the main content.</p>
+        <h3>How do I apply a theme to a whole dashboard versus a single card?</h3>
+        <p>Themes come from the frontend integration and are defined as a map of theme names to CSS variables. You can set a theme on a view through the view settings, and individual cards can carry their own theme setting as well.</p>
+        <h3>What is a good dashboard setup for a wall-mounted tablet?</h3>
+        <p>A separate dashboard with a small number of Sections views, badges for the states you glance at, and a theme that reads well in daylight. Home Assistant supports several dashboards at once, so the tablet can have its own without disturbing the one on your phone.</p>
+        <h3>Can I hide cards or whole views from guests and other users?</h3>
+        <p>Yes. A view has a Visibility tab for hiding it from specific users, and badges and cards support conditional visibility. Sections can also be shown conditionally or per user.</p>
+        <h3>What does taking control of the default dashboard actually change?</h3>
+        <p>It stops Home Assistant from auto-updating that dashboard with new elements. The change cannot be undone for that dashboard, though you can create a new default dashboard and start again.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-11-02">Read today's</a>.</p>
+
+        <p>Setting up the machine underneath the dashboard? Our guides to the <a href="home-assistant-green.html">Home Assistant Green</a> and to <a href="home-assistant-raspberry-pi.html">running Home Assistant on a Raspberry Pi</a> cover the hardware side of the same job.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/dashboards/">Home Assistant dashboards</a>; <a href="https://www.home-assistant.io/dashboards/views/">Views</a>; <a href="https://www.home-assistant.io/dashboards/sections/">Sections view</a>; <a href="https://www.home-assistant.io/dashboards/cards/">Cards</a>; <a href="https://www.home-assistant.io/dashboards/tile/">Tile card</a>; <a href="https://www.home-assistant.io/dashboards/badges/">Badges</a>; <a href="https://www.home-assistant.io/dashboards/dashboards/">Dashboards and the sidebar</a>; <a href="https://www.home-assistant.io/integrations/frontend/">Frontend integration</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
