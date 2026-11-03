@@ -270,4 +270,10 @@
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
+  <url>
+    <loc>https://hanews.org/openwrt-mesh-network</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

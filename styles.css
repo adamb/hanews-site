@@ -1051,3 +1051,8 @@ a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 }
 .facts.buy dt { color: var(--ink-soft); }
 .facts.buy a { font-weight: 600; }
+
+/* Tip box (feature articles) */
+blockquote.tipbox { margin: 1.5rem 0; padding: 1rem 1.25rem; border-left: 4px solid #1f4e79; background: #f3f6fa; font-style: normal; }
+blockquote.tipbox p { margin: 0 0 .5rem; }
+blockquote.tipbox ul { margin: .25rem 0 0 1.1rem; padding: 0; }
