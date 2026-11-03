@@ -96,7 +96,7 @@
 </tbody>
 </table>
 <h2>How the OpenWrt mesh network works</h2>
-<p>At the center sits the gateway, an OpenWrt One (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=OpenWrt+One+router&amp;tag=hanews01-20">check price on Amazon</a>) running the firewall and the three separate networks. It manages the internet connections too: fiber as the main line, with Starlink and T-Mobile as automatic backups.</p>
+<p>At the center sits the gateway, an OpenWrt One (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=OpenWrt+One+router&amp;tag=hanews01-20">check price on Amazon</a>) running the firewall and the three separate networks. It manages the internet connections too: fiber is the main line, with <a rel="sponsored nofollow" href="https://starlink.com/?referral=RC-DF-6221277-95858-60">Starlink Residential Lite</a> and T-Mobile as automatic backups. When the fiber goes down, the house fails over without anyone noticing.</p>
 <p>Around it are the mesh nodes: GL.iNet GL-MT3000 travel routers, sold as the Beryl AX (<a rel="sponsored nofollow" href="https://www.amazon.com/s?k=GL.iNet+GL-MT3000+Beryl+AX&amp;tag=hanews01-20">check price on Amazon</a>), plus a few Cudy single-port access points. Devices connect on each node's 2.4 GHz radio, with Wi-Fi 6.</p>
 <p>The 5 GHz radio in each node is reserved for the backhaul — the link nodes use to pass traffic to each other and back to the gateway, separate from the Wi-Fi devices use. It's a hidden, WPA3-protected network with every node on one channel.</p>
 <p>Three networks ride across the mesh:</p>
@@ -166,7 +166,7 @@
 <p>The most interesting number is airtime busy — the percentage of time a Wi-Fi channel is actually occupied. Signal bars won't tell you a channel is crowded; airtime will. "We monitor airtime busy on the Home Assistant graph, so we can tell if things are getting too crowded," Adam says. The graphs cover every node and both bands, grouped by channel. Anything above about 70% busy is worth a closer look, and an alert fires if a wired node falls back to Wi-Fi.</p>
 <p><img loading="lazy" width="1430" height="936" alt="Two line charts of Wi-Fi airtime busy over one week, Oct 26 to Nov 2, 2026. On 2.4 GHz most radios sit between about 15 and 40 percent busy. On 5 GHz every mesh radio tracks together around 20 to 30 percent, with a few short spikes above the 70 percent line on Nov 1 and Nov 2." src="images/wifi-airtime-busy-7d.png" /></p>
 <p><em>Hourly airtime busy for each radio in the house over seven days, from Home Assistant. The dashed line marks 70%, where a channel is worth a closer look. Source: HA News, from the homeowner's Home Assistant history.</em></p>
-<p>On an ordinary day, the 2.4 GHz radios that phones and smart devices use sit at roughly 15 to 40% busy. The busiest is the wired corner node near the guest house, which averaged about 38%. All the 5 GHz mesh radios share one channel, so their lines move together. They usually run at 20 to 30% busy, and on Nov 1 and Nov 2 they briefly spiked past the 70% line.</p>
+<p>On an ordinary day, the 2.4 GHz radios that phones and smart devices use sit at roughly 15 to 40% busy. The busiest is the wired corner node near the guest house, which averaged about 38%. All the 5 GHz mesh radios share one channel, so their lines move together. They usually run at 20 to 30% busy, and on Nov 1 and Nov 2 they briefly spiked past the 70% line. That spike wasn't the network struggling: Adam rebooted the center access point while chasing buffering on a streaming box, and the devices on it shuffled to other nodes. The buffering turned out to be the streaming service's servers, not the Wi-Fi.</p>
 <h2>For tinkerers</h2>
 <p>Everything below is the deep end — nothing above needs it.</p>
 <h3>The radio plan</h3>
@@ -205,7 +205,7 @@
 <h2>Where it stands</h2>
 <p>One gateway and a handful of travel routers now run the house: fiber, Starlink and T-Mobile on the internet side; three networks over the batman-adv mesh; Tailscale for access; Home Assistant on top. The repo is private. The recipe is not.</p>
 <p>What's next? "Hopefully nothing," Adam says. "I just want to enjoy the fast WiFi across the property." The one project on his list is a public dashboard showing when the power or water is out, because neighbors often text to ask, and a link is easier than a reply.</p>
-<p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+<p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases. The Starlink link is Adam's referral link; new customers who use it and Adam each get a Starlink service credit.</small></p>
 
       </div>
     </div>
