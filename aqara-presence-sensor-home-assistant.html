@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aqara presence sensor in Home Assistant: FP2 vs FP300 (2026) — HA News</title>
+  <meta name="description" content="How to use an Aqara presence sensor in Home Assistant: FP2 over the HomeKit Device integration, FP300 over Thread or Zigbee, setup steps, compatibility and the gotchas that decide which one you buy.">
+  <link rel="canonical" href="https://hanews.org/aqara-presence-sensor-home-assistant">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Aqara presence sensor in Home Assistant: FP2 vs FP300 (2026)", "image": "https://hanews.org/images/aqara-fp2.png", "datePublished": "2026-11-05", "dateModified": "2026-11-05", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/aqara-presence-sensor-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does the Aqara FP2 work with Home Assistant without an Aqara hub?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The FP2 is a Wi-Fi device that exposes itself to HomeKit, and Home Assistant picks it up through the HomeKit Device integration. No Aqara hub is involved, but you do need the HomeKit pairing code printed on the device or its packaging."}}, {"@type": "Question", "name": "Aqara FP2 vs FP300: which one should I put in my Home Assistant setup?", "acceptedAnswer": {"@type": "Answer", "text": "Buy the FP2 when you need to know where in a room someone is, because it maps a room up to 40 square metres into zones. Buy the FP300 when you want a battery sensor that reports presence plus light, temperature and humidity, and you already have a Thread border router and Matter controller or an Aqara hub."}}, {"@type": "Question", "name": "Does the Aqara FP300 work over Thread with Home Assistant, and do I need a Thread border router?", "acceptedAnswer": {"@type": "Answer", "text": "Aqara lists Home Assistant among the Matter controllers the FP300 can pair to in Thread mode, with no Aqara hub required. Thread traffic still has to reach the rest of your network through a Thread border router, so you need one in radio range as well as a Matter controller."}}, {"@type": "Question", "name": "Can an mmWave presence sensor detect someone sitting still, reading or watching TV?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. That is the point of the radar. Aqara says the FP2 detects people who are present but not moving, and describes the FP300 as detecting motion and stationary presence, which is what motion-only PIR sensors miss."}}, {"@type": "Question", "name": "Can I use the FP300 in Zigbee mode with Zigbee2MQTT, or do I need an Aqara hub?", "acceptedAnswer": {"@type": "Answer", "text": "Aqara's product page says Zigbee mode requires an Aqara hub and the Aqara Home app. It does not claim Zigbee2MQTT support, so treat direct pairing to a Zigbee coordinator as unconfirmed until Zigbee2MQTT lists the device. Thread mode is the documented route into Home Assistant."}}, {"@type": "Question", "name": "Do Aqara presence sensors need a cloud account or an internet connection to keep working?", "acceptedAnswer": {"@type": "Answer", "text": "Automations built in Home Assistant run on your own hardware. Aqara does say the FP2 only keeps its automations on-device when the other devices involved are Aqara or Apple Home compatible, and the Aqara app remains in the loop for configuration and firmware on both models."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 5 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html" aria-current="page">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Sensors</p>
+        <h1>Aqara presence sensor in Home Assistant: FP2 vs FP300 (2026)</h1>
+        <p class="byline">HA News · 5 Nov 2026</p>
+
+        <p>An Aqara presence sensor answers the question a motion sensor can't: is somebody still in the room? PIR sensors fire when a body moves across their field of view, then go quiet while you sit reading. Radar — mmWave — keeps sensing a person who is breathing but not walking, and the two Aqara models that do it reach Home Assistant by two completely different roads.</p>
+
+        <p><strong>Short version:</strong> the <strong>Aqara Presence Sensor FP2</strong> is a mains-powered Wi-Fi unit that maps a room into zones and comes into Home Assistant through the HomeKit Device integration. The <strong>Aqara Presence Multi-Sensor FP300</strong> is a battery device that talks Thread or Zigbee, adds temperature, humidity and illuminance, and joins Home Assistant as a Matter device — no zone map. They are not interchangeable, and picking the wrong one is the usual mistake.</p>
+
+        <figure class="figure">
+          <img src="images/aqara-fp2.png" alt="Aqara Presence Sensor FP2, a white radar presence sensor on a magnetic stand" width="710" height="800" loading="lazy">
+          <figcaption>Image: Aqara — <a href="https://www.aqara.com/en/product/presence-sensor-fp2/">Presence Sensor FP2 product page</a></figcaption>
+        </figure>
+
+        <h2>What mmWave presence sensing actually gives you</h2>
+        <p>Radar presence sensors look for small movements — a chest rising, a hand on a keyboard — rather than gross motion. Aqara says the FP2 handles people who are present but stationary, claims that temperature does not affect its accuracy, and calls it "small pet and robot vacuum-friendly". That last claim matters in a real house: a radar that reacts to every cat walking past is worse than the PIR it replaced.</p>
+        <p>The practical effect is that "turn the lights off when the room is empty" becomes reliable. With PIR you learn to wave at the ceiling. With radar the light stays on while you read and drops a configurable period after you leave.</p>
+
+        <h2>FP2 vs FP300, side by side</h2>
+        <table>
+          <thead><tr><th>Spec</th><th>Presence Sensor FP2</th><th>Presence Multi-Sensor FP300</th></tr></thead>
+          <tbody>
+            <tr><td>Radio</td><td>Wi-Fi</td><td>Thread, Zigbee, Bluetooth</td></tr>
+            <tr><td>Power</td><td>Mains, recessed USB-C</td><td>2 × CR2450 batteries, replaceable</td></tr>
+            <tr><td>Sensing</td><td>mmWave radar, room divided into zones</td><td>Dual PIR plus 60 GHz mmWave radar</td></tr>
+            <tr><td>Coverage</td><td>One unit covers up to 40 m² (about 430 sq ft)</td><td>120° field of view, up to 6 m range</td></tr>
+            <tr><td>People</td><td>Up to 5 detected at once</td><td>Not specified on the product page</td></tr>
+            <tr><td>Environment sensors</td><td>Light sensor only</td><td>Presence, motion, illuminance, temperature, humidity</td></tr>
+            <tr><td>Battery life (Aqara figures)</td><td>Not applicable</td><td>Up to 3 years in Zigbee, up to 2 years in Thread</td></tr>
+            <tr><td>Mounting</td><td>Magnetic stand, ceiling or vertical, IPX5</td><td>42 × 42 × 50 mm, indoor, −10 to 50 °C</td></tr>
+            <tr><td>Home Assistant path</td><td>HomeKit Device integration</td><td>Matter, over Thread</td></tr>
+          </tbody>
+        </table>
+        <p>Sources for every row are the two Aqara product pages, linked at the bottom of this article.</p>
+
+        <h2>FP2 in Home Assistant: the HomeKit Device route</h2>
+        <p>The FP2 is not integrated by an Aqara-made Home Assistant add-on. Aqara says it is "exposed as multiple sensors within third-party ecosystems, including HomeKit (and Home Assistant), Amazon Alexa, Google Home" — and the HomeKit half is what Home Assistant uses. The <a href="https://www.home-assistant.io/integrations/homekit_controller/">HomeKit Device integration</a> "allows you to connect accessories with the 'Works with HomeKit' logo to Home Assistant".</p>
+        <ol>
+          <li><strong>Get the pairing code before you start.</strong> It is printed on the device or its packaging, and the Home Assistant docs are blunt: "There is no way to recover this if you do not have it."</li>
+          <li><strong>Unpair it from any Apple Home or Aqara Home HomeKit setup.</strong> The docs require the device to be "not paired with another HomeKit controller".</li>
+          <li><strong>Put it on Wi-Fi and power it over USB-C.</strong> The port is recessed, and the magnetic stand lets you angle it at the room or hang it from a ceiling.</li>
+          <li><strong>Add it in Home Assistant</strong> via Settings, Devices &amp; services, Add integration, HomeKit Device. The docs cover adding over Ethernet/Wi-Fi, Bluetooth or Thread — for the FP2 it is the network path.</li>
+          <li><strong>Place it, then build zones.</strong> Aqara's zone map comes from the Aqara app; each zone then shows up as a separate presence entity you can trigger on. That is the whole trick: one sensor per zone, so the desk zone can hold the desk light while the door zone runs the hallway automation.</li>
+        </ol>
+        <p>Do not confuse HomeKit Device with the HomeKit Bridge integration, which points the other way and exposes Home Assistant devices <em>to</em> Apple Home.</p>
+        <p>Why bother with the FP2's zone map? Aqara pitches it as a replacement for multiples: "PIR Sensor x N, Light Sensor x 1" — several infrared sensors and a light sensor in one box. In a large open-plan room that is the difference between one ceiling device and four wired sensors. Aqara rates the unit at up to 5 people at once, so a family living room stays inside spec. Fall detection and alerts are advertised features, though I would not treat a radar on a shelf as a medical device.</p>
+        <p>Power and placement are unglamorous and decisive. The FP2 is IPX5, so Aqara supports humid rooms such as bathrooms and outdoor use under a roof, with its own caveat on the outdoors. Radar sees through thin partitions less gracefully than through air; aim it at the room you care about, not at a hallway you don't.</p>
+
+        <h2>FP300 in Home Assistant: Thread and Matter</h2>
+        <figure class="figure">
+          <img src="images/aqara-fp300.png" alt="Aqara Presence Multi-Sensor FP300, a small square battery-powered radar presence sensor" width="600" height="500" loading="lazy">
+          <figcaption>Image: Aqara — <a href="https://www.aqara.com/en/product/presence-multi-sensor-fp300/">Presence Multi-Sensor FP300 product page</a></figcaption>
+        </figure>
+        <p>The FP300 is the interesting one for Home Assistant because Aqara names Home Assistant explicitly. In Thread mode the sensor pairs to "a thread-enabled Matter Controller", and the list is Apple Home, Google Home, Alexa, <strong>Home Assistant</strong>, SmartThings and Homey — with no Aqara hub in the chain.</p>
+        <p>Two pieces of infrastructure have to exist, and Aqara's page only guarantees one of them. Home Assistant's <a href="https://www.home-assistant.io/integrations/matter/">Matter integration docs</a> explain that Matter "defines how to control smart home devices on a Wi-Fi or Thread network", and that a Thread border router "forwards traffic from the devices in the Thread network to devices outside that network". So: a Matter controller (Home Assistant, with the Matter integration and a Thread border router it can use) <em>and</em> a border router in radio range. If you have neither, that is a separate purchase — see our <a href="article-thread-network.html">Thread network explainer</a> for what the pieces do.</p>
+        <ol>
+          <li><strong>Check your Thread side first.</strong> Confirm Home Assistant has a Thread border router it can reach before you buy; the sensor is useless without one.</li>
+          <li><strong>Pick the mode.</strong> Thread mode needs no Aqara hub. Zigbee mode does — see the next section.</li>
+          <li><strong>Commission with the Companion app or a pairing code.</strong> The Matter docs describe adding through the iOS or Android Companion app or with a pairing code; commissioning uses Bluetooth, so keep the phone near the sensor.</li>
+          <li><strong>Expect a multi-admin world.</strong> Matter supports multi-fabric, so the same FP300 can be joined to Home Assistant and another controller at once — useful if one member of the house lives in Apple Home.</li>
+        </ol>
+        <p>Aqara's own trading table says Thread mode exposes occupancy, illumination, temperature and humidity (Alexa loses one of them). Several tuning options — radar sensitivity, absence confirmation period — are listed as "Aqara Home and Home Assistant only", which is a quiet compliment: the two places where you can actually tune the sensor are the vendor app and the local server.</p>
+        <p>The battery claims are lab claims, and worth reading precisely: two CR2450 cells, up to 3 years in Zigbee mode and up to 2 years in Thread, measured at roughly 240 data points a day "based on 4 h presence plus light, temperature and humidity". A busy hallway that reports presence all day will not match that, and neither will aggressive reporting intervals.</p>
+
+        <h2>FP300 in Zigbee mode: the hub question</h2>
+        <p>Aqara states that Zigbee mode requires an Aqara hub and the Aqara Home app, and that Matter compatibility then arrives "through an Aqara Hub with Matter bridge functionality". That is a real architectural difference: in Thread mode the sensor is a native Matter device; in Zigbee mode it is a Zigbee device behind a bridge.</p>
+        <p>Aqara's page does not claim Zigbee2MQTT support. This matters because the tempting move — pair the FP300 straight to a Zigbee coordinator and skip the hub — is unconfirmed by the manufacturer. Until Zigbee2MQTT lists the model, treat it as an experiment. If you want a battery Zigbee sensor in Home Assistant with no vendor bridge, that is a different shopping list; our <a href="zigbee-hub.html">Zigbee coordinator guide</a> covers the radio side.</p>
+
+        <h2>Which one to buy</h2>
+        <h3>Aqara Presence Sensor FP2 — for rooms with a floor plan</h3>
+        <p>Pick the FP2 when the automation depends on <em>where</em> someone is: desk lamp on in the study corner, ambient light off near the sofa, hallway light following a path. One unit, one power outlet, up to 40 m² of coverage, per-zone entities in Home Assistant, plus a light sensor good enough to hold lights off in daylight. Check <a href="https://www.amazon.com/s?k=Aqara+Presence+Sensor+FP2&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Presence Sensor FP2 on Amazon</a>.</p>
+        <h3>Aqara Presence Multi-Sensor FP300 — for battery and environment</h3>
+        <p>Pick the FP300 when you cannot run power to the corner, when you also want temperature and humidity in the same entity set, or when you are building on Thread and Matter deliberately. Accept the trade: no zone map, a 6 m range and a 120° cone, and a dependency on Thread infrastructure you must already own. Check <a href="https://www.amazon.com/s?k=Aqara+Presence+Multi-Sensor+FP300&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Presence Multi-Sensor FP300 on Amazon</a>.</p>
+        <h3>Neither — if you only need motion</h3>
+        <p>If a plain motion sensor has been fine and the complaint is coverage rather than stillness, a second PIR is cheaper. Presence radar earns its price in rooms where people sit still: offices, sofas, bathrooms, workshops.</p>
+
+        <h2>The gotchas worth knowing before you buy</h2>
+        <p><strong>Two radios, two architectures.</strong> The FP2 is mains Wi-Fi with a zone map. The FP300 is battery Thread or Zigbee with environment sensors and no map. Any comparison that treats them as the same product at two prices is wrong.</p>
+        <p><strong>Thread is not Matter.</strong> Home Assistant's own docs warn that "Thread devices don't necessarily support Matter". The FP300 in Thread mode does, per Aqara; a generic Thread sensor might not. Buy the combination, not the radio.</p>
+        <p><strong>Local automation has a caveat on the FP2.</strong> Aqara says on-device automation runs without the cloud only when the other devices in the automation are Aqara or Apple Home compatible. In Home Assistant the automations run locally by construction — but the Aqara app stays in the loop for configuration and firmware, so it is not a zero-app device.</p>
+        <p><strong>Losing the pairing code loses the FP2.</strong> Photograph the label before you mount the sensor on a ceiling.</p>
+        <p><strong>Light threshold automations are the sleeper feature.</strong> Aqara's own example is IF presence detected AND illuminance under 400 lux THEN turn on lamp. That single rule removes most of the "lights on in an empty sunlit room" complaints, and both Aqara models can feed it — the FP2 through its built-in light sensor, the FP300 through its 5-in-1 sensor set.</p>
+        <p><strong>Skip the FP1E as a reference point.</strong> Aqara's product page for the older wired FP1E currently serves placeholder copy, so there are no specs to compare against. If you see a comparison table elsewhere quoting FP1E numbers, it did not come from the manufacturer page as it stands today.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Does the Aqara FP2 work with Home Assistant without an Aqara hub?</h3>
+        <p>Yes. The FP2 is a Wi-Fi device that exposes itself to HomeKit, and Home Assistant picks it up through the HomeKit Device integration. No Aqara hub is involved, but you do need the HomeKit pairing code printed on the device or its packaging.</p>
+        <h3>Aqara FP2 vs FP300: which one should I put in my Home Assistant setup?</h3>
+        <p>Buy the FP2 when you need to know where in a room someone is, because it maps a room up to 40 square metres into zones. Buy the FP300 when you want a battery sensor that reports presence plus light, temperature and humidity, and you already have a Thread border router and Matter controller or an Aqara hub.</p>
+        <h3>Does the Aqara FP300 work over Thread with Home Assistant, and do I need a Thread border router?</h3>
+        <p>Aqara lists Home Assistant among the Matter controllers the FP300 can pair to in Thread mode, with no Aqara hub required. Thread traffic still has to reach the rest of your network through a Thread border router, so you need one in radio range as well as a Matter controller.</p>
+        <h3>Can an mmWave presence sensor detect someone sitting still, reading or watching TV?</h3>
+        <p>Yes. That is the point of the radar. Aqara says the FP2 detects people who are present but not moving, and describes the FP300 as detecting motion and stationary presence, which is what motion-only PIR sensors miss.</p>
+        <h3>Can I use the FP300 in Zigbee mode with Zigbee2MQTT, or do I need an Aqara hub?</h3>
+        <p>Aqara's product page says Zigbee mode requires an Aqara hub and the Aqara Home app. It does not claim Zigbee2MQTT support, so treat direct pairing to a Zigbee coordinator as unconfirmed until Zigbee2MQTT lists the device. Thread mode is the documented route into Home Assistant.</p>
+        <h3>Do Aqara presence sensors need a cloud account or an internet connection to keep working?</h3>
+        <p>Automations built in Home Assistant run on your own hardware. Aqara does say the FP2 only keeps its automations on-device when the other devices involved are Aqara or Apple Home compatible, and the Aqara app remains in the loop for configuration and firmware on both models.</p>
+
+        <h2>Related</h2>
+        <p>More on the sensors and radios in this article: <a href="devices.html">Devices</a>; <a href="article-thread-network.html">The Thread network, explained</a>; <a href="zigbee-hub.html">The best Zigbee hub for Home Assistant</a>; <a href="best-water-leak-sensor.html">Best water leak sensors</a>.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.aqara.com/en/product/presence-sensor-fp2/">Aqara Presence Sensor FP2</a>; <a href="https://www.aqara.com/en/product/presence-multi-sensor-fp300/">Aqara Presence Multi-Sensor FP300</a>; <a href="https://www.home-assistant.io/integrations/homekit_controller/">Home Assistant HomeKit Device integration</a>; <a href="https://www.home-assistant.io/integrations/matter/">Home Assistant Matter integration</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt WireGuard: a working tunnel in LuCI (2026) — HA News</title>
+  <meta name="description" content="How to set up OpenWrt WireGuard: the packages you need in 25.12 (apk) and 24.10 (opkg), the LuCI protocol handler, keys, peers, firewall, site-to-site links, and reaching Home Assistant from outside.">
+  <link rel="canonical" href="https://hanews.org/openwrt-wireguard">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt WireGuard: a working tunnel in LuCI (2026)", "datePublished": "2026-11-05", "dateModified": "2026-11-05", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-wireguard"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is WireGuard built into OpenWrt, or do I install a package?", "acceptedAnswer": {"@type": "Answer", "text": "The WireGuard implementation itself is a kernel module on Linux, so there is no out-of-tree DKMS build step on OpenWrt. What you install is the userspace tooling (wireguard-tools for the wg command) and, if you want it in the web interface, the LuCI protocol handler luci-proto-wireguard."}}, {"@type": "Question", "name": "Which packages do I need for WireGuard in LuCI, and what changed in 25.12?", "acceptedAnswer": {"@type": "Answer", "text": "You need luci-proto-wireguard for the interface type in LuCI and wireguard-tools for the wg command. OpenWrt 25.12.6 ships apk packages, not opkg, so opkg install commands from older guides do not work; use apk add. Version 24.10.8 still uses ipk packages and opkg."}}, {"@type": "Question", "name": "How do I open the WireGuard port on the OpenWrt firewall, and should I use 51820?", "acceptedAnswer": {"@type": "Answer", "text": "You add an inbound rule for UDP on whichever port you set as the interface listen-port and point it at the router itself. 51820 is only a convention from the WireGuard quickstart examples; any UDP port works as long as both ends agree and the port is allowed."}}, {"@type": "Question", "name": "How do I reach my Home Assistant box from outside without exposing it?", "acceptedAnswer": {"@type": "Answer", "text": "Put the Home Assistant machine on the router's LAN and give the phone or laptop a WireGuard peer whose allowed-ips covers only that LAN subnet. The tunnel then reaches port 8123 without any inbound rule for Home Assistant itself; the only open port is the WireGuard UDP port."}}, {"@type": "Question", "name": "Why does my WireGuard tunnel drop after a few minutes on a phone behind NAT?", "acceptedAnswer": {"@type": "Answer", "text": "WireGuard sends nothing when idle, so a NAT or firewall may forget the mapping. Setting persistent-keepalive to 25 seconds on the peer keeps the hole open."}}, {"@type": "Question", "name": "Can I run a WireGuard site-to-site link between two OpenWrt routers?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Each router is a peer of the other, and each lists the other's LAN subnet in allowed-ips. If one side has no public address, the side behind NAT sets persistent-keepalive and the public side needs a reachable endpoint."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 5 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt</p>
+        <h1>OpenWrt WireGuard: a working tunnel in LuCI</h1>
+        <p class="byline">HA News · 5 Nov 2026</p>
+
+        <p>WireGuard on OpenWrt is not a bolt-on. The protocol itself is a kernel module in Linux, so on a router running OpenWrt there is no out-of-tree build and no DKMS step: the driver is already in the image. What you add is the tooling — <code>wireguard-tools</code> for the <code>wg</code> command, and <code>luci-proto-wireguard</code> when you want the tunnel to appear as an interface type in the web interface. This guide walks the whole path: packages, keys, peers, the firewall rule, a site-to-site link between two OpenWrt routers, and the tunnel that gets you back to Home Assistant without opening port 8123 to the internet.</p>
+
+        <h2>What WireGuard is, in one paragraph</h2>
+        <p>WireGuard is a VPN protocol built on the Noise framework, with Curve25519 for key exchange and ChaCha20, Poly1305, BLAKE2 and SipHash24 for transport and hashing. Peers are configured by exchanging public keys and nothing else — the project's own description is "as easy to configure and deploy as SSH" — and a peer can roam between IP addresses without renegotiating. It is deliberately silent: it sends no packets unless a peer has traffic to send. That silence is the source of the most common support question on phones behind NAT, which we come back to below. Source: <a href="https://www.wireguard.com/">wireguard.com</a>.</p>
+
+        <h2>Which packages, and the 25.12 packaging change</h2>
+        <p>OpenWrt stable is 25.12.6, published 18 October 2026; oldstable is 24.10.8, published 26 July 2026 (<a href="https://github.com/openwrt/openwrt/releases">OpenWrt releases</a>). The two branches handle packages differently, and this is where most copy-pasted instructions go wrong.</p>
+        <p>On 25.12.x the package manager is <strong>apk</strong>. The <code>packages/</code> and <code>luci/</code> directories for 25.12.6 contain <code>index.json</code> and <code>.apk</code> files, not <code>.ipk</code>; 24.10.8 still ships <code>.ipk</code> and still uses opkg. So:</p>
+        <ul>
+          <li><strong>25.12.6:</strong> install with <code>apk add luci-proto-wireguard wireguard-tools</code>. The LuCI package in this release is built as <code>luci-proto-wireguard-26.304.26398~e969939.apk</code> (<a href="https://downloads.openwrt.org/releases/25.12.6/packages/x86_64/luci/">25.12.6 package index</a>).</li>
+          <li><strong>24.10.8:</strong> install with <code>opkg install luci-proto-wireguard wireguard-tools</code>. The LuCI package there is <code>luci-proto-wireguard_26.301.70438~aa4865e_all.ipk</code> (<a href="https://downloads.openwrt.org/releases/24.10.8/packages/x86_64/luci/">24.10.8 package index</a>).</li>
+        </ul>
+        <p><code>luci-proto-wireguard</code> is a protocol handler: it teaches LuCI what a WireGuard interface is, so the Interfaces page offers it alongside DHCP client, static address and PPPoE. Without it, <code>wg</code> still works from a shell but the tunnel never shows up in the web interface.</p>
+        <p>25.12.6 also bumped <code>wireguard-tools</code> to 1.0.20260223 from 1.0.20250521, and fixed <code>sysupgrade -u</code> and <code>-f</code> behaviour that had broken "with apk" (<a href="https://github.com/openwrt/openwrt/releases">release notes</a>). If you keep configuration across upgrades with <code>sysupgrade -u</code>, that fix is the one that matters to you.</p>
+
+        <h2>Step one: keys</h2>
+        <p>Every peer has a private key and a public key, both base64. Generate them on the router, or anywhere with <code>wg</code> installed, exactly as the quickstart describes:</p>
+        <pre><code>umask 077; wg genkey &gt; privatekey
+wg pubkey &lt; privatekey &gt; publickey</code></pre>
+        <p>The <code>umask 077</code> is not decoration — it is what keeps the private key readable only by its owner. Source: <a href="https://www.wireguard.com/quickstart/">WireGuard quickstart</a>. Do not reuse one key pair for several peers; each device gets its own, which is also what makes revoking a lost phone a one-line change.</p>
+
+        <h2>Step two: the interface</h2>
+        <p>In LuCI, add a new interface and choose the WireGuard VPN protocol that <code>luci-proto-wireguard</code> provides. Give it an address on a private range — the quickstart's own example uses <code>192.168.2.1/24</code> for the router side and <code>192.168.2.2</code> for the other peer — and set a listen port. Port 51820 appears in every example, but it is a convention, not a requirement: pick any UDP port, as long as every peer's <code>endpoint</code> names the same one.</p>
+        <p>The same interface can be built from a shell, which is useful when you are scripting or when LuCI is not installed:</p>
+        <pre><code>ip link add dev wg0 type wireguard
+ip address add dev wg0 192.168.2.1/24
+wg set wg0 listen-port 51820 private-key /etc/wireguard/privatekey
+ip link set up dev wg0</code></pre>
+        <p>Those four commands are the quickstart's own sequence (<a href="https://www.wireguard.com/quickstart/">wireguard.com/quickstart</a>). Vanilla <code>wg</code> leaves the interface setup to you; <code>wg-quick</code> is the wrapper that automates the <code>wg</code>-and-<code>ip</code> dance from a single config file. On OpenWrt you rarely need <code>wg-quick</code>, because the init system and LuCI already do that work — <code>wg setconf</code> and <code>wg set</code> are what you reach for when you want to apply settings by hand.</p>
+
+        <h2>Step three: peers</h2>
+        <p>A peer entry is four things: the other side's public key, the addresses or subnets you expect to find behind it (<code>allowed-ips</code>), where to reach it (<code>endpoint</code>), and optionally a keepalive. Set from the shell, that looks like the quickstart's example:</p>
+        <pre><code>wg set wg0 peer &lt;PUBKEY&gt; allowed-ips 192.168.88.0/24 endpoint 209.202.254.14:8172</code></pre>
+        <p>In LuCI the same fields are a form under the interface's Peers tab. Two habits save trouble later:</p>
+        <ul>
+          <li><code>allowed-ips</code> is a routing statement as much as a permission. List only the subnets that peer should reach. A phone that should see your house does not need <code>0.0.0.0/0</code> unless you intend to send all its traffic through the tunnel.</li>
+          <li>The server side should not carry an <code>endpoint</code> for a roaming client. Clients dial in; the router learns their address from the last authenticated packet.</li>
+        </ul>
+        <p><code>wg show</code> prints the live state — handshakes, transfer counters, the current endpoint — and <code>wg showconf</code> prints the configuration in a form you can save. With no arguments, <code>wg</code> behaves like <code>wg show</code> across all interfaces (<a href="https://www.wireguard.com/quickstart/">quickstart</a>). When a tunnel "doesn't work", the handshake timestamp in that output tells you whether you have a routing problem or a key problem.</p>
+
+        <h2>Step four: the firewall</h2>
+        <p>Only one port needs to face the internet: the UDP port you set as the interface's listen port. Add an inbound rule on the WAN zone for that protocol and port, with the destination set to the router itself. Do not forward 8123, SSH or the LuCI port — the point of the tunnel is that they stay closed. On the tunnel side, make sure the WireGuard interface is in a firewall zone that can reach the LAN, otherwise the handshake succeeds and nothing behind the router answers.</p>
+
+        <h2>Site-to-site between two OpenWrt routers</h2>
+        <p>Two routers, one tunnel, each the other's peer. Each side lists the other's LAN subnet in <code>allowed-ips</code>, plus the tunnel address of the far router if you want to reach the router itself. The side with a static public address sets no endpoint on its peer entry; the side behind a consumer connection points its <code>endpoint</code> at the public address and sets <code>persistent-keepalive</code> so the tunnel stays open through its own NAT. This is the same shape as a hub-and-spoke setup with a single client, just symmetric. If you are still choosing the hardware, see <a href="openwrt-mesh-network">our OpenWrt mesh network feature</a>.</p>
+
+        <h2>The keepalive gotcha</h2>
+        <p>WireGuard sends nothing when a peer is idle. That is a feature for battery and bandwidth, and a bug report generator for phones. A phone on a carrier network or a laptop behind a hotel router sits behind NAT; the NAT mapping expires after a few minutes of silence, and the next packet from the server side has nowhere to go. The fix is on the peer that is behind NAT: <code>persistent-keepalive</code> at 25 seconds. The quickstart notes exactly this — peers behind NAT or a firewall need a keepalive to stay reachable (<a href="https://www.wireguard.com/quickstart/">quickstart</a>). If a tunnel works for two minutes and then dies, this is almost always why.</p>
+
+        <h2>Getting back to Home Assistant</h2>
+        <p>The safe pattern for remote access to a home server is a tunnel that reaches only the LAN, with no inbound rule for the service itself. Give the phone a peer whose <code>allowed-ips</code> is your LAN subnet; the phone then resolves and reaches the Home Assistant machine on its usual port, and the router's firewall keeps everything else closed. Split tunnelling — LAN traffic through the tunnel, everything else direct — is usually what you want on a phone, and it falls out of a narrow <code>allowed-ips</code>. If you would rather not run a publicly reachable endpoint or manage key files on every device, Tailscale is the other common answer in this space and is covered separately in our plan; the trade is convenience for a third-party coordination service. For the local-radio side of the same house, see <a href="article-thread-network">how a Thread network fits together</a>.</p>
+
+        <h2>Hardware that runs it today</h2>
+        <p>Any OpenWrt-supported router will do — WireGuard is in the kernel, not an add-on module — but these three have official builds on both current branches, which is what you want if you intend to keep the tunnel patched:</p>
+        <ul>
+          <li><strong>GL.iNet GL-MT3000</strong> (mediatek/filogic), official 24.10.8 and 25.12.6 builds — <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=glinet_gl-mt3000">firmware selector</a>; <a href="https://openwrt.org/toh/glinet/gl-mt3000">device page</a>; <a href="https://www.amazon.com/s?k=GL.iNet+GL-MT3000&amp;tag=hanews01-20" rel="sponsored nofollow">GL-MT3000 on Amazon</a>.</li>
+          <li><strong>GL.iNet GL-MT6000</strong> (mediatek/filogic), official 24.10.8 and 25.12.6 builds — <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=glinet_gl-mt6000">firmware selector</a>; <a href="https://openwrt.org/toh/glinet/gl-mt6000">device page</a>; <a href="https://www.amazon.com/s?k=GL.iNet+GL-MT6000&amp;tag=hanews01-20" rel="sponsored nofollow">GL-MT6000 on Amazon</a>.</li>
+          <li><strong>Linksys E8450 / Belkin RT3200</strong> (mediatek/mt7622), official 24.10.8 and 25.12.6 builds — <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/mt7622&amp;id=linksys_e8450">firmware selector</a>; <a href="https://openwrt.org/toh/linksys/e8450">device page</a>; <a href="https://www.amazon.com/s?k=Linksys+E8450&amp;tag=hanews01-20" rel="sponsored nofollow">Linksys E8450 on Amazon</a>.</li>
+        </ul>
+        <p>Support status here comes from the firmware selector and the device pages, not from a lab test. Check the selector for your exact model before buying — a router that is only supported on the development snapshot will lose its tunnel config on the next image change. Comparing OpenWrt with the other common router firmware is covered in <a href="openwrt-vs-dd-wrt">OpenWrt vs DD-WRT</a>.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, ESPHome and the networking underneath them, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Is WireGuard built into OpenWrt, or do I install a package?</h3>
+        <p>The WireGuard implementation itself is a kernel module on Linux, so there is no out-of-tree DKMS build step on OpenWrt. What you install is the userspace tooling (<code>wireguard-tools</code> for the <code>wg</code> command) and, if you want it in the web interface, the LuCI protocol handler <code>luci-proto-wireguard</code>.</p>
+        <h3>Which packages do I need for WireGuard in LuCI, and what changed in 25.12?</h3>
+        <p>You need <code>luci-proto-wireguard</code> for the interface type in LuCI and <code>wireguard-tools</code> for the <code>wg</code> command. OpenWrt 25.12.6 ships apk packages, not opkg, so <code>opkg install</code> commands from older guides do not work; use <code>apk add</code>. Version 24.10.8 still uses ipk packages and opkg.</p>
+        <h3>How do I open the WireGuard port on the OpenWrt firewall, and should I use 51820?</h3>
+        <p>You add an inbound rule for UDP on whichever port you set as the interface listen port, pointed at the router itself. 51820 is only a convention from the WireGuard quickstart examples; any UDP port works as long as both ends agree and the port is allowed.</p>
+        <h3>How do I reach my Home Assistant box from outside without exposing it?</h3>
+        <p>Put the Home Assistant machine on the router's LAN and give the phone or laptop a WireGuard peer whose <code>allowed-ips</code> covers only that LAN subnet. The tunnel then reaches port 8123 without any inbound rule for Home Assistant itself; the only open port is the WireGuard UDP port.</p>
+        <h3>Why does my WireGuard tunnel drop after a few minutes on a phone behind NAT?</h3>
+        <p>WireGuard sends nothing when idle, so a NAT or firewall may forget the mapping. Setting <code>persistent-keepalive</code> to 25 seconds on the peer keeps the hole open.</p>
+        <h3>Can I run a WireGuard site-to-site link between two OpenWrt routers?</h3>
+        <p>Yes. Each router is a peer of the other, and each lists the other's LAN subnet in <code>allowed-ips</code>. If one side has no public address, the side behind NAT sets <code>persistent-keepalive</code> and the public side needs a reachable endpoint.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.wireguard.com/">WireGuard project</a>; <a href="https://www.wireguard.com/quickstart/">WireGuard quickstart</a>; <a href="https://github.com/openwrt/openwrt/releases">OpenWrt releases</a>; <a href="https://downloads.openwrt.org/releases/25.12.6/packages/x86_64/luci/">25.12.6 LuCI packages</a>; <a href="https://downloads.openwrt.org/releases/24.10.8/packages/x86_64/luci/">24.10.8 LuCI packages</a>; <a href="https://firmware-selector.openwrt.org/">OpenWrt firmware selector</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
