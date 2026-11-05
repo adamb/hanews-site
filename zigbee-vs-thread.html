@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zigbee vs Thread: which radio for a Home Assistant house? — HA News</title>
+  <meta name="description" content="Zigbee vs Thread for Home Assistant: what each protocol actually is, where Matter fits, which coordinator or border router you need, setup steps and the gotchas.">
+  <link rel="canonical" href="https://hanews.org/zigbee-vs-thread">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Zigbee vs Thread: which radio for a Home Assistant house?", "datePublished": "2026-11-05", "dateModified": "2026-11-05", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/zigbee-vs-thread"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is Thread the same thing as Matter?", "acceptedAnswer": {"@type": "Answer", "text": "No. Thread is the network the device talks over; Matter is the application layer that controls it. The Thread Group describes Thread as a networking layer and says vendors select an application layer separately. Home Assistant's Thread documentation names Matter and Apple HomeKit as the protocols that handle Thread credentials and connect a Thread device to the network."}}, {"@type": "Question", "name": "Can Home Assistant talk to Thread devices without a Matter controller?", "acceptedAnswer": {"@type": "Answer", "text": "Not through the Thread integration alone. That integration tracks the Thread networks in your home and stores their credentials. Control comes from an application layer: Matter or HomeKit. Home Assistant ships a Matter integration and runs its own Matter controller as a separate process, the Matter Server."}}, {"@type": "Question", "name": "Do I need a border router for Thread, and is a Zigbee coordinator the same thing?", "acceptedAnswer": {"@type": "Answer", "text": "Yes for the first, no for the second. Home Assistant only shows the Thread integration once it detects a border router. A Zigbee coordinator is a different job: the single radio that runs a Zigbee mesh, which ZHA or Zigbee2MQTT adds devices to."}}, {"@type": "Question", "name": "Which is better for battery-powered sensors, Zigbee or Thread?", "acceptedAnswer": {"@type": "Answer", "text": "Both were designed for it. The ZHA documentation describes Zigbee as a low-power mesh of devices with low-bandwidth radios, and the Thread Group positions Thread for a low energy footprint in the home. In practice the deciding factor is which devices exist in the shape you need, not the radio underneath."}}, {"@type": "Question", "name": "Can one radio dongle do both Zigbee and Thread?", "acceptedAnswer": {"@type": "Answer", "text": "Treat them as two pieces of hardware. Home Assistant's documentation keeps the Zigbee coordinator and the Thread border router separate, documents how to add a third-party Thread adapter to the OpenThread Border Router app, and documents migrating a Zigbee network to a new adapter without re-pairing."}}, {"@type": "Question", "name": "Should I replace my Zigbee devices with Thread ones?", "acceptedAnswer": {"@type": "Answer", "text": "There is no need to hurry. ZHA covers a broad set of device classes locally and supports groups, binding, OTA firmware updates and adapter migration. Add Thread when you buy Matter-over-Thread hardware, and run both networks side by side."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 5 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html" aria-current="page">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Protocols</p>
+        <h1>Zigbee vs Thread: which radio should your house use?</h1>
+        <p class="byline">HA News · 5 Nov 2026</p>
+
+        <p>Zigbee and Thread get compared as if they were two brands of the same product. They are not, and the difference is structural. <strong>Zigbee is a mesh network your devices speak, with an application layer baked in and one coordinator running it. Thread is a mesh network and nothing else</strong> — the Thread Group calls it a networking layer and leaves the application layer to somebody else, usually Matter. Once you hold that distinction, the rest of the comparison falls into place: why a Thread device needs a border router, why your Zigbee stick will not control it, and why Matter keeps appearing in a conversation that was supposed to be about radios.</p>
+
+        <h2>The short version</h2>
+        <ul>
+          <li><strong>You already own Zigbee sensors, bulbs, buttons or locks.</strong> Keep them on a Zigbee coordinator, driven by Zigbee Home Automation (ZHA) or Zigbee2MQTT. Per the ZHA documentation, that covers alarm panels, binary sensors, buttons, climate (beta), covers, device trackers, events, fans, lights, locks, numbers, selects, sensors, sirens, switches, valves and update entities — all local.</li>
+          <li><strong>You are buying hardware that says "Matter over Thread".</strong> You need two separate things: a Thread border router to carry the traffic, and a Matter controller to control the device. Home Assistant supplies the second in software. The first is a piece of hardware you may already own and not know about.</li>
+          <li><strong>You want one answer.</strong> Zigbee is the mature, cheap, wide-catalogue path for sensors and bulbs today. Thread is the path with a future, because it is the network Matter was designed to run over. Nothing forces you to choose: a coordinator and a border router coexist in the same house without arguing.</li>
+        </ul>
+
+        <h2>Thread is a network, not a language</h2>
+        <p>Thread runs on the IEEE 802.15.4 MAC/PHY layer — the same low-power radio family Zigbee sits on — and builds an open, IPv6-based protocol on top of it, for device-to-device and device-to-cloud connections. It provides security at the network layer. The Thread Group positions it for a low energy footprint in homes and buildings, which is exactly the property that makes it interesting for a door sensor that has to last years on a coin cell.</p>
+        <p>Then comes the sentence that explains a hundred support threads. The Thread Group describes Thread as a networking layer, not an application layer: vendors "select an application layer" separately, through another IoT organisation or with their own. Thread carries bytes. It does not decide what "on", "22 degrees" or "locked" mean. That is why a Thread device without a controller is a brick with a radio, and why the Home Assistant docs say Matter and Apple HomeKit are the protocols "responsible for handling the Thread credentials and connecting your Thread device to the Thread network."</p>
+        <p>On the open-source side, OpenThread is Google-originated and ships an OpenThread Border Router and an OpenThread Commissioner for building Thread networks. That is the stack Home Assistant leans on when it runs the OpenThread Border Router add-on.</p>
+
+        <h2>What Zigbee looks like in a Home Assistant house</h2>
+        <p>Zigbee is a low-power mesh of devices with low-bandwidth radios, coordinated by exactly one coordinator. The ZHA integration is a hardware-independent gateway that can replace most proprietary Zigbee bridges and hubs: you plug a coordinator radio adapter into the machine running Home Assistant — typically a USB stick — and every device pairs to that one network.</p>
+        <p>ZHA handles OTA firmware updates for Zigbee devices, groups and binding, a network topology view, and migration to a new adapter without re-pairing anything. If you have no coordinator yet, the docs recommend Home Assistant's own Connect ZBT-2, list tested and compatible adapters, and keep a third tier marked "supported but not recommended".</p>
+        <p>The alternative stack is Zigbee2MQTT, which talks to Home Assistant over MQTT. It has one hard requirement the docs are blunt about: the adapter has to be flashed with coordinator firmware before use, though some ship pre-flashed. Its recommended families are Texas Instruments zStack (CC2652 and CC1352), Silicon Labs EmberZNet and Dresden Elektronik deCONZ, with "not recommended" and "experimental" tiers below those. If you want the buying detail, our <a href="zigbee-hub">Zigbee hub guide</a> walks the hardware side, and <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a> covers the older comparison.</p>
+
+        <h2>What a Thread network looks like</h2>
+        <p>Thread needs a border router: a device that bridges the 802.15.4 mesh to your IP network, and in most homes that is a speaker or a hub you already bought for something else. Home Assistant's Thread integration tracks the different Thread networks in your home and stores their credentials — the docs compare them to a Wi-Fi password, which is the right mental model. Lose the credentials and you re-commission devices.</p>
+        <p>You never install that integration by hand. It appears automatically when Home Assistant detects a border router, and the docs still label it a work in progress. The Thread panel is where the maintenance lives: combining separate Thread networks, changing the Thread channel, migrating a network to a new adapter, and adding a third-party Thread adapter to the OpenThread Border Router app.</p>
+
+        <h2>Where Matter fits — and what "Matter vs Zigbee" really asks</h2>
+        <p>Matter is the application layer. The Home Assistant Matter integration controls Matter devices on a local Wi-Fi or Thread network. Home Assistant runs its own Matter controller as a separate app and process, the Matter Server; the integration talks to it over a WebSocket, and the controller maintains the Fabric (Matter's term for the set of controllers that share authority over a device).</p>
+        <p>Matter 1.0 was published in October 2022 under the Connectivity Standards Alliance, with Apple, Google and Amazon as backers, and the docs are honest that adoption is still in progress. Matter devices run locally and allow local control without an internet connection. The integration supports OTA device updates, a network map view, sharing a device from another controller, and Matter bridges inside Home Assistant.</p>
+        <p>So "Matter vs Zigbee" is a category error of a different kind: Matter is a language, Zigbee is a network that speaks its own. The useful comparison is Thread versus Zigbee at the transport, and Matter versus the Zigbee application layer above it. For the longer version, see <a href="explainer-matter-15">what Matter 1.5 changed</a> and our <a href="article-thread-network">Thread network field notes</a>.</p>
+
+        <h2>Side by side</h2>
+        <table>
+          <thead><tr><th></th><th>Zigbee</th><th>Thread</th></tr></thead>
+          <tbody>
+            <tr><td>What it is</td><td>A mesh of low-power, low-bandwidth devices with one coordinator, per the ZHA docs</td><td>An open, IPv6-based networking layer for device-to-device and device-to-cloud traffic</td></tr>
+            <tr><td>Application layer</td><td>Part of the Zigbee stack; devices pair and are understood by the coordinator</td><td>Chosen separately by the vendor — usually Matter, sometimes HomeKit</td></tr>
+            <tr><td>Hardware you need</td><td>A coordinator radio adapter, typically USB</td><td>A border router, plus a controller that speaks Matter or HomeKit</td></tr>
+            <tr><td>Home Assistant piece</td><td>ZHA, or Zigbee2MQTT over MQTT</td><td>Thread integration (credentials and networks) plus the Matter integration and Matter Server</td></tr>
+            <tr><td>Local control</td><td>Yes, fully local</td><td>Yes — Matter devices allow local control without an internet connection</td></tr>
+            <tr><td>Maintenance surface</td><td>OTA updates, groups and binding, topology view, adapter migration</td><td>Combine networks, change channel, migrate adapter, add a third-party adapter to the border router app</td></tr>
+            <tr><td>Maturity in Home Assistant</td><td>Broad, long-standing device support</td><td>Thread integration is still labelled a work in progress; Matter adoption is still in progress</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Compatibility: the five things people get wrong</h2>
+        <ol>
+          <li><strong>"Built on Thread: requires border router" is a hard requirement, not a suggestion.</strong> Per the Home Assistant docs, that label means Thread is the only supported network protocol for the device — Wi-Fi cannot reach it. No border router, no device.</li>
+          <li><strong>A border router is not a controller.</strong> It moves packets. It does not give you a switch to press. You still need Matter or HomeKit in the middle.</li>
+          <li><strong>Your Zigbee coordinator will not adopt a Thread device.</strong> They are different networks with different credentials and different radios in the Home Assistant model.</li>
+          <li><strong>Home Assistant hides the Thread integration until it sees a border router.</strong> If the Thread panel is missing from Settings, that is the reason, not a broken install.</li>
+          <li><strong>Zigbee2MQTT will not talk to an unflashed adapter.</strong> Coordinator firmware first; some adapters arrive pre-flashed, many do not.</li>
+        </ol>
+
+        <h2>Setting up Zigbee, in order</h2>
+        <ol>
+          <li>Choose a coordinator. With no adapter in hand, the ZHA docs point at the Connect ZBT-2; Zigbee2MQTT users should stay inside the zStack, EmberZNet and deCONZ families.</li>
+          <li>Plug it into the Home Assistant machine. ZHA treats it as a gateway: one Zigbee network that you add devices to.</li>
+          <li>Open Settings, then Devices &amp; services. ZHA usually shows up as discovered; if it does not, add the Zigbee Home Automation integration manually.</li>
+          <li>Create the network, or migrate from the old adapter. The migration path is documented and avoids re-pairing devices.</li>
+          <li>Pair mains-powered devices first so they can route, then the battery devices. Turn on OTA updates if you want the coordinator pushing firmware to devices that support it.</li>
+        </ol>
+
+        <h2>Setting up Thread and Matter, in order</h2>
+        <ol>
+          <li>Get a border router onto the network, or confirm one you already have. Home Assistant will only surface the Thread integration once it detects one.</li>
+          <li>Open the Thread panel and look at what it found. If you have more than one Thread network, this is where you combine them, and where you change the channel or migrate to a new adapter later.</li>
+          <li>Make sure the Matter integration is running. It is a separate process from the core — the Matter Server — and the integration reaches it over a WebSocket.</li>
+          <li>Add the device through Matter, not Thread. The Matter controller maintains the Fabric and handles the Thread credentials on the device's behalf.</li>
+          <li>Check the network map if a device drops. The Matter integration exposes one, and the Thread panel shows which network a device landed on.</li>
+        </ol>
+
+        <h2>What to buy, depending on which path you take</h2>
+        <p>We do not quote prices here; the links go to Amazon search results and the price shown there is the one that counts.</p>
+        <ul>
+          <li><strong>Zigbee, starting fresh:</strong> the Home Assistant Connect ZBT-2, the adapter the ZHA docs recommend when you have no coordinator — <a href="https://www.amazon.com/s?k=Home+Assistant+Connect+ZBT-2&amp;tag=hanews01-20" rel="sponsored nofollow">Connect ZBT-2 on Amazon</a>.</li>
+          <li><strong>Zigbee on Zigbee2MQTT:</strong> a Texas Instruments CC2652 or CC1352 coordinator, one of Z2M's recommended families — <a href="https://www.amazon.com/s?k=CC2652+Zigbee+coordinator+USB&amp;tag=hanews01-20" rel="sponsored nofollow">CC2652 coordinators on Amazon</a>.</li>
+          <li><strong>Zigbee, Silicon Labs route:</strong> an EmberZNet-based adapter — <a href="https://www.amazon.com/s?k=EmberZNet+Zigbee+USB+coordinator&amp;tag=hanews01-20" rel="sponsored nofollow">EmberZNet adapters on Amazon</a>.</li>
+          <li><strong>Thread:</strong> a border router, if no speaker or hub in the house already acts as one — <a href="https://www.amazon.com/s?k=Thread+border+router+Matter&amp;tag=hanews01-20" rel="sponsored nofollow">Thread border routers on Amazon</a>.</li>
+        </ul>
+
+        <h2>Should you replace Zigbee with Thread?</h2>
+        <p>No, and the documentation does not ask you to. ZHA's device coverage is wide, entirely local, and includes the unglamorous classes — valves, sirens, device trackers — that a real house accumulates. Thread's advantage is not that it is a better radio; it is that Matter runs over it, and Matter is where new certified hardware is heading.</p>
+        <p>The sane plan for most homes is both: leave the Zigbee mesh alone, add a border router when you start buying Matter-over-Thread gear, and let Home Assistant hold the two together. Treat Thread as the network you grow into rather than the one you migrate to. If you are choosing a first hub rather than a first protocol, our <a href="matter">Matter &amp; Thread section</a> has the device-side coverage.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Is Thread the same thing as Matter?</h3>
+        <p>No. Thread is the network the device talks over; Matter is the application layer that controls it. The Thread Group describes Thread as a networking layer and says vendors select an application layer separately. Home Assistant's Thread documentation names Matter and Apple HomeKit as the protocols that handle Thread credentials and connect a Thread device to the network.</p>
+        <h3>Can Home Assistant talk to Thread devices without a Matter controller?</h3>
+        <p>Not through the Thread integration alone. That integration tracks the Thread networks in your home and stores their credentials. Control comes from an application layer: Matter or HomeKit. Home Assistant ships a Matter integration and runs its own Matter controller as a separate process, the Matter Server.</p>
+        <h3>Do I need a border router for Thread, and is a Zigbee coordinator the same thing?</h3>
+        <p>Yes for the first, no for the second. Home Assistant only shows the Thread integration once it detects a border router. A Zigbee coordinator is a different job: the single radio that runs a Zigbee mesh, which ZHA or Zigbee2MQTT adds devices to.</p>
+        <h3>Which is better for battery-powered sensors, Zigbee or Thread?</h3>
+        <p>Both were designed for it. The ZHA documentation describes Zigbee as a low-power mesh of devices with low-bandwidth radios, and the Thread Group positions Thread for a low energy footprint in the home. In practice the deciding factor is which devices exist in the shape you need, not the radio underneath.</p>
+        <h3>Can one radio dongle do both Zigbee and Thread?</h3>
+        <p>Treat them as two pieces of hardware. Home Assistant's documentation keeps the Zigbee coordinator and the Thread border router separate, documents how to add a third-party Thread adapter to the OpenThread Border Router app, and documents migrating a Zigbee network to a new adapter without re-pairing.</p>
+        <h3>Should I replace my Zigbee devices with Thread ones?</h3>
+        <p>There is no need to hurry. ZHA covers a broad set of device classes locally and supports groups, binding, OTA firmware updates and adapter migration. Add Thread when you buy Matter-over-Thread hardware, and run both networks side by side.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.threadgroup.org/what-is-thread">Thread Group: What is Thread</a>; <a href="https://openthread.io/guides">OpenThread guides</a>; <a href="https://www.home-assistant.io/integrations/thread/">Home Assistant Thread integration</a>; <a href="https://www.home-assistant.io/integrations/zha/">Home Assistant ZHA integration</a>; <a href="https://www.home-assistant.io/integrations/matter/">Home Assistant Matter integration</a>; <a href="https://www.zigbee2mqtt.io/guide/adapters/">Zigbee2MQTT supported adapters</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
