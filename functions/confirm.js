@@ -1,5 +1,15 @@
 const TOKEN_RE = /^[a-f0-9]{64}$/i;
 
+function randomHex(bytes) {
+  const buf = new Uint8Array(bytes);
+  crypto.getRandomValues(buf);
+  let hex = "";
+  for (let i = 0; i < buf.length; i++) {
+    hex += buf[i].toString(16).padStart(2, "0");
+  }
+  return hex;
+}
+
 function htmlHeaders() {
   return {
     "Content-Type": "text/html; charset=utf-8",
@@ -136,6 +146,9 @@ export async function onRequestGet(context) {
     ts: rec.ts,
     confirmed: true,
     confirmedAt: now,
+    // Carry the per-subscriber unsubscribe token forward; older records
+    // confirmed before this field existed get one minted here.
+    unsubToken: rec.unsubToken || randomHex(32),
   };
   await kv.put(emailKey, JSON.stringify(confirmed));
   await kv.delete("token:" + token);

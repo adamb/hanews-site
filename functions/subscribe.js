@@ -266,6 +266,11 @@ export async function onRequestPost(context) {
     confirmed: false,
     token: token,
     tokenExp: tokenExp,
+    // Per-subscriber unsubscribe token: the newsletter's unsubscribe link is
+    // /unsubscribe?e=<email>&s=<unsubToken>. Kept stable across re-subscribes
+    // so a link in an old email keeps working.
+    unsubToken:
+      existing && existing.unsubToken ? existing.unsubToken : randomToken(),
   };
   if (existing && existing.lastSent) record.lastSent = existing.lastSent;
 
