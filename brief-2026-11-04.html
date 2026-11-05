@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brief 4 Nov 2026 — HA News</title>
+  <meta name="description" content="HA News daily brief for 4 November 2026. Home Assistant 2026.11 ships: HACS arrives as the built-in Marketplace, entity naming is reworked with backward-incompatible changes, Matter cameras get talk-back, and LoRaWAN support lands. Plus Z-Wave JS 15.32.1 and two betas.">
+  <link rel="canonical" href="https://hanews.org/brief-2026-11-04">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Wednesday, 4 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">The Briefing</p>
+        <h1>4 November 2026</h1>
+        <p class="lede">The November release is out and it is unusually large: <strong>Core 2026.11.0</strong> landed on 4 Nov with HACS rebuilt as a built-in Marketplace, a reworked entity-naming model that breaks some dashboard names, two-way audio for Matter cameras, LoRaWAN support and 38 new integrations. Also today: Z-Wave JS <strong>v15.32.1</strong>, and betas of HAOS 18.5 and ESPHome 2026.11.</p>
+
+        <article class="story-block" id="lead">
+          <p class="meta">01 · Home Assistant</p>
+          <h2>Core 2026.11.0 ships — HACS becomes the built-in Marketplace</h2>
+          <p><strong>What happened:</strong> Home Assistant released Core 2026.11.0 on 4 Nov. The headline change is the Marketplace: the Home Assistant Community Store, HACS, is now part of Home Assistant itself, reachable from Settings on every installation type. The project says existing HACS installs stay installed and keep updating. <a href="https://version.home-assistant.io/stable.json">stable.json</a> now lists Core 2026.11.0.</p>
+          <p><strong>Why it matters:</strong> HACS was the first thing many people installed after flashing, and its install step was a hurdle for everyone else. Folding it into the core makes custom cards, themes and integrations a supported in-product path rather than a bootstrap ritual. If you run HACS today, check that your custom repositories and installed items survived the transition before you rebuild a dashboard on top of them. The release notes also count 38 new integrations.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/core/releases/tag/2026.11.0">Core 2026.11.0</a>; <a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/">2026.11: A lot in store!</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="targets">
+          <p class="meta">02 · Automations</p>
+          <h2>Exclude items from a target — the exception that stays an exception</h2>
+          <p><strong>What happened:</strong> Service calls and targets can now exclude specific entities. Turning on all the lights downstairs except the kitchen one becomes a single action rather than a template or a second script. The release notes say the exclusion is evaluated at run time, so a light added to the kitchen next month is excluded too.</p>
+          <p><strong>Why it matters:</strong> The old workaround was an inline template that filtered the entity list by hand — correct, but fragile and invisible to anyone reading the automation later. A first-class exclude makes the exception readable, and it survives new devices in the same area, which is exactly the part hand-written filters got wrong.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#exclude-items-from-a-target">2026.11 release notes — Exclude items from a target</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="naming">
+          <p class="meta">03 · Home Assistant</p>
+          <h2>Entity naming reworked — a backward-incompatible change you will notice</h2>
+          <p><strong>What happened:</strong> 2026.11 reworks how entity names are assembled: you name a thing once and Home Assistant adds the surrounding context itself. The project flags this as a backward-incompatible change and warns that some names on existing dashboards will look different after updating. It has a separate post explaining the model.</p>
+          <p><strong>Why it matters:</strong> This is the change most likely to touch a working house. Names show up in dashboards, automations, voice assistants and notification templates; anything that matched an old friendly name literally can stop matching. Read the naming post before you press update, and take a backup so you can compare.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/11/03/naming-things-in-home-assistant/">Naming things in Home Assistant, shaped by your feedback</a>; <a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/">2026.11 release notes</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="matter">
+          <p class="meta">04 · Matter &amp; Thread</p>
+          <h2>Matter cameras can now talk back</h2>
+          <p><strong>What happened:</strong> 2026.11 adds two-way audio for Matter cameras in Home Assistant — the release notes describe cameras you can <em>talk back through</em>. Matter camera support already existed; this release adds the outbound audio path.</p>
+          <p><strong>Why it matters:</strong> Talk-back is the difference between a camera you watch and a camera you can use at the front door. It also puts pressure on the camera vendors: a Matter camera that implements the speaker path works locally in Home Assistant without the vendor app in the loop. Check the vendor's Matter implementation before assuming the microphone on your existing model works.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#talk-back-through-your-cameras">2026.11 release notes — Talk back through your cameras</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="radios">
+          <p class="meta">05 · Radios</p>
+          <h2>LoRaWAN support, and batteryless switches on Zigbee Green Power</h2>
+          <p><strong>What happened:</strong> The November release adds LoRaWAN support — the long-range, low-power radio family — and support for batteryless switches that run on Zigbee Green Power, which harvests the energy of the button press itself. Both appear as sections of the 2026.11 release notes.</p>
+          <p><strong>Why it matters:</strong> These are the two radio paths that reach places Wi-Fi and normal Zigbee batteries cannot: a sensor in a field or a barn, and a switch on a wall with no wiring and no battery to change. Neither is a mainstream install yet — LoRaWAN needs a gateway and a network server — but it is the first time both sit inside core Home Assistant rather than in a custom integration.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#reach-the-far-corners-with-lorawan">2026.11 release notes — LoRaWAN</a>; <a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#batteryless-switches-with-zigbee-green-power">— Zigbee Green Power</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="backups">
+          <p class="meta">06 · Local control</p>
+          <h2>Backups and media can live on local drives</h2>
+          <p><strong>What happened:</strong> Home Assistant 2026.11 can store backups and media on local drives instead of only in the cloud or the internal disk, per the release notes.</p>
+          <p><strong>Why it matters:</strong> Backups have been the most common reason people keep a Nabu Casa subscription even when everything else in their house runs locally. A local target does not replace an off-site copy — a house fire takes both — but it makes a local-first setup honest about where the data sits. Pair it with a sync you control.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#store-backups-and-media-on-local-drives">2026.11 release notes — Store backups and media on local drives</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="haos">
+          <p class="meta">07 · Home Assistant OS (beta)</p>
+          <h2>HAOS 18.5.rc1 — release candidate for the operating system</h2>
+          <p><strong>What happened:</strong> Home Assistant OS tagged 18.5.rc1 on 3 Nov. The stable channel stays at 18.4, released 27 Oct.</p>
+          <p><strong>Why it matters:</strong> The OS release is the one update you cannot roll back from the UI if the box will not boot, and it carries the kernel and container runtime under everything else. Leave an rc of the operating system alone on a house that has to work tomorrow.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/home-assistant/operating-system/releases/tag/18.5.rc1">HAOS 18.5.rc1</a>; <a href="https://version.home-assistant.io/stable.json">stable.json</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="esphome">
+          <p class="meta">08 · ESPHome</p>
+          <h2>ESPHome 2026.11.0b1 opens the November beta; stable stays 2026.10.2</h2>
+          <p><strong>What happened:</strong> ESPHome tagged 2026.11.0b1 on 4 Nov, the first beta of its November cycle. The stable channel is on 2026.10.2, released 2 Nov. The project has not yet published its monthly release post for 2026.11.</p>
+          <p><strong>Why it matters:</strong> ESPHome betas are for the board on your bench. A failed flash is recoverable over serial, but only if you can physically reach the device — so beta builds belong on hardware you can unplug, never on the node behind a wall switch.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/esphome/esphome/releases/tag/2026.11.0b1">ESPHome 2026.11.0b1</a>; <a href="https://esphome.io/blog/rss.xml">ESPHome blog</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="zwave">
+          <p class="meta">09 · Z-Wave</p>
+          <h2>Z-Wave JS v15.32.1 — driver update behind Z-Wave JS UI</h2>
+          <p><strong>What happened:</strong> Z-Wave JS moved from v15.31.2 to v15.32.1 on 4 Nov. Z-Wave JS UI stays at v11.25.2, from 26 Oct.</p>
+          <p><strong>Why it matters:</strong> The driver is what actually talks to your stick and your devices; UI releases usually lag it. If you run Z-Wave JS UI, check its changelog for the bundled driver version before you update — a driver bump is the release most likely to change how an older device behaves.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://github.com/zwave-js/zwave-js/releases/tag/v15.32.1">zwave-js v15.32.1</a>; <a href="https://github.com/zwave-js/zwave-js-ui/releases/tag/v11.25.2">Z-Wave JS UI v11.25.2</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="community">
+          <p class="meta">10 · Community</p>
+          <h2>Community Day is Saturday 7 November; the WTH month is still open</h2>
+          <p><strong>What happened:</strong> The release post repeats two dates: the Month of &ldquo;What the Heck?!&rdquo; runs through November, with the project asking non-technical household members to file what annoys them; and Community Day is Saturday 7 Nov, with 97 meetups in more than 30 countries.</p>
+          <p><strong>Why it matters:</strong> WTH is the one feedback channel where a complaint about setup friction actually changes the product, and it is aimed this year at the people who did not install Home Assistant. If you administer a house for someone else, file what they hit.</p>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://www.home-assistant.io/blog/2026/10/29/what-the-heck-2026-everyone-at-home-gets-a-say/">&ldquo;What the Heck?!&rdquo; 2026</a>; <a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/">2026.11 release notes</a></dd>
+          </dl>
+        </article>
+
+        <article class="story-block" id="versions">
+          <p class="meta">11 · The stack</p>
+          <h2>Version table: where every moving part sits this evening</h2>
+          <p><strong>What happened:</strong> Four things moved since the 3 Nov check: Core from 2026.10.4 to 2026.11.0 on stable, HAOS to an 18.5 release candidate, ESPHome to a 2026.11 beta, and Z-Wave JS from v15.31.2 to v15.32.1. Supervisor, Z-Wave JS UI, Zigbee2MQTT and matter.js are unchanged.</p>
+          <p><strong>Why it matters:</strong> One of the four is a stable release for everyone (Core), one is a driver bump behind a UI (Z-Wave JS), and two are betas you should ignore unless the hardware is on your bench.</p>
+          <table>
+            <caption>Stable versions, 4 November 2026</caption>
+            <thead>
+              <tr><th scope="col">Component</th><th scope="col">Stable</th><th scope="col">Released</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Home Assistant Core</td><td>2026.11.0</td><td>2026-11-04</td></tr>
+              <tr><td>Supervisor</td><td>2026.10.5</td><td>2026-10-28</td></tr>
+              <tr><td>Home Assistant OS</td><td>18.4</td><td>2026-10-27</td></tr>
+              <tr><td>HAOS (beta)</td><td>18.5.rc1</td><td>2026-11-03</td></tr>
+              <tr><td>ESPHome</td><td>2026.10.2</td><td>2026-11-02</td></tr>
+              <tr><td>ESPHome (beta)</td><td>2026.11.0b1</td><td>2026-11-04</td></tr>
+              <tr><td>Z-Wave JS UI</td><td>v11.25.2</td><td>2026-10-26</td></tr>
+              <tr><td>Z-Wave JS</td><td>v15.32.1</td><td>2026-11-04</td></tr>
+              <tr><td>Zigbee2MQTT</td><td>2.14.3</td><td>2026-11-01</td></tr>
+              <tr><td>matter.js</td><td>v0.18.0</td><td>2026-10-20</td></tr>
+            </tbody>
+          </table>
+          <dl class="facts">
+            <dt>Primary source</dt>
+            <dd><a href="https://version.home-assistant.io/stable.json">stable.json</a>; <a href="https://github.com/home-assistant/core/releases/tag/2026.11.0">Core 2026.11.0</a>; <a href="https://github.com/home-assistant/supervisor/releases/tag/2026.10.5">Supervisor 2026.10.5</a>; <a href="https://github.com/home-assistant/operating-system/releases/tag/18.4">HAOS 18.4</a>; <a href="https://github.com/esphome/esphome/releases/tag/2026.10.2">ESPHome 2026.10.2</a>; <a href="https://github.com/zwave-js/zwave-js/releases/tag/v15.32.1">zwave-js v15.32.1</a>; <a href="https://github.com/Koenkk/zigbee2mqtt/releases/tag/2.14.3">Zigbee2MQTT 2.14.3</a>; <a href="https://github.com/matter-js/matter.js/releases/tag/v0.18.0">matter.js v0.18.0</a></dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
