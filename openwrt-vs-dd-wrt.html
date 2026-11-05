@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt vs DD-WRT: which router firmware to run in 2026 — HA News</title>
+  <meta name="description" content="OpenWrt vs DD-WRT compared for home routers: package management vs single firmware, per-revision device support, how to check the Firmware Selector, and where OPNsense or pfSense fit instead.">
+  <link rel="canonical" href="https://hanews.org/openwrt-vs-dd-wrt">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt vs DD-WRT: which router firmware to run in 2026", "datePublished": "2026-11-05", "dateModified": "2026-11-05", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-vs-dd-wrt", "description": "OpenWrt vs DD-WRT compared for home routers: package management versus single firmware, per-revision device support, and how to verify a build before flashing."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is DD-WRT or OpenWrt better for an older router?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on whether your exact hardware revision still has a current image. OpenWrt publishes official builds per device revision and keeps two stable branches alive at once, so an older router can stay on the oldstable branch and still receive builds. DD-WRT's long device tail is its reputation, but dd-wrt.com was behind a bot challenge during this pass, so no current build list could be confirmed here. Check both projects by exact model and revision before you flash."}}, {"@type": "Question", "name": "What is OpenWrt, in one paragraph?", "acceptedAnswer": {"@type": "Answer", "text": "OpenWrt is a Linux operating system for embedded devices. Instead of a fixed vendor firmware, it provides a fully writable filesystem with package management, so you can add or remove software after flashing rather than waiting for a vendor to ship a new image. Official project description at github.com/openwrt/openwrt."}}, {"@type": "Question", "name": "How do I know whether my exact router revision has an OpenWrt build?", "acceptedAnswer": {"@type": "Answer", "text": "Use the OpenWrt Firmware Selector at firmware-selector.openwrt.org and search the model name, then match the hardware revision exactly. OpenWrt support is per revision, not per model name: Linksys WRT1900ACS v1 and v2 are separate entries, and ASUS RT-AX1800HP and RT-AX1800HP V2 land on different targets."}}, {"@type": "Question", "name": "Can I run OpenWrt on the same hardware I used for DD-WRT?", "acceptedAnswer": {"@type": "Answer", "text": "Sometimes, but do not assume it. Check the OpenWrt build table by model and revision, confirm the install method on that device's page, and keep the vendor's stock firmware image on hand for recovery. A device that ran one third-party firmware is not automatically supported by the other."}}, {"@type": "Question", "name": "OpenWrt vs OPNsense: which should replace my router?", "acceptedAnswer": {"@type": "Answer", "text": "They are different jobs. OpenWrt is a router operating system for the Wi-Fi hardware you already own. OPNsense is a FreeBSD-based firewall and routing platform that runs on dedicated x86 hardware, with Community and Business editions and a plugin system. Pick OPNsense when you are building a separate firewall box, not when you want to reflash an all-in-one router."}}, {"@type": "Question", "name": "OpenWrt vs pfSense: what is the real difference?", "acceptedAnswer": {"@type": "Answer", "text": "pfSense is published by Netgate, and its documentation is organized around hardware, installing and upgrading, firewall and routing, VPN, services and packages, plus a separate licensing section. Like OPNsense it is an x86 firewall platform, so the comparison with OpenWrt is about appliance versus router firmware, not about two builds of the same thing."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 5 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Comparison · Networking</p>
+        <h1>OpenWrt vs DD-WRT: which router firmware to run in 2026</h1>
+        <p class="byline">HA News · 5 Nov 2026</p>
+
+        <p>OpenWrt vs DD-WRT is not a fight between two versions of the same thing. It is a choice between two habits of mind. OpenWrt is a Linux operating system for embedded devices with a writable filesystem and a package manager, so the router keeps accepting new software after you flash it. DD-WRT grew out of the other tradition: one firmware image per router, replaced wholesale when the developer publishes a new build, with support handled on a forum rather than in a package index.</p>
+
+        <p><strong>For most people running a home network with Home Assistant on it, OpenWrt is the better fit in 2026</strong> — not because DD-WRT is bad, but because packages, per-revision device pages and two live stable branches make the support question answerable before you flash. DD-WRT still makes sense if you have an older router that OpenWrt never picked up and you want a familiar web UI rather than a package manager.</p>
+
+        <p>One honest caveat before the comparison proper. dd-wrt.com, wiki.dd-wrt.com and svn.dd-wrt.com all answered automated requests during this pass with a JavaScript proof-of-work check, so no DD-WRT version number, changelog or device list could be read and confirmed. Everything below about DD-WRT is limited to what its own repository structure and mirror README support. If you want a build number, get it from the project directly; we are not going to guess one.</p>
+
+        <h2>What OpenWrt actually is</h2>
+        <p>The project describes itself plainly: "OpenWrt Project is a Linux operating system targeting embedded devices." The important half of that sentence is what follows — instead of a single static firmware, it "provides a fully writable filesystem with package management." You are not limited to the vendor's app selection or the vendor's configuration options.</p>
+        <p>That difference is structural, not cosmetic. Because the filesystem is writable, packages can be added or removed after flashing, and a developer can build an application "without having to build a complete firmware around it." In practice, a VPN server, a DNS filter, a VLAN layout or a monitoring agent is a package you install, not a reason to wait six months for the next image. Source: the <a href="https://raw.githubusercontent.com/openwrt/openwrt/master/README.md">OpenWrt project README</a>.</p>
+
+        <h2>What DD-WRT actually is, and what we could not verify</h2>
+        <p>DD-WRT's development lives in Subversion, not Git. The project's source mirror README states that it mirrors <code>svn://svn.dd-wrt.com/DD-WRT</code>, points bug tracking at svn.dd-wrt.com and user help and discussion at forum.dd-wrt.com. That is a coherent, long-running model: centralised version control, a single tree of builds, and a community forum as the support surface. It also explains the shape of the documentation you will find — forum threads and wiki pages rather than a package index.</p>
+        <p>What that model does not give you is a machine-readable answer to "is my exact router supported right now?" You get that from a human-maintained wiki, or from the project's own device database, neither of which we could read this pass. Treat any DD-WRT claim you see elsewhere — including a version string on a download page — as something to verify at the source before you trust your network to it.</p>
+
+        <h2>Why packages beat single images for a smart home</h2>
+        <p>A router in a home with Home Assistant is no longer just a router. It is the DHCP server your devices depend on, the DNS resolver that decides whether your local names work when the internet is down, and often the VLAN boundary that keeps IoT gear off your laptops. Every one of those jobs is software, and software changes.</p>
+        <ul>
+          <li><strong>Updates without reflashing.</strong> With a package manager, a security fix to a daemon is a package upgrade rather than a whole-image rebuild and a config restore.</li>
+          <li><strong>Small additions stay small.</strong> Adding a WireGuard peer or an mDNS reflector does not require a custom build.</li>
+          <li><strong>Rollback is a package operation.</strong> Reverting one package is cheaper than reverting a firmware image and re-entering your VLANs.</li>
+          <li><strong>Configuration is text and versionable.</strong> UCI config files can be backed up and diffed the same way you handle Home Assistant's YAML.</li>
+        </ul>
+        <p>The single-image model is not wrong; it is just older. Its advantage is simplicity — one file, one flash, one web UI you already know. If you never intend to add software to the router, that simplicity is worth something.</p>
+
+        <h2>Device support: OpenWrt's numbers, checked</h2>
+        <p>OpenWrt publishes an official build table. As of the data pulled from downloads.openwrt.org on 5 November 2026, that table lists <strong>2,187 devices</strong>, of which <strong>2,153 have a 25.12.6 image</strong>. Two stable branches are being built at once: <strong>25.12.6 is the stable release</strong> and <strong>24.10.8 is the oldstable release</strong>. Devices are not required to move to the newest branch, which is the practical answer for older hardware.</p>
+
+        <p>The catch, and it is the one that burns people, is that <strong>OpenWrt support is per hardware revision, not per model name</strong>. "Linksys WRT1900ACS v1" and "Linksys WRT1900ACS v2" are separate entries in the build table. "ASUS RT-AX1800HP" sits on the ramips/mt7621 target while "RT-AX1800HP V2" sits on mediatek/filogic — different targets, different release sets, different images. Flashing the wrong revision's image is how a router becomes a paperweight.</p>
+
+        <table>
+          <thead><tr><th>Device</th><th>Target</th><th>Releases listed</th></tr></thead>
+          <tbody>
+            <tr><td>Linksys WRT3200ACM</td><td>mvebu/cortexa9</td><td>24.10.8, 25.12.6</td></tr>
+            <tr><td>Linksys MR8300</td><td>ipq40xx/generic</td><td>24.10.8, 25.12.6</td></tr>
+            <tr><td>Xiaomi AX3600</td><td>qualcommax/ipq807x</td><td>24.10.8, 25.12.6</td></tr>
+            <tr><td>GL.iNet GL-MT2500</td><td>mediatek/filogic</td><td>24.10.8, 25.12.6</td></tr>
+            <tr><td>TP-Link Archer AX23 v1</td><td>ramips/mt7621</td><td>24.10.8, 25.12.6</td></tr>
+          </tbody>
+        </table>
+        <p>Those five are drawn from the official build table, with the release columns exactly as listed. Two of them are consumer boxes from the last few years, one is a travel-sized router, one is a mid-range mesh node; the point is that the list is broad and current, not a museum. You can confirm each one in the <a href="https://firmware-selector.openwrt.org/">OpenWrt Firmware Selector</a>, and read the install notes on the device page — the pattern is openwrt.org/toh/&lt;vendor&gt;/&lt;model&gt;, for example the <a href="https://openwrt.org/toh/linksys/wrt3200acm">WRT3200ACM device page</a>.</p>
+
+        <h2>How to check before you flash</h2>
+        <ol>
+          <li>Find the exact model and the revision string on the router's label. Not the marketing name — the revision letter or version number printed next to it.</li>
+          <li>Search the <a href="https://firmware-selector.openwrt.org/">Firmware Selector</a> for that model. If multiple revisions come back, read the target names and pick the one that matches your label.</li>
+          <li>Open the device page linked from the selector and read the install method. Factory images and sysupgrade images are different files for different situations.</li>
+          <li>Download the vendor's stock firmware for your exact model and keep it somewhere you can reach without the network you are about to disturb.</li>
+          <li>Flash over a cable, from a machine you can reboot, and do not do it the night before something matters.</li>
+        </ol>
+        <p>If your router has run DD-WRT for years, that history tells you the hardware can boot third-party firmware. It does not tell you that OpenWrt has a port for that revision. Those are two separate facts and only the second one matters here.</p>
+
+        <h2>Gotchas worth knowing</h2>
+        <ul>
+          <li><strong>The oldstable branch is not a dead end.</strong> 24.10.8 is still built. If 25.12.6 misbehaves on your hardware, staying on the older branch is a supported position, not neglect.</li>
+          <li><strong>Wi-Fi drivers decide everything.</strong> A model listed in the table can still have thin radio support. Read the device page's notes on the wireless chipset before assuming the 6 GHz radio works.</li>
+          <li><strong>Your IoT VLAN is the reason to do this at all.</strong> Budget an evening for DNS and DHCP migration; that, not the flash, is where the downtime lives.</li>
+          <li><strong>Keep a serial console option in mind</strong> for anything you flash twice. Recovery procedures are per model and live on the device page.</li>
+        </ul>
+
+        <h2>If you need hardware for it</h2>
+        <p>The two boxes below appear in the official build table for both current releases, so they are safe starting points rather than guesses. Check the Amazon listing against the revision on the box when it arrives — vendors ship silent hardware revisions, and the build table is the authority, not the listing.</p>
+        <ul>
+          <li><strong>Linksys WRT3200ACM</strong> — mvebu/cortexa9, images for 24.10.8 and 25.12.6: <a href="https://www.amazon.com/s?k=Linksys+WRT3200ACM&amp;tag=hanews01-20" rel="sponsored nofollow">WRT3200ACM on Amazon</a></li>
+          <li><strong>GL.iNet GL-MT2500</strong> — mediatek/filogic, images for 24.10.8 and 25.12.6: <a href="https://www.amazon.com/s?k=GL.iNet+GL-MT2500&amp;tag=hanews01-20" rel="sponsored nofollow">GL-MT2500 on Amazon</a></li>
+        </ul>
+        <p>If you are choosing a router rather than deciding on firmware, the <a href="best-openwrt-router.html">OpenWrt router roundup</a> narrows the field by use case, and <a href="devices.html">our devices section</a> tracks the hardware we cover elsewhere.</p>
+
+        <h2>Where OPNsense and pfSense fit</h2>
+        <p>People searching for OpenWrt vs OPNsense or OpenWrt vs pfSense are usually asking a different question than they think. OpenWrt is a router operating system that runs on the Wi-Fi hardware you already own. OPNsense and pfSense are x86 firewall platforms that run on a dedicated box.</p>
+        <p>OPNsense describes itself as "an open source, easy-to-use and easy-to-build FreeBSD based firewall and routing platform," positioned as bringing commercial-firewall features with open, verifiable sources. It ships in Community Edition and Business Edition, offers official hardware, and has a plugin system covering community and third-party plugins. Source: <a href="https://docs.opnsense.org/">OPNsense documentation</a>.</p>
+        <p>pfSense documentation is published by Netgate and organized around hardware, installing and upgrading, firewall/NAT/routing, VPN (IPsec, OpenVPN, WireGuard), services and packages, with a separate licensing section. Source: <a href="https://docs.netgate.com/pfsense/en/latest/">Netgate pfSense documentation</a>.</p>
+        <p>The practical split: if you want to replace the router on your shelf, that is an OpenWrt question. If you want to put a firewall between the modem and everything else and keep a separate Wi-Fi access point, that is an OPNsense or pfSense question — and the hardware is a small computer, not a router. We do not quote prices for those boxes or for Business Edition licensing.</p>
+
+        <h2>The short decision</h2>
+        <table>
+          <thead><tr><th>Your situation</th><th>Run this</th></tr></thead>
+          <tbody>
+            <tr><td>Current router has an OpenWrt build for your exact revision</td><td>OpenWrt, stable 25.12.6</td></tr>
+            <tr><td>Router is supported but newer branch is shaky</td><td>OpenWrt, oldstable 24.10.8</td></tr>
+            <tr><td>Older router OpenWrt never ported, familiar UI preferred</td><td>DD-WRT, after verifying the build yourself</td></tr>
+            <tr><td>Replacing the router with a dedicated firewall box</td><td>OPNsense or pfSense, not either of the above</td></tr>
+            <tr><td>You want local DNS, VLANs and readable firewall rules</td><td>Any of them, but OpenWrt is the cheapest path</td></tr>
+          </tbody>
+        </table>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Is DD-WRT or OpenWrt better for an older router?</h3>
+        <p>It depends on whether your exact hardware revision still has a current image. OpenWrt publishes official builds per device revision and keeps two stable branches alive at once, so an older router can stay on the oldstable branch and still receive builds. DD-WRT's long device tail is its reputation, but dd-wrt.com was behind a bot challenge during this pass, so no current build list could be confirmed here. Check both projects by exact model and revision before you flash.</p>
+        <h3>What is OpenWrt, in one paragraph?</h3>
+        <p>OpenWrt is a Linux operating system for embedded devices. Instead of a fixed vendor firmware, it provides a fully writable filesystem with package management, so you can add or remove software after flashing rather than waiting for a vendor to ship a new image. That is the project's own description, not a marketing gloss.</p>
+        <h3>How do I know whether my exact router revision has an OpenWrt build?</h3>
+        <p>Use the OpenWrt Firmware Selector and search the model name, then match the hardware revision exactly. Support is per revision, not per model name: Linksys WRT1900ACS v1 and v2 are separate entries, and ASUS RT-AX1800HP and RT-AX1800HP V2 land on different targets with different release sets.</p>
+        <h3>Can I run OpenWrt on the same hardware I used for DD-WRT?</h3>
+        <p>Sometimes, but do not assume it. Check the build table by model and revision, confirm the install method on that device's page, and keep the vendor's stock firmware image on hand for recovery. A device that ran one third-party firmware is not automatically supported by the other.</p>
+        <h3>OpenWrt vs OPNsense — which should replace my router?</h3>
+        <p>They are different jobs. OpenWrt is a router operating system for the Wi-Fi hardware you already own. OPNsense is a FreeBSD-based firewall and routing platform that runs on dedicated x86 hardware, with Community and Business editions and a plugin system. Pick OPNsense when you are building a separate firewall box, not when you want to reflash an all-in-one router.</p>
+        <h3>OpenWrt vs pfSense — what is the real difference?</h3>
+        <p>pfSense is published by Netgate, and its documentation is organized around hardware, installing and upgrading, firewall and routing, VPN, services and packages, plus a separate licensing section. Like OPNsense it is an x86 firewall platform, so the comparison with OpenWrt is about appliance versus router firmware, not two builds of the same thing.</p>
+        <p>We publish a daily brief on Home Assistant, OpenWrt, Matter and ESPHome releases. <a href="brief-2026-11-02">Read the latest</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://raw.githubusercontent.com/openwrt/openwrt/master/README.md">OpenWrt project README</a>; <a href="https://firmware-selector.openwrt.org/">OpenWrt Firmware Selector</a>; <a href="https://openwrt.org/toh/linksys/wrt3200acm">OpenWrt device page, WRT3200ACM</a>; <a href="https://raw.githubusercontent.com/mirror/dd-wrt/master/README.md">DD-WRT source mirror README</a>; <a href="https://docs.opnsense.org/">OPNsense documentation</a>; <a href="https://docs.netgate.com/pfsense/en/latest/">Netgate pfSense documentation</a>. Device and release counts from the official OpenWrt build table, downloaded 5 November 2026.</dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
