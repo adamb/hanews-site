@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shelly relay with Home Assistant: setup, models and gotchas (2026) — HA News</title>
+  <meta name="description" content="How to add a Shelly relay to Home Assistant locally: the built-in Shelly integration, automatic discovery, Gen1 CoIoT fixes, and which Gen4 model to buy for a switch, a meter or a blind.">
+  <link rel="canonical" href="https://hanews.org/shelly-home-assistant">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Shelly relay with Home Assistant: setup, models and gotchas (2026)", "image": "https://hanews.org/images/shelly-1-gen4.jpg", "datePublished": "2026-11-04", "dateModified": "2026-11-04", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/shelly-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I add a Shelly relay to Home Assistant without the cloud?", "acceptedAnswer": {"@type": "Answer", "text": "Use the built-in Shelly integration. Put the relay on the same network as Home Assistant, wait for it to appear as Discovered under Settings, then Devices and services, or add the integration and enter its hostname or IP address and port. No Shelly account, add-on or HACS install is involved, and the integration talks to the device directly."}}, {"@type": "Question", "name": "Do Shelly relays work with Home Assistant if I block them from the internet?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Home Assistant's Shelly documentation states that the integration communicates directly with the device and no cloud connection is needed. Blocking outbound internet access leaves local switching, metering and automation working, but it also blocks Shelly firmware updates, so update the device first or allow updates deliberately."}}, {"@type": "Question", "name": "Why does my Gen1 Shelly stop updating in Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Gen1 devices report state over CoIoT, which has to be switched on in the device's own web interface under Internet and Security, Advanced developer settings, Enable CoIoT. Set the CoIoT peer to unicast with the Home Assistant server IP and UDP port 5683, save, and restart the device by hand. Battery-powered Gen1 devices will not report state at all without it."}}, {"@type": "Question", "name": "What is the difference between Shelly 1, 1PM and 2PM?", "acceptedAnswer": {"@type": "Answer", "text": "Shelly 1 Gen4 is a single potential-free contact with no metering. Shelly 1PM Gen4 adds power measurement on one channel. Shelly 2PM Gen4 has two channels or one cover output, with metering, and can drive Venetian blinds. All three are 37 by 42 by 16 mm class devices that need a neutral wire."}}, {"@type": "Question", "name": "Do Shelly relays need a neutral wire?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Shelly's knowledge base lists neutral as required for the Shelly 1 Gen4 and Shelly 1PM Gen4, because the electronics are powered from the mains supply. Old switch loops that only carry live and switched live have nowhere to connect the neutral, so check the box before ordering."}}, {"@type": "Question", "name": "Can a Shelly relay act as a Bluetooth proxy for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Gen2 and newer devices can, except battery-powered models. The option lives in the integration settings with Auto, Active, Passive and Disabled modes. Shelly does not proxy active GATT connections, so it extends passive Bluetooth coverage rather than replacing a dedicated adapter for devices that need a connection."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Wednesday, 4 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html" aria-current="page">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Devices</p>
+        <h1>Shelly relay with Home Assistant: setup, models and gotchas (2026)</h1>
+        <p class="byline">HA News · 4 Nov 2026</p>
+
+        <p>A Shelly relay is one of the few smart switches that Home Assistant can drive without a vendor cloud in the path. The Shelly integration is part of Home Assistant core, so there is nothing to install from HACS, no add-on to keep running and no Shelly account to create. Point the relay at your network, let Home Assistant discover it, and it becomes a local switch with push updates.</p>
+
+        <p><strong>The short answer:</strong> use the built-in Shelly integration, not Matter, if you want metering entities and instant state changes. Buy the <strong>Shelly 1 Gen4</strong> for a plain dry-contact switch, the <strong>1PM Gen4</strong> when you want to measure what the load draws, and the <strong>2PM Gen4</strong> for two circuits or one blind. All of them need a neutral wire at the box.</p>
+
+        <figure class="figure">
+          <img src="images/shelly-1-gen4.jpg" alt="Shelly 1 Gen4 relay, a small blue DIN-style module with screw terminals" width="333" height="300" loading="lazy">
+          <figcaption>Shelly 1 Gen4. Credit: Shelly Europe Ltd., product photo via the <a href="https://kb.shelly.cloud/knowledge-base/shelly-1-gen4">Shelly Knowledge Base</a></figcaption>
+        </figure>
+
+        <h2>How the integration actually works</h2>
+        <p>Home Assistant's Shelly documentation is blunt about the architecture: "Integration is communicating directly with the device; cloud connection is not needed." The relay and Home Assistant talk over your LAN. Updates are pushed, not polled — the documentation says devices push changes to Home Assistant for all main functions — which is why a Shelly switch feels instant in an automation while a cloud-bridged device often lags a second or two.</p>
+        <p>One integration covers every generation. Gen1, Gen2, Gen3 and Gen4 hardware all work with the same Shelly integration, and Shelly's own firmware documentation calls its relays "compatible with Matter" as well. That gives you a choice: pair over Matter to a Thread or Wi-Fi Matter controller, or use the Shelly integration. For a Home Assistant household the integration is usually the better fit, because the Matter path exposes a narrower set of entities than the native one.</p>
+
+        <h2>Adding a relay to Home Assistant</h2>
+        <ol>
+          <li>Wire the relay and power it up. It broadcasts its presence on the local network within a few seconds of booting.</li>
+          <li>Open Home Assistant and go to <em>Settings › Devices &amp; services</em>. Under Discovered you should see the relay listed. Select it and confirm.</li>
+          <li>If discovery misses it — separate VLAN, mDNS blocked, static-only network — choose <em>Add integration</em>, search for <strong>Shelly</strong>, and enter the device's hostname or IP address and its port.</li>
+          <li>Name the entity and assign it to an area. Repeat for each relay; there is no per-model integration to install.</li>
+        </ol>
+        <p>Gen1 hardware is the exception. Those devices use the CoIoT protocol, and it has to be switched on in the relay's own web interface: <em>Internet &amp; Security › ADVANCED – DEVELOPER SETTINGS › Enable CoIoT</em>. Set the CoIoT peer to unicast, enter the Home Assistant server's IP address and UDP port 5683, save, and restart the device by hand. Battery-powered Gen1 devices will not report state without this. If push updates never arrive, Home Assistant raises a repair issue rather than silently showing stale values.</p>
+        <p>Gen2 and newer use the RPC protocol and need no extra configuration by default. Battery devices are the exception there too: they may need <em>Settings › Connectivity › Outbound WebSocket</em> pointed at <code>ws://HA_IP:8123/api/shelly/ws</code>, or the <code>wss://</code> form when Home Assistant is behind TLS.</p>
+
+        <h2>Which Shelly relay to buy</h2>
+        <p>The four models below cover most houses. Shelly publishes full specifications in its knowledge base; the table is built from those pages, not from a bench test.</p>
+        <table>
+          <thead><tr><th>Model</th><th>What it is</th><th>Key numbers</th></tr></thead>
+          <tbody>
+            <tr><td>Shelly 1 Gen4</td><td>Single potential-free (dry) contact, no metering. Model S4SW-001X16EU.</td><td>110-240 V~ / 24-48 V⎓ / 12 V⎓, under 1 W standby; neutral required</td></tr>
+            <tr><td>Shelly 1PM Gen4</td><td>Same footprint, one channel with power measurement. 37 × 42 × 16 mm, 27 g.</td><td>110-240 V~ / 24-30 V⎓, under 1 W; terminals 0.5-4 mm² (20-11 AWG)</td></tr>
+            <tr><td>Shelly 2PM Gen4</td><td>Two channels or one cover output, with metering and Venetian blind support. 37 × 42 × 16 mm, 30 g.</td><td>110-240 V~ / 24 VDC ±10%, under 1.4 W; 10 A per channel, 16 A total, 18 A peak</td></tr>
+            <tr><td>Shelly Pro 1</td><td>DIN-rail unit for panel installs, Gen2 firmware, Ethernet plus Wi-Fi.</td><td>Potential-free contacts; runs standalone on the local network</td></tr>
+          </tbody>
+        </table>
+        <p>Sources: Shelly Knowledge Base pages for the <a href="https://kb.shelly.cloud/knowledge-base/shelly-1-gen4">Shelly 1 Gen4</a>, <a href="https://kb.shelly.cloud/knowledge-base/shelly-1pm-gen4">Shelly 1PM Gen4</a>, <a href="https://kb.shelly.cloud/knowledge-base/shelly-2pm-gen4">Shelly 2PM Gen4</a> and <a href="https://kb.shelly.cloud/knowledge-base/shelly-pro-1">Shelly Pro 1</a>.</p>
+
+        <h3>Shelly 1 Gen4: the dry-contact workhorse</h3>
+        <p>Dry contacts are the reason to pick this one over a metering model. Because the output is potential-free, it can switch something that isn't mains lighting: a garage door opener's control input, a boiler's thermostat loop, a gate motor, a low-voltage circuit. Shelly's knowledge base describes it as a "small form factor smart switch with potential-free contacts" and cites 16 A switching current, with a B or C curve breaker rated at 16 A and at least 6 kA interrupting capacity to EN60898-1.</p>
+        <p>That same page also lists Wi-Fi, Zigbee and Bluetooth in the radio section, and the wireless MCU is shared with the rest of the Gen4 line. <a href="https://www.amazon.com/s?k=Shelly+1+Gen4&amp;tag=hanews01-20" rel="sponsored nofollow">Check the Shelly 1 Gen4 on Amazon</a>. One caveat about the spec sheet: the "main features" block on that page carries boilerplate about monitoring humidity and temperature, which is wrong for a relay. Ignore it.</p>
+
+        <figure class="figure">
+          <img src="images/shelly-1pm-gen4.jpg" alt="Shelly 1PM Gen4 relay with power measurement, small blue module" width="332" height="300" loading="lazy">
+          <figcaption>Shelly 1PM Gen4. Credit: Shelly Europe Ltd., product photo via the <a href="https://kb.shelly.cloud/knowledge-base/shelly-1pm-gen4">Shelly Knowledge Base</a></figcaption>
+        </figure>
+
+        <h3>Shelly 1PM Gen4: metering on one circuit</h3>
+        <p>If you want the washer, the dryer or a heat pump to show up in Home Assistant's energy dashboard, this is the part. It measures the load and reports it through the same integration, so no separate clamp meter is needed. Shelly lists it at 37 × 42 × 16 mm and 27 g in a plastic shell, with terminals that take 0.5-4 mm² (20-11 AWG) and an ambient range of -20 to 40 °C. External protection is the same B or C curve breaker, 16 A rated, 6 kA interrupting. <a href="https://www.amazon.com/s?k=Shelly+1PM+Gen4&amp;tag=hanews01-20" rel="sponsored nofollow">Shelly 1PM Gen4 on Amazon</a>.</p>
+        <p>One number is missing on purpose. The "max switching current AC" field in Shelly's table came back truncated when retrieved, so this page does not publish a current rating for the 1PM Gen4. Check the label or re-read the knowledge base page before loading it near its limit.</p>
+
+        <h3>Shelly 2PM Gen4: two circuits or one blind</h3>
+        <p>Two channels in the same shell, or a single cover output, with metering. It supports Venetian blinds the way the 2PM Gen3 did, which matters if you have tilt-and-lift slats. Current budget is 10 A per channel, 16 A total, 18 A peak. Shelly also says the Gen4 has a faster processor and more memory than the model it replaces. <a href="https://www.amazon.com/s?k=Shelly+2PM+Gen4&amp;tag=hanews01-20" rel="sponsored nofollow">Shelly 2PM Gen4 on Amazon</a>.</p>
+
+        <figure class="figure">
+          <img src="images/shelly-2pm-gen4.jpg" alt="Shelly 2PM Gen4 two-channel relay and cover controller, small black module" width="333" height="300" loading="lazy">
+          <figcaption>Shelly 2PM Gen4. Credit: Shelly Europe Ltd., product photo via the <a href="https://kb.shelly.cloud/knowledge-base/shelly-2pm-gen4">Shelly Knowledge Base</a></figcaption>
+        </figure>
+
+        <h3>Shelly Pro 1: when the relay lives in the panel</h3>
+        <p>DIN rail, potential-free contacts, Gen2 firmware, and — the useful part — LAN connectivity alongside Wi-Fi. In a metal enclosure or a basement corner where Wi-Fi is a rumour, a wired Ethernet run is worth more than any radio feature. It is aimed at professional integrators and runs standalone on the local network. Shelly's page for this model did not expose an official product image, so there is no photo of it here rather than a borrowed one.</p>
+
+        <h2>Gotchas worth knowing before you buy</h2>
+        <p><strong>Neutral is not optional.</strong> Shelly lists neutral as required on the 1 Gen4 and 1PM Gen4. Old switch loops that carry only live and switched live have nowhere to land the neutral, so the box dictates the purchase more than the spec sheet does.</p>
+        <p><strong>HTTPS changed in firmware 2.0.0.</strong> For the EU Radio Equipment Directive, Shelly enabled "Enhanced Security" on Gen2 and newer firmware. Devices shipped with 2.0.0 or later serve HTTPS using Shelly's internal certificate authority; units upgraded in the field keep serving plain HTTP until you upload a certificate yourself. Home Assistant detects HTTPS and switches to port 443, so a freshly bought relay and an upgraded one do not behave identically on first contact.</p>
+        <p><strong>A few entities poll every 60 seconds and start disabled.</strong> On Gen1 that covers cloud connectivity, RSSI, uptime and firmware update; on Gen2 and newer it is device temperature, RSSI and uptime. Enable the ones you want; leave the rest off.</p>
+        <p><strong>The BLU sensors are a different integration.</strong> Shelly BLU devices such as the BLU H&amp;T are not handled by the Shelly integration — they belong to BTHome. The exception is the Shelly BLU TRV, which works through a Shelly BLU Gateway Gen3 or a device with built-in BLU TRV support.</p>
+        <p><strong>Range Extenders change the port.</strong> If a relay reaches Home Assistant through a Shelly Range Extender, the port is configurable in the integration options.</p>
+
+        <h2>Bluetooth proxy, almost for free</h2>
+        <p>Gen2 and newer relays, excluding battery models, can repeat Bluetooth traffic for Home Assistant. The mode is set in the integration options — Auto, Active, Passive or Disabled — and Auto is the sane default: Shelly says it saves about 95% of the scan-related battery drain on nearby BLE devices. The limit is that Shelly does not proxy active GATT connections, so it extends passive coverage rather than replacing a dedicated adapter for devices that need a persistent link.</p>
+
+        <aside class="rail-sub article-cta" aria-label="Newsletter">
+          <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </aside>
+
+        <h2>FAQ</h2>
+        <h3>How do I add a Shelly relay to Home Assistant without the cloud?</h3>
+        <p>Use the built-in Shelly integration. Put the relay on the same network as Home Assistant, wait for it to appear as Discovered under Settings, then Devices and services, or add the integration and enter its hostname or IP address and port. No Shelly account, add-on or HACS install is involved, and the integration talks to the device directly.</p>
+        <h3>Do Shelly relays work with Home Assistant if I block them from the internet?</h3>
+        <p>Yes. Home Assistant's Shelly documentation states that the integration communicates directly with the device and no cloud connection is needed. Blocking outbound internet access leaves local switching, metering and automation working, but it also blocks Shelly firmware updates, so update the device first or allow updates deliberately.</p>
+        <h3>Why does my Gen1 Shelly stop updating in Home Assistant?</h3>
+        <p>Gen1 devices report state over CoIoT, which has to be switched on in the device's own web interface under Internet and Security, Advanced developer settings, Enable CoIoT. Set the CoIoT peer to unicast with the Home Assistant server IP and UDP port 5683, save, and restart the device by hand. Battery-powered Gen1 devices will not report state at all without it.</p>
+        <h3>What is the difference between Shelly 1, 1PM and 2PM?</h3>
+        <p>Shelly 1 Gen4 is a single potential-free contact with no metering. Shelly 1PM Gen4 adds power measurement on one channel. Shelly 2PM Gen4 has two channels or one cover output, with metering, and can drive Venetian blinds. All three are 37 by 42 by 16 mm class devices that need a neutral wire.</p>
+        <h3>Do Shelly relays need a neutral wire?</h3>
+        <p>Yes. Shelly's knowledge base lists neutral as required for the Shelly 1 Gen4 and Shelly 1PM Gen4, because the electronics are powered from the mains supply. Old switch loops that only carry live and switched live have nowhere to connect the neutral, so check the box before ordering.</p>
+        <h3>Can a Shelly relay act as a Bluetooth proxy for Home Assistant?</h3>
+        <p>Gen2 and newer devices can, except battery-powered models. The option lives in the integration settings with Auto, Active, Passive and Disabled modes. Shelly does not proxy active GATT connections, so it extends passive Bluetooth coverage rather than replacing a dedicated adapter for devices that need a connection.</p>
+
+        <p>More on the hardware side: <a href="devices">our Devices section</a>, plus <a href="zigbee-hub">the best Zigbee hub for Home Assistant</a> and <a href="z-wave-hub">picking a Z-Wave hub</a>. We also publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases — <a href="brief-2026-11-02">read the latest</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/integrations/shelly/">Home Assistant Shelly integration</a>; <a href="https://kb.shelly.cloud/knowledge-base/shelly-1-gen4">Shelly 1 Gen4</a>; <a href="https://kb.shelly.cloud/knowledge-base/shelly-1pm-gen4">Shelly 1PM Gen4</a>; <a href="https://kb.shelly.cloud/knowledge-base/shelly-2pm-gen4">Shelly 2PM Gen4</a>; <a href="https://kb.shelly.cloud/knowledge-base/shelly-pro-1">Shelly Pro 1</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
