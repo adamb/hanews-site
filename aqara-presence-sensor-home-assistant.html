@@ -90,6 +90,10 @@
         <p>Power and placement are unglamorous and decisive. The FP2 is IPX5, so Aqara supports humid rooms such as bathrooms and outdoor use under a roof, with its own caveat on the outdoors. Radar sees through thin partitions less gracefully than through air; aim it at the room you care about, not at a hallway you don't.</p>
 
         <h2>FP300 in Home Assistant: Thread and Matter</h2>
+        <figure class="figure">
+          <img src="images/aqara-fp300.png" alt="Aqara Presence Multi-Sensor FP300, a small square battery-powered radar presence sensor" width="600" height="500" loading="lazy">
+          <figcaption>Image: Aqara — <a href="https://www.aqara.com/en/product/presence-multi-sensor-fp300/">Presence Multi-Sensor FP300 product page</a></figcaption>
+        </figure>
         <p>The FP300 is the interesting one for Home Assistant because Aqara names Home Assistant explicitly. In Thread mode the sensor pairs to "a thread-enabled Matter Controller", and the list is Apple Home, Google Home, Alexa, <strong>Home Assistant</strong>, SmartThings and Homey — with no Aqara hub in the chain.</p>
         <p>Two pieces of infrastructure have to exist, and Aqara's page only guarantees one of them. Home Assistant's <a href="https://www.home-assistant.io/integrations/matter/">Matter integration docs</a> explain that Matter "defines how to control smart home devices on a Wi-Fi or Thread network", and that a Thread border router "forwards traffic from the devices in the Thread network to devices outside that network". So: a Matter controller (Home Assistant, with the Matter integration and a Thread border router it can use) <em>and</em> a border router in radio range. If you have neither, that is a separate purchase — see our <a href="article-thread-network.html">Thread network explainer</a> for what the pieces do.</p>
         <ol>
