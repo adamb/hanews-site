@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Magic Mirror with Home Assistant: build guide (2026) — HA News</title>
+  <meta name="description" content="How to build a Magic Mirror for Home Assistant: MagicMirror 2 on a Raspberry Pi, MMM-HomeAssistantDisplay vs MMM-MQTT, rest_command control, supported hardware and the gotchas that break builds.">
+  <link rel="canonical" href="https://hanews.org/home-assistant-magic-mirror">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Magic Mirror with Home Assistant: build guide (2026)", "image": "https://hanews.org/images/magicmirror-demo.gif", "datePublished": "2026-11-05", "dateModified": "2026-11-05", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-assistant-magic-mirror"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can Home Assistant talk to MagicMirror without a cloud account?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Every route described here runs on your own LAN: the MMM-HomeAssistantDisplay module opens a websocket to your Home Assistant instance, MMM-MQTT subscribes to your broker, and MMM-Remote-Control exposes a local HTTP API that rest_command can call. None of them needs Nabu Casa or any third-party service."}}, {"@type": "Question", "name": "Which MagicMirror module should I use for Home Assistant sensors?", "acceptedAnswer": {"@type": "Answer", "text": "Use MMM-HomeAssistantDisplay if you want Home Assistant to do the formatting: it renders Jinja2 templates on the Home Assistant side and pushes the HTML to the mirror over the websocket API. Use MMM-MQTT if your devices already publish to MQTT and you would rather keep the mirror independent of Home Assistant."}}, {"@type": "Question", "name": "How do I make the mirror show an alert only when something is happening?", "acceptedAnswer": {"@type": "Answer", "text": "MMM-HomeAssistantDisplay can hide or show itself based on an entity state or a template result, so a washer-done block can appear only while the washer is running. With MQTT you publish to a topic only when the alert is active, and leave the topic empty otherwise."}}, {"@type": "Question", "name": "Can I run a smart mirror on a Raspberry Pi Zero?", "acceptedAnswer": {"@type": "Answer", "text": "Not with the standard install. MagicMirror2 wraps the display in Electron, which upstream supports only on Raspberry Pi 2, 3, 4 and 5. For a Pi Zero or Pi 1 the documented workaround is server-only mode, where the Pi runs MagicMirror2 and a separate fullscreen browser drives the panel."}}, {"@type": "Question", "name": "How do I blank the mirror or switch scenes from Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Install MMM-Remote-Control on the mirror and give Home Assistant a rest_command that calls its API. A dashboard button or an automation can then hide and show modules, or shut the mirror down, with a single HTTP request on your LAN."}}, {"@type": "Question", "name": "Is it safe to expose MagicMirror2 to the internet for remote access?", "acceptedAnswer": {"@type": "Answer", "text": "No. Upstream warns that secrets live in config.js and says never to expose the mirror directly to the internet. If you need remote access, put it behind a reverse proxy with authentication, HTTPS and strict network access controls."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 5 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Projects</p>
+        <h1>Magic Mirror with Home Assistant: how to build one</h1>
+        <p class="byline">HA News · 5 Nov 2026</p>
+
+        <p>A smart mirror is a monitor behind two-way glass. The glass reflects the room and the panel shows through it, so text appears to float where the screen is lit and the wall behind it is dark. The software question is separate from the optical one, and it has a settled answer: <strong>MagicMirror² runs the display, and Home Assistant feeds it</strong> — through a community module that renders your own templates, through MQTT, or through REST calls. There is no official Home Assistant MagicMirror integration; the integrations page at <a href="https://www.home-assistant.io/integrations/magicmirror/" rel="nofollow">home-assistant.io/integrations/magicmirror/</a> returns 404. Every working setup is one of the community paths below.</p>
+
+        <p>This guide covers what to install, which module to pick for which job, and the four or five details that break builds. It stays on the software side, because the mirror stack is where the surprises are.</p>
+
+        <figure class="figure">
+          <img src="images/magicmirror-demo.gif" alt="Animated demo of MagicMirror 2 running, with clock, calendar, weather and news modules laid out on a dark background" width="2102" height="1202" loading="lazy">
+          <figcaption>MagicMirror² running its default module layout. Source: <a href="https://magicmirror.builders/">MagicMirror² project</a></figcaption>
+        </figure>
+
+        <h2>What runs on the glass</h2>
+        <p>MagicMirror² is an open source modular smart mirror platform. It is modular in the literal sense: the screen is a set of independent modules — clock, calendar, weather, news — laid out in regions (top left, top right, bottom bar) that you configure in a single JavaScript file. It wraps a local Electron app, which the project describes as "So no more web server or browser installs necessary": the mirror is not a web page in kiosk mode, it is a desktop application that draws to the screen directly. <a href="https://github.com/MagicMirrorOrg/MagicMirror" rel="nofollow">Source: MagicMirror² repository</a>.</p>
+        <p>The project lives at <a href="https://magicmirror.builders/">magicmirror.builders</a>, with documentation at <a href="https://docs.magicmirror.builders/">docs.magicmirror.builders</a>, a forum at <a href="https://forum.magicmirror.builders/">forum.magicmirror.builders</a> and a Discord at <a href="https://discord.gg/J5BAtvx" rel="nofollow">discord.gg/J5BAtvx</a>.</p>
+
+        <h2>Hardware that is actually supported</h2>
+        <p>This is the first place people go wrong. Electron, the app wrapper, supports Raspberry Pi 2, 3, 4 and 5 only. Pi Zero and Pi 1 are not supported. For those boards upstream suggests running MagicMirror² in server-only mode and pointing your own fullscreen browser at it from something else. <a href="https://docs.magicmirror.builders/getting-started/requirements.html">Source: requirements</a>.</p>
+        <p>Two more requirements from the same page: you need the latest full Raspberry Pi OS (a desktop environment is mandatory, because Electron needs one, so Raspberry Pi OS Lite will not work), and Debian "Buster"-based releases are no longer supported. The Node.js version requirement is listed on the release page rather than pinned in the documentation, so check it against the release you install.</p>
+        <p>For a new build, a Raspberry Pi 5 is the straightforward choice: it is on the supported list and it has headroom for a screen full of modules. Check <a href="https://www.amazon.com/s?k=Raspberry+Pi+5&amp;tag=hanews01-20" rel="sponsored nofollow">Raspberry Pi 5 on Amazon</a> for price and stock; the board is widely available from specialist resellers too, usually cheaper.</p>
+
+        <h3>The optical part, briefly</h3>
+        <p>The stack is one-way mirror glass or acrylic over a monitor. Brightness matters more than resolution: the effect works because the panel is brighter than the reflected room, so a dim screen in a bright hallway reads as a grey rectangle, and a bright screen in a dim hallway reads as text on black. Dim the room or brighten the panel, in that order.</p>
+
+        <h2>Installing MagicMirror²</h2>
+        <p>The only officially supported install path is the manual one. The old automatic installer was moved out of core into a community repository in early 2020, so ignore any guide that tells you to run it. The manual steps from the documentation:</p>
+        <ol>
+          <li>Install Node.js on the Raspberry Pi.</li>
+          <li><code>git clone https://github.com/MagicMirrorOrg/MagicMirror.git</code></li>
+          <li><code>cd MagicMirror</code></li>
+          <li><code>node --run install-mm</code></li>
+          <li><code>cp config/config.js.sample config/config.js</code></li>
+          <li><code>node --run start</code></li>
+        </ol>
+        <p><a href="https://docs.magicmirror.builders/getting-started/installation.html">Source: installation guide</a>. One gotcha is worth planning around: the <code>install-mm</code> step takes roughly ten minutes on a Pi 3 and roughly twenty-five on a Pi 2, and it prints very little to the terminal while it works. People assume it has hung, kill it, and end up with a half-installed tree. Let it finish.</p>
+
+        <h2>Wiring Home Assistant to the mirror</h2>
+        <p>Because there is no official integration, the link is made one of three ways: a module that speaks Home Assistant's websocket API, a module that subscribes to MQTT, or a module that exposes an HTTP API for Home Assistant to call. They solve different problems, and a real build often uses two of them.</p>
+
+        <h3>Option A — MMM-HomeAssistantDisplay (start here)</h3>
+        <p><a href="https://github.com/wonderslug/MMM-HomeAssistantDisplay" rel="nofollow">MMM-HomeAssistantDisplay</a> is the most active of the Home Assistant display modules found: around 130 GitHub stars, last push 2026-03-16. Its design is the reason to pick it. You write a Jinja2 template in the module's config, Home Assistant renders it, and the returned HTML is displayed on the mirror — so every template function, entity attribute and formatting trick you already use in a dashboard is available on the glass, evaluated on the Home Assistant side where the data lives.</p>
+        <p>It connects over Home Assistant's websocket API, which means state changes appear immediately rather than on a polling interval. It reconnects automatically when the connection drops, and it only re-renders the sections whose watched entity actually changed — worth knowing if you plan six sections on one screen. It can also hide or show itself based on an entity state or a template result, which is the clean answer to "only show the laundry block while the washer is running".</p>
+        <p>Install: <code>git clone https://github.com/wonderslug/MMM-HomeAssistantDisplay.git</code> into your <code>modules/</code> directory, then <code>npm install</code> inside it. The default module title is "Home Assistant". It adds custom CSS classes to the module and to each section and embeds Material Design icons, so the output can be styled to match the rest of the mirror.</p>
+        <p>The connection needs a long-lived access token, created under your Home Assistant profile, then Security, then Long-lived access tokens. Treat that token like a password: it grants API access to your instance, and it is the reason the mirror must not be reachable from the internet.</p>
+
+        <h3>Option B — MMM-MQTT (protocol-agnostic)</h3>
+        <p><a href="https://github.com/ottopaulsen/MMM-MQTT" rel="nofollow">MMM-MQTT</a> (around 63 stars, last push 2026-10-24) subscribes to MQTT topics and shows the payload. It is the right pick when the mirror should not depend on Home Assistant at all, or when your devices already publish to a broker.</p>
+        <p>Install from your <code>MagicMirror/modules</code> directory: <code>git clone https://github.com/ottopaulsen/MMM-MQTT</code>, then <code>cd MMM-MQTT</code> and <code>npm install</code>. Configuration is a <code>mqttServers[]</code> array with <code>address</code>, <code>port</code> (1883 by default), optional <code>user</code> and <code>password</code>, and optional TLS via <code>ca</code>, <code>cert</code> and <code>key</code>. Each subscription takes a <code>topic</code> plus presentation options: <code>label</code>, <code>suffix</code>, <code>decimals</code>, <code>sortOrder</code>, <code>maxAgeSeconds</code>, <code>row</code>, <code>broadcast</code> and <code>colors</code> thresholds.</p>
+        <p><code>maxAgeSeconds</code> is the detail worth stealing for any sensor row: when a value stops updating, the module dims it. On a mirror that runs for months, a stale sensor that still shows a number is worse than no number, and this is a free staleness indicator. Note that Home Assistant publishes state over MQTT only when the MQTT integration is set up and its state topics are configured; the module reads whatever topics you point it at.</p>
+
+        <h3>Option C — MMM-Remote-Control (control the mirror from Home Assistant)</h3>
+        <p><a href="https://github.com/Jopyth/MMM-Remote-Control" rel="nofollow">MMM-Remote-Control</a> (around 605 stars, last push 2026-11-01) is the most-used control module, and it points the other way: it lets other devices drive the mirror. It provides a browser UI plus a RESTful API, so anything that can open a URL can shut the mirror down or hide and show modules. It also ships a PWA mode and can render a QR code on the mirror for phone pairing.</p>
+        <p>Install: <code>cd ~/MagicMirror/modules</code>, <code>git clone https://github.com/Jopyth/MMM-Remote-Control</code>, <code>cd MMM-Remote-Control</code>, <code>npm ci --omit=dev</code>.</p>
+        <p>That API is what a Home Assistant <code>rest_command</code> or a dashboard button hits to blank the screen. Home Assistant's <code>rest_command</code> integration is the built-in way to call a URL: it takes <code>url</code> (templatable), <code>method</code> (get, patch, post, put or delete), <code>headers</code>, <code>payload</code> (a template), <code>username</code> and <code>password</code>, <code>timeout</code> (10 seconds by default) and <code>verify_ssl</code> (true by default), and the service appears as <code>rest_command.&lt;service_name&gt;</code>. See <a href="https://www.home-assistant.io/integrations/rest_command/">the rest_command documentation</a> for the full schema. Point the command at the mirror's LAN address, give it a timeout short enough that a sleeping mirror does not stall an automation, and call it from a script rather than from ten different automations.</p>
+
+        <h3>Other modules, and why they are not the pick</h3>
+        <p>Three more Home Assistant-adjacent modules turn up in searches, all with lower activity: <code>leinich/MMM-homeassistant-sensors</code> shows Home Assistant sensors directly (around 66 stars, last push 2021-07); <code>ambarusa/MMM-HomeAssistant</code> (around 52 stars, last push 2026-08); and <code>Tom-Hirschberger/MMM-MQTTbridge</code> (around 29 stars, last push 2025-12), which makes the mirror itself an MQTT device in both directions. The last one is interesting if you want Home Assistant to know the mirror's state as well as feed it; the first is effectively unmaintained.</p>
+
+        <h2>Gotchas</h2>
+        <ul>
+          <li><strong>Never expose the mirror to the internet.</strong> Upstream is explicit: secrets live in <code>config.js</code>, so do not expose MagicMirror² directly. If you need remote access, put it behind a reverse proxy with authentication, HTTPS and strict network access controls. A long-lived Home Assistant token sitting on that machine raises the stakes.</li>
+          <li><strong>Raspberry Pi OS Lite will not work</strong> on the panel machine, because Electron needs a desktop environment. Server-only mode on a Pi Zero is the documented workaround, with a separate browser stick driving the screen.</li>
+          <li><strong>Do not interrupt <code>install-mm</code>.</strong> Ten to twenty-five minutes of near-silence depending on the board; interrupting it leaves a broken install.</li>
+          <li><strong>There is no integration to wait for.</strong> If a guide tells you to add MagicMirror under Devices and services, it is describing a module install badly.</li>
+        </ul>
+
+        <h2>Where this fits in your setup</h2>
+        <p>A mirror is a display surface for the same entities you already watch, so build the data side first. If your dashboards are still ad hoc, start with <a href="home-assistant-dashboard">the Home Assistant dashboard guide</a>. If you have not chosen the machine that runs Home Assistant yet, the trade-offs are in <a href="home-assistant-raspberry-pi">Home Assistant on a Raspberry Pi</a>. And the wider index of Home Assistant guides lives in <a href="ha.html">the Home Assistant section</a>.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Can Home Assistant talk to MagicMirror without a cloud account?</h3>
+        <p>Yes. Every route described here runs on your own LAN: the MMM-HomeAssistantDisplay module opens a websocket to your Home Assistant instance, MMM-MQTT subscribes to your broker, and MMM-Remote-Control exposes a local HTTP API that rest_command can call. None of them needs Nabu Casa or any third-party service.</p>
+        <h3>Which MagicMirror module should I use for Home Assistant sensors?</h3>
+        <p>Use MMM-HomeAssistantDisplay if you want Home Assistant to do the formatting: it renders Jinja2 templates on the Home Assistant side and pushes the HTML to the mirror over the websocket API. Use MMM-MQTT if your devices already publish to MQTT and you would rather keep the mirror independent of Home Assistant.</p>
+        <h3>How do I make the mirror show an alert only when something is happening?</h3>
+        <p>MMM-HomeAssistantDisplay can hide or show itself based on an entity state or a template result, so a washer-done block can appear only while the washer is running. With MQTT you publish to a topic only when the alert is active, and leave the topic empty otherwise.</p>
+        <h3>Can I run a smart mirror on a Raspberry Pi Zero?</h3>
+        <p>Not with the standard install. MagicMirror2 wraps the display in Electron, which upstream supports only on Raspberry Pi 2, 3, 4 and 5. For a Pi Zero or Pi 1 the documented workaround is server-only mode, where the Pi runs MagicMirror2 and a separate fullscreen browser drives the panel.</p>
+        <h3>How do I blank the mirror or switch scenes from Home Assistant?</h3>
+        <p>Install MMM-Remote-Control on the mirror and give Home Assistant a rest_command that calls its API. A dashboard button or an automation can then hide and show modules, or shut the mirror down, with a single HTTP request on your LAN.</p>
+        <h3>Is it safe to expose MagicMirror2 to the internet for remote access?</h3>
+        <p>No. Upstream warns that secrets live in config.js and says never to expose the mirror directly to the internet. If you need remote access, put it behind a reverse proxy with authentication, HTTPS and strict network access controls.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-11-02">Read the latest</a>.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://docs.magicmirror.builders/getting-started/installation.html">MagicMirror² installation guide</a>; <a href="https://docs.magicmirror.builders/getting-started/requirements.html">MagicMirror² requirements</a>; <a href="https://github.com/wonderslug/MMM-HomeAssistantDisplay">MMM-HomeAssistantDisplay</a>; <a href="https://github.com/ottopaulsen/MMM-MQTT">MMM-MQTT</a>; <a href="https://github.com/Jopyth/MMM-Remote-Control">MMM-Remote-Control</a>; <a href="https://www.home-assistant.io/integrations/rest_command/">Home Assistant rest_command</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
