@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt One: the community's own router, by the spec sheet (2026) — HA News</title>
+  <meta name="description" content="OpenWrt One explained: the first router board designed by the OpenWrt project, its MediaTek MT7981B specs, the two-flash unbrickable design, official 25.12.6 and 24.10.8 builds, Home Assistant ubus setup, and whether to wait for OpenWrt Two.">
+  <link rel="canonical" href="https://hanews.org/openwrt-one">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt One: the community's own router, by the spec sheet (2026)", "datePublished": "2026-11-06", "dateModified": "2026-11-06", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-one"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is the OpenWrt One a real router or a development board?", "acceptedAnswer": {"@type": "Answer", "text": "Both. It routes and serves Wi-Fi on its own, but it ships as a bare board with three MMCX antenna connectors, no antennas and no case, so you finish it yourself. That is the point: it is the OpenWrt project's own reference hardware, not a consumer appliance."}}, {"@type": "Question", "name": "Does the OpenWrt One come with OpenWrt preinstalled, and which release?", "acceptedAnswer": {"@type": "Answer", "text": "It runs OpenWrt, and official images exist for stable 25.12.6 and oldstable 24.10.8 at target mediatek/filogic, profile openwrt_one. You pick the release yourself with the firmware selector rather than being locked to a vendor build."}}, {"@type": "Question", "name": "Is the OpenWrt One fast enough as a main home router for gigabit fibre?", "acceptedAnswer": {"@type": "Answer", "text": "On the spec sheet, yes: a dual-core Cortex-A53 at 1.3 GHz with 1 GB of DDR4 and a 2.5 GbE WAN port. The 2.5 GbE port leaves headroom above a gigabit line, and the second GbE port is enough for a switch or an access point."}}, {"@type": "Question", "name": "What is the 16 MB NOR flash for, and can I brick an OpenWrt One?", "acceptedAnswer": {"@type": "Answer", "text": "The 256 MiB SPI NAND holds U-Boot and Linux. A separate 16 MiB SPI NOR holds a write-protected recovery bootloader that you can re-enable with a jumper to reflash the board. That two-flash design is why the board is described as almost unbrickable."}}, {"@type": "Question", "name": "How do I get an OpenWrt One into Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Use the OpenWrt (ubus) integration, which watches hostapd client changes to report presence. On OpenWrt 24.10 and later you install its dependencies with apk, add a dedicated hass system user, grant it ubus read and write access in /etc/config/rpcd and install an ACL file at /usr/share/rpcd/acl.d/hass.json. It reports presence and system data; it does not let Home Assistant manage firewall rules."}}, {"@type": "Question", "name": "Should I wait for OpenWrt Two instead of buying an OpenWrt One?", "acceptedAnswer": {"@type": "Answer", "text": "There is no official OpenWrt build for any device sold as OpenWrt Two in our snapshot of the official build list, so there is no ship date to plan around. If you need a router now, buy on the OpenWrt One's published specs and treat Two as future news."}}, {"@type": "Question", "name": "Which case, antennas and power supply do I need to deploy one?", "acceptedAnswer": {"@type": "Answer", "text": "Three MMCX antennas for the Wi-Fi radios, a case that fits the 148 x 100.5 mm board, and either an 802.3at or 802.3af PoE injector or a 15 V USB-C PD supply. The board includes a PWM fan header, so a fan is optional."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 6 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt hardware</p>
+        <h1>OpenWrt One: the community's own router, by the spec sheet</h1>
+        <p class="byline">HA News · 6 Nov 2026</p>
+
+        <p>The OpenWrt One is the first router board designed by the OpenWrt project itself, manufactured and distributed by Banana Pi, with part of every sale donated to the Software Freedom Conservancy and earmarked for OpenWrt. It is a real router and a development board at the same time: a MediaTek Filogic 820 board with Wi-Fi 6, a 2.5 GbE port, 1 GB of RAM and two separate flash chips, sold without antennas or a case so you finish it yourself. <strong>If you want a router that runs current official OpenWrt builds with no vendor firmware in the way, this is the shortest path to one.</strong> If you want a sealed box you plug in and forget, it is the wrong product.</p>
+
+        <p>This is a spec-sheet reading, not a bench test. Everything below comes from Banana Pi's published board description as carried by a distributor, from the OpenWrt device page, and from the official build list refreshed on 5 November 2026. No manufacturer photo was available to us — the banana-pi.org product pages returned 404 and the distributor page exposed no image URL — so there is no product shot here rather than a stand-in. Our editor will add a credited Banana Pi photo when one can be captured.</p>
+
+        <h2>What the board actually is</h2>
+        <p>OpenWrt One is a 148 × 100.5 mm board built around the MediaTek MT7981B, also called Filogic 820: two Cortex-A53 cores at 1.3 GHz, 1 GB of DDR4 and 256 MiB of SPI NAND. Wi-Fi 6 comes from the MT7976C radio, two streams on 2.4 GHz and up to three streams on 5 GHz, with zero-wait DFS so the board can use radar channels without the usual long wait. Wired side: one 2.5 GbE RJ45 and one GbE RJ45.</p>
+
+        <table>
+          <thead><tr><th>Spec</th><th>OpenWrt One</th></tr></thead>
+          <tbody>
+            <tr><td>SoC</td><td>MediaTek MT7981B (Filogic 820), dual-core Cortex-A53 @ 1.3 GHz</td></tr>
+            <tr><td>RAM</td><td>1 GB DDR4</td></tr>
+            <tr><td>Storage</td><td>256 MiB SPI NAND, plus a separate 16 MiB SPI NOR for the recovery bootloader</td></tr>
+            <tr><td>Wi-Fi</td><td>Wi-Fi 6 via MT7976C: 2×2 on 2.4 GHz, 3×3/2×2 on 5 GHz, zero-wait DFS</td></tr>
+            <tr><td>Ethernet</td><td>1× 2.5 GbE RJ45, 1× GbE RJ45</td></tr>
+            <tr><td>Expansion</td><td>M.2 2242/2230 NVMe socket (PCIe gen2 ×1), mikroBUS socket, USB 2.0 Type-A host, USB-C console port</td></tr>
+            <tr><td>Power</td><td>802.3at/af PoE via an RT5040 module, or 15 V USB-PD on the USB-C port</td></tr>
+            <tr><td>Antennas</td><td>3× MMCX connectors, not included</td></tr>
+            <tr><td>Other</td><td>RTC battery holder, PWM fan support in software</td></tr>
+            <tr><td>Dimensions</td><td>148 × 100.5 mm</td></tr>
+          </tbody>
+        </table>
+        <p>Source for the hardware figures: <a href="https://corpshadow.biz/banana-pi/openwrt-one-ap-24xy-router-board-based-on-mediatek-mt7981b" rel="nofollow">Banana Pi's OpenWrt One/AP-24.XY board description</a> as published by the distributor, because the banana-pi.org product URLs were returning 404 when this was written.</p>
+
+        <h2>Which OpenWrt release runs on it</h2>
+        <p>Official images exist for both current branches. As of 6 November 2026, stable is 25.12.6 and oldstable is 24.10.8, and the OpenWrt One has builds on both, at target <code>mediatek/filogic</code> and profile <code>openwrt_one</code>. Start at the <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=openwrt_one" rel="nofollow">firmware selector with the profile already selected</a>, and check install instructions against the <a href="https://openwrt.org/toh/openwrt/one" rel="nofollow">OpenWrt device page</a>.</p>
+        <p>One practical warning about that second link: openwrt.org sits behind an Anubis proof-of-work bot wall, so it answers with a JavaScript challenge and no content when fetched by a script. Open it in a browser by hand. It is cited here for hand-checking, not for scraping.</p>
+        <p>Because both branches are supported, you get to choose. Take 25.12.6 for a new build — it is the current stable and where fixes land. Stay on 24.10.8 only if you are matching an existing fleet, or an installed package only builds there. Our overview of <a href="openwrt">what OpenWrt is and why it exists</a> covers the release model if that choice is new to you.</p>
+
+        <h2>The two-flash design, and why it matters</h2>
+        <p>Most consumer routers have exactly one copy of their firmware. A bad flash means a serial cable, a soldering iron or a landfill. OpenWrt One splits the job in two: the 256 MiB SPI NAND holds U-Boot and Linux, while a separate 16 MiB SPI NOR holds a write-protected recovery bootloader. Move a jumper and that recovery loader can be re-enabled to reflash the board. That is the whole basis of the "almost unbrickable" claim — it is a hardware arrangement, not a marketing line.</p>
+        <p>For anyone who has flashed a router at 11 p.m. and then driven to a shop for a replacement, that is the single most interesting thing about this board. It is also the feature that makes it a fair choice for a device you will upgrade across major releases for years.</p>
+
+        <h2>What you still have to buy</h2>
+        <p>The board arrives without antennas or an enclosure. To deploy one as a router or access point you need:</p>
+        <ul>
+          <li><strong>Three MMCX antennas</strong>, one per connector. Check the band coverage is right for 2.4 and 5 GHz. <a href="https://www.amazon.com/s?k=MMCX+dual+band+wifi+antenna&amp;tag=hanews01-20" rel="sponsored nofollow">MMCX dual-band antennas on Amazon</a></li>
+          <li><strong>A case</strong> sized for a 148 × 100.5 mm board. <a href="https://www.amazon.com/s?k=OpenWrt+One+case&amp;tag=hanews01-20" rel="sponsored nofollow">OpenWrt One cases on Amazon</a></li>
+          <li><strong>Power</strong>: an 802.3at or 802.3af PoE injector if you want a single cable run to the ceiling, or a 15 V USB-C PD supply for a desk. <a href="https://www.amazon.com/s?k=802.3at+poe+injector+gigabit&amp;tag=hanews01-20" rel="sponsored nofollow">802.3at PoE injectors on Amazon</a> · <a href="https://www.amazon.com/s?k=usb-c+pd+15v+power+supply&amp;tag=hanews01-20" rel="sponsored nofollow">15 V USB-C PD supplies on Amazon</a></li>
+        </ul>
+        <p>Optional: an NVMe drive in the M.2 2242/2230 socket for logs, containers or a small file share, and a fan on the PWM header if the board lives somewhere warm. Neither is needed to route packets. Our <a href="best-openwrt-router">shortlist of OpenWrt routers by use case</a> is the place to look if assembling a board sounds like more work than you want.</p>
+
+        <h2>Putting it in front of the house</h2>
+        <p>The 2.5 GbE port is the natural WAN, which leaves the gigabit port for a switch or a wired access point. If your fibre is a gigabit line, the dual-core A53 and 1 GB of RAM are comfortable on paper; the 2.5 GbE port also means the router is not the bottleneck if you move to a faster line later. Two Ethernet ports is the honest limit, though: this is a router, not a switch, so plan on a switch downstream unless your whole network is wireless.</p>
+        <p>Where it earns its place in a smart home is segmentation. Put the IoT gear on its own network and keep the work laptops and the NAS off it; the <a href="openwrt-iot-vlan">OpenWrt IoT VLAN walkthrough</a> is the pattern to copy. For reaching Home Assistant from outside without opening a port, our <a href="openwrt-wireguard">WireGuard on OpenWrt</a> piece covers the setup; there is also a comparison of <a href="openwrt-vs-dd-wrt">OpenWrt against DD-WRT</a> if you are choosing a platform rather than a board.</p>
+
+        <h2>Home Assistant: what you get, and what you don't</h2>
+        <p>Home Assistant's OpenWrt (ubus) integration is a presence-detection scanner. It watches <code>hostapd.*</code> client changes, so it belongs on an OpenWrt box acting as a wireless access point — not on one that only routes. Point it at a router with no Wi-Fi clients and there is nothing for it to see.</p>
+        <p>Setup, per Home Assistant's documentation:</p>
+        <ol>
+          <li>Install the dependencies: <code>apk update &amp;&amp; apk add rpcd-mod-file uhttpd-mod-ubus</code>.</li>
+          <li>Create a dedicated <code>hass</code> system user with a password, rather than reusing root.</li>
+          <li>Add <code>list read</code> and <code>list write</code> lines for that user in <code>/etc/config/rpcd</code>.</li>
+          <li>Install an ACL file at <code>/usr/share/rpcd/acl.d/hass.json</code>, then add the integration in Home Assistant with the router's address and those credentials.</li>
+        </ol>
+        <p>Two gotchas. First, from OpenWrt 24.10 onward the package manager is <code>apk</code>, not <code>opkg</code>, so older tutorials that start with <code>opkg update</code> will simply fail on this board. Second, the integration gives you presence and system data only. It does not turn the router into a Home Assistant-controlled device — firewall rules, NAT and DHCP still happen in LuCI or UCI. Anyone expecting to toggle a firewall rule from a dashboard should know that up front. Source: <a href="https://www.home-assistant.io/integrations/ubus/">Home Assistant ubus integration docs</a>.</p>
+
+        <h2>OpenWrt Two: wait, or buy now?</h2>
+        <p>Search interest in OpenWrt Two is real, and it is the obvious question. Our snapshot of the official build list, checked on 6 November 2026, contains no official OpenWrt build for any device sold as "OpenWrt Two". So there is no release, no date and no spec sheet to plan around — and no basis for stating a ship date. The nearest high-end Filogic boards with official builds today are the Banana Pi BPi-R4, which has images on both 24.10.8 and 25.12.6, and the BPi-R4 Lite, which has 25.12.6 only.</p>
+        <p>That makes the decision simple. If you need a router this month, buy on the OpenWrt One's published specs. If you are curious about Two, watch the project's own announcements, not the resellers.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Is the OpenWrt One a real router or a development board?</h3>
+        <p>Both. It routes and serves Wi-Fi on its own, but it ships as a bare board with three MMCX antenna connectors, no antennas and no case, so you finish it yourself. That is the point: it is the OpenWrt project's own reference hardware, not a consumer appliance.</p>
+        <h3>Does the OpenWrt One come with OpenWrt preinstalled, and which release?</h3>
+        <p>It runs OpenWrt, and official images exist for stable 25.12.6 and oldstable 24.10.8 at target <code>mediatek/filogic</code>, profile <code>openwrt_one</code>. You pick the release yourself with the firmware selector rather than being locked to a vendor build.</p>
+        <h3>Is the OpenWrt One fast enough as a main home router for gigabit fibre?</h3>
+        <p>On the spec sheet, yes: a dual-core Cortex-A53 at 1.3 GHz with 1 GB of DDR4 and a 2.5 GbE WAN port. The 2.5 GbE port leaves headroom above a gigabit line, and the second GbE port is enough for a switch or an access point.</p>
+        <h3>What is the 16 MB NOR flash for, and can I brick an OpenWrt One?</h3>
+        <p>The 256 MiB SPI NAND holds U-Boot and Linux. A separate 16 MiB SPI NOR holds a write-protected recovery bootloader that you can re-enable with a jumper to reflash the board. That two-flash design is why the board is described as almost unbrickable.</p>
+        <h3>How do I get an OpenWrt One into Home Assistant?</h3>
+        <p>Use the OpenWrt (ubus) integration, which watches <code>hostapd</code> client changes to report presence. On OpenWrt 24.10 and later you install its dependencies with <code>apk</code>, add a dedicated <code>hass</code> system user, grant it ubus read and write access in <code>/etc/config/rpcd</code> and install an ACL file at <code>/usr/share/rpcd/acl.d/hass.json</code>. It reports presence and system data; it does not let Home Assistant manage firewall rules.</p>
+        <h3>Should I wait for OpenWrt Two instead of buying an OpenWrt One?</h3>
+        <p>There is no official OpenWrt build for any device sold as OpenWrt Two in our snapshot of the official build list, so there is no ship date to plan around. If you need a router now, buy on the OpenWrt One's published specs and treat Two as future news.</p>
+        <h3>Which case, antennas and power supply do I need to deploy one?</h3>
+        <p>Three MMCX antennas for the Wi-Fi radios, a case that fits the 148 × 100.5 mm board, and either an 802.3at or 802.3af PoE injector or a 15 V USB-C PD supply. The board includes a PWM fan header, so a fan is optional.</p>
+        <p>We publish a daily brief on Home Assistant, Matter, Thread and OpenWrt releases. <a href="brief-2026-11-02">Read today's</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://corpshadow.biz/banana-pi/openwrt-one-ap-24xy-router-board-based-on-mediatek-mt7981b" rel="nofollow">Banana Pi OpenWrt One/AP-24.XY board description</a>; <a href="https://openwrt.org/toh/openwrt/one" rel="nofollow">OpenWrt device page for OpenWrt One</a>; <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=openwrt_one" rel="nofollow">OpenWrt firmware selector, openwrt_one</a>; <a href="https://www.home-assistant.io/integrations/ubus/">Home Assistant OpenWrt (ubus) integration</a>; official build list from downloads.openwrt.org, snapshot refreshed 5 November 2026.</dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
