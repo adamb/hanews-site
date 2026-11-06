@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt VLANs for IoT: a separate network for smart devices — HA News</title>
+  <meta name="description" content="How to build an IoT VLAN on OpenWrt: create the VLAN on the bridge, firewall zones, Wi-Fi binding, and the mDNS problem that makes ESPHome, HomeKit and Matter devices vanish from Home Assistant.">
+  <link rel="canonical" href="https://hanews.org/openwrt-iot-vlan">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt VLANs for IoT: a separate network for smart devices", "datePublished": "2026-11-06", "dateModified": "2026-11-06", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-iot-vlan"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I need a VLAN for Home Assistant, or is a guest network enough?", "acceptedAnswer": {"@type": "Answer", "text": "A guest network is a start: it usually isolates clients from each other and from your main LAN, which is most of the security benefit. What it does not give you is control. A VLAN lets you decide exactly which ports are open between Home Assistant and your devices, keep the IoT subnet on its own addressing plan, and bind several SSIDs or ports to the same isolated segment. If your router can only do a guest SSID, use it, but expect to solve discovery problems the same way you would on a VLAN."}}, {"@type": "Question", "name": "Why did my ESPHome and HomeKit devices disappear from Home Assistant after I created an IoT VLAN?", "acceptedAnswer": {"@type": "Answer", "text": "Because discovery is multicast, and multicast does not cross a router by default. Home Assistant's zeroconf integration listens for mDNS announcements, and Home Assistant OS itself is reached at an address ending in .local. Once devices sit behind a different interface, those announcements stop arriving and the .local name no longer resolves. The fix is either to forward or reflect mDNS between the two networks, or to stop depending on it by giving devices fixed addresses and adding them by IP."}}, {"@type": "Question", "name": "How do I keep Home Assistant discovering devices on a separate IoT VLAN?", "acceptedAnswer": {"@type": "Answer", "text": "Two workable patterns. Forward multicast between the IoT VLAN and the network Home Assistant sits on, so mDNS announcements arrive, and check results in Settings > System > Network > Zeroconf Browser. Or accept that discovery will not work, give every ESPHome node a static IP with manual_ip, and add devices by host or IP address. The second is more predictable; the first keeps vendor apps working."}}, {"@type": "Question", "name": "Does a Zigbee or Z-Wave coordinator care about VLANs at all?", "acceptedAnswer": {"@type": "Answer", "text": "No. A Zigbee or Z-Wave coordinator is a USB radio attached to the machine running Home Assistant. It speaks to sensors over 802.15.4 or sub-GHz radio and to the host over the USB cable, so IP routing never enters the picture. Zigbee and Z-Wave devices are unaffected by how you segment Wi-Fi."}}, {"@type": "Question", "name": "Will isolating IoT devices break Matter or Thread commissioning?", "acceptedAnswer": {"@type": "Answer", "text": "It can. Matter relies on IPv6 and mDNS, and Thread commissioning needs a border router on the same link or working multicast and IPv6 routing to the devices. A VLAN design that only forwards IPv4 unicast will look routed and still fail at commissioning. Give the IoT segment IPv6, and either keep the border router on that segment or verify that multicast crosses the boundary."}}, {"@type": "Question", "name": "Which cheap OpenWrt routers have official builds for 25.12.6?", "acceptedAnswer": {"@type": "Answer", "text": "From the official download index: the GL.iNet GL-MT3000 and GL-MT6000, the Cudy WR3000 v1, the TP-Link Archer AX23 v1 and the ASUS RT-AX53U all have 25.12.6 builds on the mediatek/filogic and ramips/mt7621 targets, alongside 24.10.8 builds. Check your exact model and revision in the firmware selector before flashing."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 6 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">How-to · OpenWrt</p>
+        <h1>OpenWrt VLANs for IoT: a separate network for smart devices</h1>
+        <p class="byline">HA News · 6 Nov 2026</p>
+
+        <p>An IoT VLAN on OpenWrt is one extra network segment, carried over the same switch and radio as your main LAN, that holds the smart plugs, bulbs, cameras and ESP32 boards. You create it once on the bridge, firewall it so devices cannot reach your laptops, bind a Wi-Fi network to it, and then spend the rest of the afternoon solving the part nobody warns you about: discovery. Home Assistant finds devices by multicast, and multicast does not cross a router.</p>
+
+        <p>This guide covers the whole job on current OpenWrt — 25.12.6 is the stable release published 18 October 2026, with 24.10.8 still built for most devices — and it is honest about the step that has no clean answer.</p>
+
+        <h2>What a VLAN buys you</h2>
+        <p>A VLAN is a way to run more than one logical network over one physical switch and one access point. Devices on different VLANs behave as if they were plugged into separate routers: they cannot talk to each other unless a router forwards the traffic, and you decide per port and per protocol whether it does.</p>
+        <p>For a smart home that buys three things. First, a cheap bulb or an unpatched camera with a cloud account can no longer reach the machine holding your files. Second, broadcast traffic from fifty chatty devices stays off your main network. Third, you get a clean place to apply rules: the IoT segment reaches the internet, reaches Home Assistant on exactly the ports it needs, and reaches nothing else.</p>
+        <p>It does not buy you privacy from the manufacturer. A bulb that phones home still phones home; the VLAN only decides what it can reach inside your house. Blocking outbound traffic is a separate decision, made in the firewall, and many devices misbehave when you make it.</p>
+
+        <h2>Before you touch anything: know your hardware target</h2>
+        <p>OpenWrt's switch configuration is not one thing. Modern targets — <code>mediatek/filogic</code> and <code>ramips/mt7621</code>, which cover most current routers — use the DSA network stack, where ports appear as individual interfaces under a bridge. Older <code>ath79</code> hardware still uses the swconfig-era model with a single switch device and a port map. The menu names, and the way tagged and untagged membership is expressed, differ between the two.</p>
+        <p>Check the device's own page before copying any configuration from a guide, including this one. That matters more than usual right now: OpenWrt's documentation wiki sits behind a JavaScript proof-of-work bot check (Anubis), so automated fetches get a challenge page instead of the article. Reading the wiki needs a normal browser. Everything below is written to be true across releases at the concept level; exact labels should be checked against the wiki and your device page on the day you do it.</p>
+        <p>Both current branches are worth knowing about, because a device page may describe one and your router may run the other. OpenWrt 25.12.6 shipped on 18 October 2026; 24.10.8 shipped on 26 July 2026. Official images for a specific device and release are listed in the <a href="https://firmware-selector.openwrt.org/">OpenWrt firmware selector</a>, and the per-release target indexes live under <a href="https://downloads.openwrt.org/releases/25.12.6/targets/">downloads.openwrt.org</a>.</p>
+
+        <h2>The plan, in numbers</h2>
+        <p>Pick your addressing before you create anything. A simple scheme that stays readable:</p>
+        <table>
+          <thead><tr><th>Segment</th><th>VLAN ID</th><th>Example subnet</th><th>Holds</th></tr></thead>
+          <tbody>
+            <tr><td>Main LAN</td><td>1 (untagged)</td><td>192.168.1.0/24</td><td>Laptops, phones, Home Assistant</td></tr>
+            <tr><td>IoT</td><td>20</td><td>192.168.20.0/24</td><td>Plugs, bulbs, cameras, ESPHome nodes</td></tr>
+            <tr><td>Guest</td><td>30</td><td>192.168.30.0/24</td><td>Visitors, internet only</td></tr>
+          </tbody>
+        </table>
+        <p>Keep Home Assistant on the main LAN and treat the IoT segment as the far side of a firewall. The alternative — moving Home Assistant onto the IoT VLAN — removes the routing problem for discovery but exposes the server to every compromised device on that segment, which is the thing you were trying to avoid.</p>
+
+        <h2>Step 1: create the VLAN on the bridge</h2>
+        <p>In DSA builds, the LAN ports are members of a bridge device. You add a new VLAN to that bridge, set the CPU port as tagged for it so the router's own network stack can see it, and set the physical ports you care about as either untagged (a device that does not speak VLANs, like a TV or a dumb switch) or tagged (a downstream managed switch or a second access point). Ports you leave out of the VLAN simply do not carry it.</p>
+        <p>The practical rule: a port that should belong entirely to the IoT network is untagged in VLAN 20 and removed from VLAN 1. A port feeding a second access point carries both VLANs tagged. Getting this wrong is the usual cause of a router that boots into an unreachable state, so make the change over a wired connection with a rollback timer set, and keep a copy of the config.</p>
+
+        <h2>Step 2: give the VLAN an interface and a DHCP server</h2>
+        <p>A VLAN with no interface is just a label on a wire. Create a new interface on top of the VLAN device, give it the gateway address for the subnet (192.168.20.1 in the example), and enable a DHCP server on it. Set the DHCP lease time long — twelve hours or a day — because IoT devices reconnecting every few minutes add nothing but noise.</p>
+        <p>This is also where you decide whether the segment gets IPv6. If you run Matter or Thread anywhere in the house, it should. Matter depends on IPv6, and a segment with IPv4 only will look healthy right up until commissioning fails.</p>
+
+        <h2>Step 3: firewall zones, and the two rules that matter</h2>
+        <p>OpenWrt's firewall works on zones, and a zone is usually one interface. Create an <em>iot</em> zone containing the new interface and set input and forward to reject, output to accept. Then add forwarding from IoT to WAN so devices can reach the internet, and leave IoT to LAN blocked.</p>
+        <p>Home Assistant still needs to reach devices, so add the narrow exception: a forwarding rule from LAN to IoT, restricted to the Home Assistant host address and to the ports you actually use. For ESPHome that is 6053 for the API and 80 for over-the-air updates; for a camera stream it is whatever the camera serves. The point of the exercise is that the rule names one source address, not the whole LAN.</p>
+        <p>Do not forget the return path. Forwarding from IoT to LAN is what most people block first, and it is also what breaks devices that call back to a local server. If something works until you enable the firewall and then stops, this is where to look.</p>
+
+        <h2>Step 4: bind Wi-Fi to the IoT network</h2>
+        <p>Wireless is a separate step from switching. Create a new wireless network, attach it to the IoT interface as its network, and give it its own SSID and passphrase. Most IoT devices are 2.4 GHz only, so put that SSID on the 2.4 GHz radio and, if your hardware allows it, leave it off 5 GHz entirely to stop devices from wandering.</p>
+        <p>Two habits worth keeping: give the IoT SSID a name that does not advertise what it is (an SSID called "IoT-VLAN" tells a passer-by which network to target), and disable WPA3-only modes on that SSID if older devices refuse to associate. WPA2/WPA3 mixed mode is the usual compromise.</p>
+
+        <h2>Step 5: the discovery problem</h2>
+        <p>This is where most people get stuck, and it is not an OpenWrt bug. Home Assistant's <a href="https://www.home-assistant.io/integrations/zeroconf/">zeroconf integration</a> — mDNS, Bonjour, Avahi — is enabled by default through <code>default_config:</code>. It is what populates the discovered list with HomeKit, ESPHome, Google Cast and Android TV devices. It works by listening to multicast announcements on the interfaces the Network integration tells it to use, and it enables IPv6 automatically when a selected interface has an IPv6 address.</p>
+        <p>Multicast does not route. The moment your bulbs are on VLAN 20 and Home Assistant is on VLAN 1, the announcements never arrive. The same applies to names: a default Home Assistant OS install answers at <code>http://homeassistant.local:8123</code>, and <code>.local</code> is a private mDNS suffix that only resolves where multicast works.</p>
+        <p>You have two honest options.</p>
+        <p><strong>Reflect or forward mDNS.</strong> Run a reflector that listens on the IoT interface and re-announces on the main LAN, or forward the mDNS group between zones. This keeps vendor apps and automatic discovery working, at the cost of one more moving part and more multicast noise on the main LAN.</p>
+        <p><strong>Stop depending on discovery.</strong> Give every device a fixed address and add it by IP. ESPHome's own documentation recommends a static address through <code>manual_ip:</code> — with <code>static_ip</code>, <code>gateway</code> and <code>subnet</code> — saying it "can dramatically improve connection times". It also removes the dependency on DHCP and on <code>.local</code> resolution across subnets. The <code>domain</code> option controls the hostname suffix used for uploads and defaults to <code>.local</code>; <code>use_address</code> overrides the address used to reach the device, which is what you need after it has moved to another subnet or its address changed. For ESPHome nodes this is the better answer, because you are editing the configuration file anyway.</p>
+        <p>Whichever you choose, confirm it with the Zeroconf Browser at Settings, System, Network, Zeroconf Browser. If devices appear there, discovery traffic is reaching Home Assistant. If the browser is empty, nothing downstream will work.</p>
+
+        <h2>Step 6: Matter and Thread need more than routing</h2>
+        <p>Matter in Home Assistant runs as a separate Matter Server app that Home Assistant talks to over a WebSocket; the controller then speaks to devices over the local Wi-Fi or Thread network. Thread devices need a border router, and commissioning starts over Bluetooth before the device joins the Thread mesh. A border router has to sit on the same layer-2 segment as the devices, or have working multicast and IPv6 routing to them.</p>
+        <p>The consequence is blunt: a VLAN design that forwards only IPv4 unicast will break Matter commissioning while every ping test passes. If Matter matters to you, either place the Thread border router and the devices on the same segment, or verify multicast and IPv6 across the boundary before you start moving devices around.</p>
+
+        <h2>Gotchas worth knowing before you start</h2>
+        <ul>
+          <li><strong>Locking yourself out.</strong> Change one thing at a time, and apply switch changes from a wired port you are not reconfiguring.</li>
+          <li><strong>DSA versus swconfig instructions.</strong> Guides written for a 2019 Archer do not describe a 2026 filogic router. Check the device page's switch and driver notes.</li>
+          <li><strong>Zigbee and Z-Wave are unaffected.</strong> A coordinator is a USB radio on the Home Assistant host, not a network device. Segmenting Wi-Fi changes nothing for them. See <a href="zigbee-hub">Zigbee hub for Home Assistant</a> if you are weighing radios.</li>
+          <li><strong>Printers, TVs and speakers.</strong> Cloud-dependent consumer gear often needs to see the phone or app that set it up. Expect a few devices that only work when they share a subnet with the controller app.</li>
+          <li><strong>Guest network is not a VLAN.</strong> It gives isolation, but not the per-port control that lets Home Assistant talk to devices while nothing else does.</li>
+        </ul>
+
+        <h2>Routers with official OpenWrt builds</h2>
+        <p>VLAN work is easier on hardware with a current official image and DSA-era switch configuration. From the official download index, these all have builds for both 25.12.6 and 24.10.8:</p>
+        <ul>
+          <li><strong>GL.iNet GL-MT3000</strong>, target <code>mediatek/filogic</code>: <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=glinet_gl-mt3000">firmware selector</a>, <a href="https://openwrt.org/toh/glinet/gl-mt3000">device page</a>, <a href="https://www.amazon.com/s?k=GL.iNet+GL-MT3000&amp;tag=hanews01-20" rel="sponsored nofollow">Amazon search</a></li>
+          <li><strong>GL.iNet GL-MT6000</strong>, target <code>mediatek/filogic</code>: <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=glinet_gl-mt6000">firmware selector</a>, <a href="https://openwrt.org/toh/glinet/gl-mt6000">device page</a>, <a href="https://www.amazon.com/s?k=GL.iNet+GL-MT6000&amp;tag=hanews01-20" rel="sponsored nofollow">Amazon search</a></li>
+          <li><strong>Cudy WR3000 v1</strong>, target <code>mediatek/filogic</code>: <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=cudy_wr3000-v1">firmware selector</a>, <a href="https://openwrt.org/toh/cudy/wr3000_v1">device page</a>, <a href="https://www.amazon.com/s?k=Cudy+WR3000&amp;tag=hanews01-20" rel="sponsored nofollow">Amazon search</a></li>
+          <li><strong>TP-Link Archer AX23 v1</strong>, target <code>ramips/mt7621</code>: <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=ramips/mt7621&amp;id=tplink_archer-ax23-v1">firmware selector</a>, <a href="https://openwrt.org/toh/tp-link/archer_ax23_v1">device page</a>, <a href="https://www.amazon.com/s?k=TP-Link+Archer+AX23&amp;tag=hanews01-20" rel="sponsored nofollow">Amazon search</a></li>
+          <li><strong>ASUS RT-AX53U / RT-AX1800U</strong>, target <code>ramips/mt7621</code>: <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=ramips/mt7621&amp;id=asus_rt-ax53u">firmware selector</a>, <a href="https://openwrt.org/toh/asus/rt-ax53u">device page</a>, <a href="https://www.amazon.com/s?k=ASUS+RT-AX53U&amp;tag=hanews01-20" rel="sponsored nofollow">Amazon search</a></li>
+        </ul>
+        <p>Model and hardware revision matter; a v2 with the same retail name can be a different target with different switch support. Check the revision in the firmware selector before buying, and see <a href="openwrt">OpenWrt for the smart home</a> for more hardware that has official builds.</p>
+
+        <h2>Where this fits</h2>
+        <p>If you are new to OpenWrt itself, start with <a href="openwrt">the OpenWrt pillar</a>, then decide whether this router OS suits you at all with <a href="openwrt-vs-dd-wrt">OpenWrt vs DD-WRT</a>. Once the VLAN is in place, a road-warrior tunnel is the natural next step — <a href="openwrt-wireguard">WireGuard on OpenWrt</a> — and the Home Assistant side of networking is covered on the <a href="ha.html">Home Assistant</a> section front. Anyone weighing a Thread network should read our <a href="matter.html">Matter &amp; Thread</a> coverage before putting devices behind a firewall.</p>
+
+        <aside class="rail-sub article-cta" aria-label="Newsletter">
+          <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </aside>
+
+        <h2>FAQ</h2>
+        <h3>Do I need a VLAN for Home Assistant, or is a guest network enough?</h3>
+        <p>A guest network is a start: it usually isolates clients from each other and from your main LAN, which is most of the security benefit. What it does not give you is control. A VLAN lets you decide exactly which ports are open between Home Assistant and your devices, keep the IoT subnet on its own addressing plan, and bind several SSIDs or ports to the same isolated segment. If your router can only do a guest SSID, use it, but expect to solve discovery problems the same way you would on a VLAN.</p>
+        <h3>Why did my ESPHome and HomeKit devices disappear from Home Assistant after I created an IoT VLAN?</h3>
+        <p>Because discovery is multicast, and multicast does not cross a router by default. Home Assistant's zeroconf integration listens for mDNS announcements, and Home Assistant OS itself is reached at an address ending in <code>.local</code>. Once devices sit behind a different interface, those announcements stop arriving and the <code>.local</code> name no longer resolves. The fix is either to forward or reflect mDNS between the two networks, or to stop depending on it by giving devices fixed addresses and adding them by IP.</p>
+        <h3>How do I keep Home Assistant discovering devices on a separate IoT VLAN?</h3>
+        <p>Two workable patterns. Forward multicast between the IoT VLAN and the network Home Assistant sits on, so mDNS announcements arrive, and check results in Settings &gt; System &gt; Network &gt; Zeroconf Browser. Or accept that discovery will not work, give every ESPHome node a static IP with <code>manual_ip</code>, and add devices by host or IP address. The second is more predictable; the first keeps vendor apps working.</p>
+        <h3>Does a Zigbee or Z-Wave coordinator care about VLANs at all?</h3>
+        <p>No. A Zigbee or Z-Wave coordinator is a USB radio attached to the machine running Home Assistant. It speaks to sensors over 802.15.4 or sub-GHz radio and to the host over the USB cable, so IP routing never enters the picture. Zigbee and Z-Wave devices are unaffected by how you segment Wi-Fi.</p>
+        <h3>Will isolating IoT devices break Matter or Thread commissioning?</h3>
+        <p>It can. Matter relies on IPv6 and mDNS, and Thread commissioning needs a border router on the same link or working multicast and IPv6 routing to the devices. A VLAN design that only forwards IPv4 unicast will look routed and still fail at commissioning. Give the IoT segment IPv6, and either keep the border router on that segment or verify that multicast crosses the boundary.</p>
+        <h3>Which cheap OpenWrt routers have official builds for 25.12.6?</h3>
+        <p>From the official download index: the GL.iNet GL-MT3000 and GL-MT6000, the Cudy WR3000 v1, the TP-Link Archer AX23 v1 and the ASUS RT-AX53U all have 25.12.6 builds on the mediatek/filogic and ramips/mt7621 targets, alongside 24.10.8 builds. Check your exact model and revision in the firmware selector before flashing.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.6">OpenWrt 25.12.6 release</a>; <a href="https://github.com/openwrt/openwrt/releases/tag/v24.10.8">OpenWrt 24.10.8 release</a>; <a href="https://downloads.openwrt.org/releases/25.12.6/targets/">official target index</a>; <a href="https://openwrt.org/docs/guide-user/network/vlan/switch_configuration">OpenWrt VLAN documentation</a> (behind a bot check; open in a browser); <a href="https://www.home-assistant.io/integrations/zeroconf/">Home Assistant zeroconf</a>; <a href="https://esphome.io/components/wifi/">ESPHome Wi-Fi component</a>; <a href="https://www.home-assistant.io/integrations/matter/">Home Assistant Matter</a>; <a href="https://companion.home-assistant.io/docs/troubleshooting/networking/">Companion app networking notes</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

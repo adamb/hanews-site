@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdGuard Home on OpenWrt: install it without breaking DNS (2026) — HA News</title>
+  <meta name="description" content="How to install AdGuard Home on OpenWrt 25.12, free port 53 from dnsmasq, find the config files, set up parental controls, and fix the usual 'not blocking' problems. Version 0.107.80, from the package feed.">
+  <link rel="canonical" href="https://hanews.org/openwrt-adguard-home">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "AdGuard Home on OpenWrt: install it without breaking DNS (2026)", "datePublished": "2026-11-06", "dateModified": "2026-11-06", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-adguard-home"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does AdGuard Home replace dnsmasq on OpenWrt, or do they conflict?", "acceptedAnswer": {"@type": "Answer", "text": "They conflict by default, because both want port 53. OpenWrt ships dnsmasq as its DNS forwarder and DHCP server, and the AdGuard Home init script starts at START=19, the same slot as dnsmasq, with the comment 'matches dnsmasq'. Before you enable the service, decide which daemon owns port 53 and stop or repoint the other one."}}, {"@type": "Question", "name": "How do I stop dnsmasq from fighting AdGuard Home for port 53?", "acceptedAnswer": {"@type": "Answer", "text": "Decide the split first: one daemon answers DNS on port 53, the other does not. AdGuard Home has its own DHCP settings page, so 'dnsmasq keeps DHCP and AdGuard Home takes DNS' is a configuration choice rather than a limitation of the package. If AdGuard Home cannot bind port 53 it will fail at start, and the error appears in syslog."}}, {"@type": "Question", "name": "How do I set up AdGuard Home parental controls on OpenWrt?", "acceptedAnswer": {"@type": "Answer", "text": "Open the AdGuard Home web interface and go to Settings, then General settings, where Parental Control sits on the same page as 'Block domains using filters and hosts files'. The blocklists behind it live under Filters, in DNS blocklists. A custom block page needs the dns.parental_block_host key in adguardhome.yaml; it is not exposed in the UI."}}, {"@type": "Question", "name": "Where are AdGuard Home logs on OpenWrt, and how do I turn on verbose logging?", "acceptedAnswer": {"@type": "Answer", "text": "The OpenWrt package runs AdGuard Home with --logfile syslog, so logs go to the system log and are read with logread -e AdGuardHome. The verbose option in /etc/config/adguardhome turns up the detail, and query logs are stored separately in the work directory rather than in syslog."}}, {"@type": "Question", "name": "Can I run AdGuard Home on a router with 128 MB of RAM?", "acceptedAnswer": {"@type": "Answer", "text": "It will start, but memory is the constraint, which is why the init script exposes gc (GOGC), memlimit (GOMEMLIMIT) and maxprocs (GOMAXPROCS) as UCI options. Query history and statistics also live in the work directory, so trim retention on a small box instead of assuming the defaults fit."}}, {"@type": "Question", "name": "How do I update AdGuard Home on OpenWrt — the UI button or the package manager?", "acceptedAnswer": {"@type": "Answer", "text": "The package manager. The init script runs AdGuard Home with --no-check-update, so the self-update button in the web interface is disabled by design. Upgrades arrive as a new adguardhome package version; the feed currently builds 0.107.80-1, the same version as upstream's 0.107.80 release."}}, {"@type": "Question", "name": "Why is AdGuard Home not blocking ads after install?", "acceptedAnswer": {"@type": "Answer", "text": "AdGuard's own FAQ checklist, in order: the client is not actually pointed at AdGuard Home (verify with nslookup which server answers), the interface is not being listened on, blocking with filters and hosts files is switched off, an allowlist entry is overriding the block, or a DNS rewrite or custom rule is overriding it."}}, {"@type": "Question", "name": "Do I need a LuCI app to manage AdGuard Home on OpenWrt?", "acceptedAnswer": {"@type": "Answer", "text": "No. There is no official LuCI app from either project. AdGuard's documentation lists an OpenWrt LuCI app maintained by @kongfl888 under unofficial options, and the package itself is configured through UCI plus AdGuard Home's own web interface on port 80 after setup."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 6 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt</p>
+        <h1>AdGuard Home on OpenWrt: install it without breaking DNS</h1>
+        <p class="byline">HA News · 6 Nov 2026</p>
+
+        <p>AdGuard Home on OpenWrt gives you network-wide ad blocking, tracker filtering and parental controls on the router itself, with no subscription and no cloud account. Every device on the LAN gets filtered DNS whether it wants to or not, including the ones you can't install an app on: televisions, consoles, the thermostat.</p>
+
+        <p>The install is a single package. The hard part is not the install. It is port 53, because OpenWrt already has a DNS daemon running there, and the two will fight. This guide covers the package as it exists in the official feed today, what it puts on disk, how to hand DNS over cleanly, and how to set up parental controls that hold up.</p>
+
+        <h2>Versions, and why the package matters</h2>
+        <p>AdGuard Home's latest stable release is <strong>v0.107.80</strong>, published on 3 November 2026. It is a dependency and security release: Go moved to 1.27.3, Multipath TCP support was disabled to mitigate CVE-2026-98432, and macOS 13 Ventura support was dropped. (<a href="https://github.com/AdguardTeam/AdGuardHome/releases/tag/v0.107.80">release notes</a>)</p>
+        <p>The OpenWrt packages feed builds <strong>adguardhome 0.107.80-1</strong> — the same version as upstream, so there is no lag to work around right now. (<a href="https://github.com/openwrt/packages/blob/master/net/adguardhome/Makefile">packages feed Makefile</a>) Current OpenWrt stable is <strong>25.12.6</strong>, with <strong>24.10.8</strong> as oldstable; the commands below are the same on both.</p>
+
+        <h2>What the package actually installs</h2>
+        <p>The package is GPL-3.0-only, maintained in the packages feed by Dobroslaw Kijowski and George Sapkin, and depends on <code>ca-bundle</code> — needed for DNS-over-HTTPS and DNS-over-TLS upstreams and for downloading filter lists over TLS. (<a href="https://github.com/openwrt/packages/blob/master/net/adguardhome/Makefile">Makefile</a>)</p>
+        <p>It creates a dedicated service user and group, <code>adguardhome</code>, with uid and gid 853. That user is how AdGuard Home binds port 53 without running as root: the init script runs it under procd with <code>no_new_privs 1</code> and capabilities read from <code>/etc/capabilities/adguardhome.json</code>. (<a href="https://github.com/openwrt/packages/blob/master/net/adguardhome/files/adguardhome.init">init script</a>)</p>
+        <p>Configuration is split in two, and both halves are marked as conffiles — meaning the package manager will ask before overwriting them:</p>
+        <ul>
+          <li><code>/etc/config/adguardhome</code> — the UCI service settings.</li>
+          <li><code>/etc/adguardhome/adguardhome.yaml</code> — AdGuard Home's own YAML, where the DNS listen settings, upstreams and web interface address live.</li>
+        </ul>
+        <p>The YAML must sit in its own directory. If you put it back at <code>/etc/adguardhome.yaml</code>, the init script refuses to start with "AdGuard Home config must be stored in its own directory, and not in /etc". A uci-defaults migration moves a legacy file into the new location for you.</p>
+        <p>Runtime data — query log, statistics, sessions — lives in <code>/var/lib/adguardhome</code>, the <code>work_dir</code> UCI option. The init script creates it with mode 0700 and chowns it to the service user on every start. Backups should therefore cover both <code>/etc/adguardhome/</code> and that work directory, not just the YAML.</p>
+
+        <h2>The port 53 problem, stated plainly</h2>
+        <p>AdGuard Home is not the only DNS daemon on an OpenWrt box. dnsmasq ships with the firmware and also wants port 53. The AdGuard Home init script starts at <strong>START=19</strong>, with the comment "# matches dnsmasq" — it is deliberately launched in the same slot, which is exactly why the two compete.</p>
+        <p>So decide ownership before you enable anything. Three shapes work:</p>
+        <ol>
+          <li><strong>AdGuard Home takes DNS, dnsmasq keeps DHCP.</strong> AdGuard Home has its own DHCP settings page, so this is a configuration choice, not a limitation. Turn off dnsmasq's DNS role and leave its DHCP role alone.</li>
+          <li><strong>AdGuard Home takes both.</strong> Move DHCP from dnsmasq to AdGuard Home's DHCP page, then retire dnsmasq.</li>
+          <li><strong>Chain them.</strong> Leave dnsmasq answering clients and set AdGuard Home as its upstream — but then AdGuard Home's own DHCP and per-client features are doing less work than they could.</li>
+        </ol>
+        <p>Whichever you pick, one daemon has to be off port 53 or the second one to start will fail. AdGuard Home's listening ports are not UCI options, by the way — <code>http.address</code> and the DNS settings live in the YAML, so port changes go through the web interface or by editing <code>adguardhome.yaml</code>.</p>
+
+        <h2>Installing it</h2>
+        <p>Install the package from the command line on the router, then start it once so it writes its initial files:</p>
+        <pre><code>opkg update
+opkg install adguardhome
+/etc/init.d/adguardhome enable
+/etc/init.d/adguardhome start</code></pre>
+        <p>On OpenWrt 25.12 the package manager is <code>apk</code> rather than <code>opkg</code>; the package name is unchanged, so swap the command and keep going. The service is a procd service with respawn enabled, so it comes back on its own if it dies — which also means a broken config will loop rather than fail once.</p>
+
+        <h2>First start: the wizard on port 3000</h2>
+        <p>On first run AdGuard Home listens on <code>0.0.0.0:3000</code> and prints the URLs to open for the setup wizard. Browse to the router's address on port 3000, choose an admin username and password, and set the DNS listen interface and web interface port. (<a href="https://adguard-dns.io/kb/adguard-home/getting-started/">AdGuard Home getting started</a>)</p>
+        <p>The ports involved are <strong>3000/TCP</strong> for setup, <strong>80/TCP</strong> for the web interface afterwards, and <strong>53/UDP</strong> plus <strong>53/TCP</strong> for DNS. If you keep the dashboard on 80, it collides with LuCI; many people move it, and the setting is <code>http.address</code> in the YAML — for example <code>0.0.0.0:8080</code>, <code>0.0.0.0:0</code> for all interfaces on an ephemeral port, or <code>127.0.0.1:0</code> for loopback only. (<a href="https://adguard-dns.io/kb/adguard-home/faq/">AdGuard Home FAQ</a>)</p>
+
+        <h2>Parental controls</h2>
+        <p>This is where most people actually end up with AdGuard Home, and it is not buried. Parental Control is switched on from <strong>Settings → General settings</strong>, the same page that carries "Block domains using filters and hosts files". The lists behind it are managed under <strong>Filters</strong>: DNS blocklists, DNS allowlists, DNS rewrites and custom filtering rules.</p>
+        <p>Two details worth knowing before you promise anyone a filtered network:</p>
+        <ul>
+          <li><strong>AdGuard Home inspects responses, not just requests.</strong> It blocks CNAME cloaking — the trick where an allowed hostname resolves through a chain to a tracker domain — and the query log shows it as "Blocked by CNAME or IP". If a rule names a tracker domain but the request looks like a legitimate host, that is the line to look for.</li>
+          <li><strong>Custom block pages are a YAML edit.</strong> Pointing Parental Control or Safe Browsing at your own block page uses <code>dns.parental_block_host</code> and <code>dns.safebrowsing_block_host</code> set to the IP of a local HTTP server. Neither is exposed in the web interface.</li>
+        </ul>
+        <p>The service-level settings in <code>/etc/config/adguardhome</code> — <code>verbose</code>, <code>gc</code>, <code>maxprocs</code>, <code>memlimit</code>, the jail mounts — are all per-service, not per-client. Filtering policy itself is set inside AdGuard Home, which is one more reason to keep the two config files straight in your head and in your backups.</p>
+
+        <h2>Running it on a small router</h2>
+        <p>On a 128 MB router, memory is the real limit, and the package knows it: <code>gc</code> maps to GOGC, <code>memlimit</code> to GOMEMLIMIT, and <code>maxprocs</code> to GOMAXPROCS. Tightening those in <code>/etc/config/adguardhome</code> is the supported lever. Query history also grows in <code>/var/lib/adguardhome</code>, so shorten retention rather than letting statistics fill the overlay.</p>
+        <p>If the router is also the Wi-Fi access point and the DHCP server, watch what you ask of it. Splitting IoT devices onto their own network — see <a href="openwrt-iot-vlan">VLANs on OpenWrt</a> — reduces the noise AdGuard Home has to log, and gives you a second place to apply rules.</p>
+
+        <h2>Updating, and why the button is greyed out</h2>
+        <p>The init script runs AdGuard Home with <code>--no-check-update</code>. Self-update from the web interface is disabled on purpose: upgrades come from the package manager so that the binary, the conffiles and the init script stay in step. Update the package, restart the service, and keep an eye on syslog for the config migration messages.</p>
+
+        <h2>Logs and troubleshooting</h2>
+        <p>The service logs to syslog with <code>--logfile syslog</code>, so read it with <code>logread -e AdGuardHome</code>. That is where a failed port bind or a bad YAML shows up.</p>
+        <p>If it is running but "not blocking", AdGuard's FAQ gives an ordered checklist: confirm with <code>nslookup</code> that the server answering is actually the AdGuard Home IP; confirm the interface is being listened on; confirm blocking with filters and hosts files is on; look for an allowlist exception; look for a DNS rewrite or custom rule overriding the block.</p>
+
+        <h2>No LuCI app, and that is fine</h2>
+        <p>Neither the OpenWrt project nor AdGuard ships an official LuCI app. AdGuard's documentation lists an OpenWrt LuCI app maintained by @kongfl888 under *other/unofficial* options, and the same page lists the Home Assistant add-on maintained by @frenck as an unofficial route for people who already run Home Assistant. The supported path is UCI for the service and AdGuard Home's own web interface for everything else.</p>
+
+        <p>Where this fits: AdGuard Home is the DNS half of a filtered home network, not the whole thing. For the bigger picture, start with <a href="openwrt">OpenWrt, explained</a>, then look at <a href="openwrt-iot-vlan">segmentation</a> and <a href="openwrt-vs-dd-wrt">OpenWrt vs DD-WRT</a> if you are still picking a platform.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, ESPHome and the routers that carry them — sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Does AdGuard Home replace dnsmasq on OpenWrt, or do they conflict?</h3>
+        <p>They conflict by default, because both want port 53. OpenWrt ships dnsmasq as its DNS forwarder and DHCP server, and the AdGuard Home init script starts at START=19 — the same slot as dnsmasq, with the comment "matches dnsmasq". Before you enable the service, decide which daemon owns port 53 and stop or repoint the other one.</p>
+
+        <h3>How do I stop dnsmasq from fighting AdGuard Home for port 53?</h3>
+        <p>Decide the split first: one daemon answers DNS on port 53, the other does not. AdGuard Home has its own DHCP settings page, so "dnsmasq keeps DHCP and AdGuard Home takes DNS" is a configuration choice rather than a limitation of the package. If AdGuard Home cannot bind port 53 it will fail at start, and the error appears in syslog.</p>
+
+        <h3>How do I set up AdGuard Home parental controls on OpenWrt?</h3>
+        <p>Open the AdGuard Home web interface and go to Settings, then General settings, where Parental Control sits on the same page as "Block domains using filters and hosts files". The blocklists behind it live under Filters, in DNS blocklists. A custom block page needs <code>dns.parental_block_host</code> in adguardhome.yaml; it is not exposed in the UI.</p>
+
+        <h3>Where are AdGuard Home logs on OpenWrt, and how do I turn on verbose logging?</h3>
+        <p>The OpenWrt package runs AdGuard Home with <code>--logfile syslog</code>, so logs go to the system log and are read with <code>logread -e AdGuardHome</code>. The <code>verbose</code> option in <code>/etc/config/adguardhome</code> turns up the detail; query logs are stored separately in the work directory rather than in syslog.</p>
+
+        <h3>Can I run AdGuard Home on a router with 128 MB of RAM?</h3>
+        <p>It will start, but memory is the constraint — which is why the init script exposes <code>gc</code> (GOGC), <code>memlimit</code> (GOMEMLIMIT) and <code>maxprocs</code> (GOMAXPROCS) as UCI options. Query history and statistics also live in the work directory, so trim retention on a small box instead of assuming the defaults fit.</p>
+
+        <h3>How do I update AdGuard Home on OpenWrt — the UI button or the package manager?</h3>
+        <p>The package manager. The init script runs AdGuard Home with <code>--no-check-update</code>, so the self-update button is disabled by design. Upgrades arrive as a new adguardhome package version; the feed currently builds 0.107.80-1, the same version as upstream's 0.107.80 release.</p>
+
+        <h3>Why is AdGuard Home not blocking ads after install?</h3>
+        <p>AdGuard's own FAQ checklist, in order: the client is not actually pointed at AdGuard Home (verify with <code>nslookup</code> which server answers), the interface is not being listened on, blocking with filters and hosts files is switched off, an allowlist entry is overriding the block, or a DNS rewrite or custom rule is overriding it.</p>
+
+        <h3>Do I need a LuCI app to manage AdGuard Home on OpenWrt?</h3>
+        <p>No. There is no official LuCI app from either project. AdGuard's documentation lists an OpenWrt LuCI app maintained by @kongfl888 under unofficial options, and the package is configured through UCI plus AdGuard Home's own web interface on port 80 after setup.</p>
+
+        <p>Related: <a href="openwrt">OpenWrt for the smart home</a> and <a href="openwrt-iot-vlan">IoT VLANs on OpenWrt</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://github.com/openwrt/packages/blob/master/net/adguardhome/Makefile">OpenWrt adguardhome package Makefile</a>; <a href="https://github.com/openwrt/packages/blob/master/net/adguardhome/files/adguardhome.init">adguardhome init script</a>; <a href="https://github.com/AdguardTeam/AdGuardHome/releases/tag/v0.107.80">AdGuard Home v0.107.80 release</a>; <a href="https://adguard-dns.io/kb/adguard-home/getting-started/">AdGuard Home getting started</a>; <a href="https://adguard-dns.io/kb/adguard-home/faq/">AdGuard Home FAQ</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
