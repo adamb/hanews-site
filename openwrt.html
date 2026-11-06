@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt for the smart home: what it is and which routers to run it on (2026) — HA News</title>
+  <meta name="description" content="OpenWrt explained for people running a smart home: what the Linux router firmware does, the 25.12 release and the switch from opkg to apk, which routers have official builds, and how to feed router stats into Home Assistant.">
+  <link rel="canonical" href="https://hanews.org/openwrt">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt for the smart home: what it is and which routers to run it on (2026)", "datePublished": "2026-11-06", "dateModified": "2026-11-06", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is OpenWrt, in one paragraph?", "acceptedAnswer": {"@type": "Answer", "text": "OpenWrt is a Linux-based firmware for routers and other small network devices, maintained as an open-source project rather than by a hardware vendor. It replaces the stock firmware with a writable filesystem and a package manager, so you can add features — VPN servers, DNS filtering, network monitoring — without buying new hardware."}}, {"@type": "Question", "name": "Is OpenWrt Linux?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. OpenWrt is a Linux distribution built for embedded network hardware, and it is packaged like one: builds are cut per release and per device target. Since release 25.12 the package manager is apk, the Alpine Package Keeper, replacing opkg."}}, {"@type": "Question", "name": "Which routers have official OpenWrt support?", "acceptedAnswer": {"@type": "Answer", "text": "The project's official downloads index lists 2,187 device profiles with builds for 24.10.8 and/or 25.12.6 as of early November 2026. Check a specific model in the OpenWrt Firmware Selector by target and profile name before you buy; support is per model and sometimes per hardware revision."}}, {"@type": "Question", "name": "Does the OpenWrt Firmware Selector keep my installed packages?", "acceptedAnswer": {"@type": "Answer", "text": "The selector can build an image with packages baked in, which is how attended sysupgrade works. On 25.12 attended sysupgrade is installed in LuCI by default and rebuilds an image with your installed packages while preserving configuration. Devices with larger flash also get the owut command-line tool."}}, {"@type": "Question", "name": "Should I run OpenWrt on my main router or on a separate box?", "acceptedAnswer": {"@type": "Answer", "text": "On the main router if you want one device doing routing, Wi-Fi and filtering. Run it on a separate box — a travel router or an x86 mini PC — if you would rather not risk the house network while learning, or if you want the router and the Zigbee or Thread coordinator in different places."}}, {"@type": "Question", "name": "How do I get router statistics into Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Enable UPnP or NAT-PMP on the router — miniupnpd is the OpenWrt package for it — and add Home Assistant's built-in UPnP/IGD integration. It creates sensors for bytes and packets in and out, uptime and the WAN address, plus a binary sensor for WAN connectivity, and it is auto-discoverable."}}, {"@type": "Question", "name": "Is 24.10 still supported, and how do I move to 25.12?", "acceptedAnswer": {"@type": "Answer", "text": "24.10 is in security maintenance only. The project put end of life at September 2026 and recommends migrating to 25.12. Move with attended sysupgrade where your device has the flash for it, keep a copy of your configuration, and expect to reinstall packages by hand if you script the upgrade: 24.10 is opkg-only and does not accept apk packages."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 6 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Pillar · Networking</p>
+        <h1>OpenWrt for the smart home: what it is and which routers to run it on (2026)</h1>
+        <p class="byline">HA News · 6 Nov 2026</p>
+
+        <p>OpenWrt is a Linux-based firmware for routers, maintained by an open-source project instead of a hardware vendor. You flash it over the stock firmware and get a router you can log into, script and extend: a VPN server, DNS filtering for the kids' tablets, a separate network for the smart-home gear, traffic counters you can chart. <strong>The reason to care is control</strong> — the router is the one box every device in the house depends on, and OpenWrt is the only common way to own its software.</p>
+
+        <p>This page is the standing reference for the OpenWrt cluster on HA News: what the project shipped, what changed in the current release, which routers have official builds, and how to get the router talking to Home Assistant. Everything below is sourced from the OpenWrt release notes and the project's own downloads index, both linked in full at the foot of the page.</p>
+
+        <h2>What OpenWrt actually is</h2>
+        <p>A router you buy in a shop runs firmware written by the manufacturer, usually locked down, usually supported for a couple of years, usually with a cloud app attached. OpenWrt is the other arrangement. It is a Linux distribution built for embedded network hardware, cut per release and per device target, with a package manager on top so software can be added and removed after the fact. Configuration lives in plain text under <code>/etc/config</code> and survives a reboot; shell history on 24.10 and 25.12 is stored in RAM and disappears when the box restarts, a deliberate change so that commands typed into a router don't end up in flash.</p>
+        <p>It also means you can keep a router working long after the vendor has moved on. A 2016 access point running current OpenWrt still gets security patches; the same box on stock firmware probably stopped getting them years ago. If you would rather compare it against the other common DIY router platform, our piece on <a href="openwrt-vs-dd-wrt">OpenWrt vs DD-WRT</a> covers where each one fits.</p>
+
+        <h2>Where the project stands in November 2026</h2>
+        <p>Current stable is <strong>OpenWrt 25.12.6</strong>, published 18 October 2026. The previous series, 24.10, is at <strong>24.10.8</strong>, published 26 July 2026, and is now in <strong>security maintenance only</strong>. The 24.10 release notes put its end of life at September 2026 and recommend migrating to 25.12. In practice: a 24.10 box still works and still gets security fixes for now, but it is not where new work is happening, and every month you leave it there the upgrade gets slightly more annoying.</p>
+        <p>The project's own numbers give a sense of scale. The 24.10 release notes describe support for over 1,970 devices; the official build index we cached on 5 November 2026 holds <strong>2,187 device profiles</strong> with firmware for 24.10.8 and/or 25.12.6. That is a lot of hardware, and almost none of it was sold as an OpenWrt device.</p>
+
+        <h2>The 25.12 change that matters: opkg is gone</h2>
+        <p>OpenWrt 25.12 switched its package manager from <strong>opkg to apk</strong>, the Alpine Package Keeper. This is the single most consequential change in the release, because it invalidates muscle memory. Every guide you have bookmarked that says <code>opkg update</code> is describing the old world. It also means the two series do not share packages: 24.10 is opkg-only and does not accept apk packages, so you cannot mix a 25.12 package feed into a 24.10 install and expect it to work.</p>
+        <p>Why it matters at home: if you follow an old tutorial on a fresh 25.12 install and the commands fail, that is not a broken router. It is a package manager change. Read the release notes for the version you actually flashed, not the top search result.</p>
+
+        <h2>Upgrading without a brick: attended sysupgrade</h2>
+        <p>The second change is quieter and much more useful for people who don't want a weekend project. OpenWrt 25.12 installs <strong>attended sysupgrade</strong> in LuCI by default, and adds the <code>owut</code> command-line tool on devices with enough flash. Attended sysupgrade does not flash a generic image over your configuration. It asks the build server to produce an image with your installed packages already included, then flashes that, preserving configuration.</p>
+        <p>The practical effect is that the riskiest part of an OpenWrt upgrade — reinstalling a dozen packages afterwards, one at a time, hoping two of them don't conflict — mostly goes away on devices that can host it. Small-flash routers still may not fit the tool or the rebuilt image. That is the number to check before you pick hardware: flash size, not Wi-Fi speed.</p>
+        <p>Back up before you start regardless. Attended sysupgrade preserves configuration; it does not preserve your patience if the power drops mid-flash. Put the router on a UPS if the grid is unreliable where you live.</p>
+
+        <h2>Does my router have an official build?</h2>
+        <p>OpenWrt support is per model, and sometimes per hardware revision, which is why the answer should come from the project rather than a shop listing. Two tools exist:</p>
+        <ul>
+          <li><strong>The Firmware Selector</strong> at <a href="https://firmware-selector.openwrt.org/">firmware-selector.openwrt.org</a>: pick the release, the target and the device profile, and download the correct image. It can also bake packages into the image.</li>
+          <li><strong>The downloads index</strong> at <a href="https://downloads.openwrt.org/releases/25.12.6/targets/">downloads.openwrt.org</a>: the raw directory tree behind the selector, useful for confirming a profile name exists in a given release.</li>
+        </ul>
+        <p>Note that the openwrt.org wiki now sits behind an Anubis proof-of-work bot wall and returns nothing to a plain fetch, so device support on this page was verified from the downloads index instead. Humans in a browser will not notice the wall; scripts will.</p>
+
+        <h2>Six routers that make sense for a smart home</h2>
+        <p>Every device below has official images for both 24.10.8 and 25.12.6 in the cached build index, so you are not choosing between "works" and "might work". They differ in flash, radios and how much router you actually need.</p>
+
+        <table>
+          <thead><tr><th>Model</th><th>Target / profile</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>GL.iNet GL-MT3000 (Beryl AX)</td><td>mediatek/filogic, <code>glinet_gl-mt3000</code></td><td>Wi-Fi 6 travel-size router, USB-C powered, under 8 W</td></tr>
+            <tr><td>GL.iNet GL-MT6000 (Flint 2)</td><td>mediatek/filogic, <code>glinet_gl-mt6000</code></td><td>Bigger sibling, more flash, meant as a main router</td></tr>
+            <tr><td>Belkin RT3200 / Linksys E8450</td><td>mediatek/mt7622, <code>linksys_e8450</code></td><td>Note the separate <code>linksys_e8450-ubi</code> profile; check which layout yours has</td></tr>
+            <tr><td>NETGEAR Nighthawk X4S R7800</td><td>ipq806x/generic, <code>netgear_r7800</code></td><td>Older hardware, well documented, cheap secondhand</td></tr>
+            <tr><td>TP-Link Archer AX23 v1</td><td>ramips/mt7621, <code>tplink_archer-ax23-v1</code></td><td>Budget Wi-Fi 6; the v1 matters, other revisions differ</td></tr>
+            <tr><td>Ubiquiti EdgeRouter X</td><td>ramips/mt7621, <code>ubnt_edgerouter-x</code></td><td>No Wi-Fi at all — pair it with an access point</td></tr>
+          </tbody>
+        </table>
+
+        <p>Two of these are worth a longer look. The <strong>GL.iNet GL-MT3000</strong> is the easiest way to try OpenWrt without touching the house network: MediaTek MT7981B dual-core at 1.3 GHz, 512 MB DDR4 and 256 MB NAND, Wi-Fi 6 at 574 Mbps on 2.4 GHz and 2402 Mbps on 5 GHz, one 2.5 GbE WAN and one 1 GbE LAN port, USB 3.0, powered from 5 V/3 A over USB-C and drawing under 8 W per GL.iNet's specification. Its official profile is <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=glinet_gl-mt3000">glinet_gl-mt3000 in the firmware selector</a>; the device page is <a href="https://openwrt.org/toh/glinet/gl-mt3000">openwrt.org/toh/glinet/gl-mt3000</a>. Check <a href="https://www.amazon.com/s?k=GL.iNet+GL-MT3000+Beryl+AX&amp;tag=hanews01-20" rel="sponsored nofollow">GL.iNet GL-MT3000 on Amazon</a>.</p>
+        <p>The <strong>Linksys E8450 / Belkin RT3200</strong> is the value pick if you want a full-size router rather than a travel box, and it has been in the tree for years, which means the community documentation is deep. Confirm whether your unit is the standard or UBI layout before downloading: there are two profiles, <code>linksys_e8450</code> and <code>linksys_e8450-ubi</code>, and flashing the wrong one is how people end up with a serial cable. Check <a href="https://www.amazon.com/s?k=Linksys+E8450+WiFi+6+router&amp;tag=hanews01-20" rel="sponsored nofollow">Linksys E8450 on Amazon</a>; the <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/mt7622&amp;id=linksys_e8450">selector entry</a> and the <a href="https://openwrt.org/toh/linksys/e8450">device page</a> are the sources to read first.</p>
+        <p>For a wider shortlist with prices and an "OpenWrt support today" column, see <a href="best-openwrt-router">the best OpenWrt routers</a>.</p>
+
+        <h2>Getting the router talking to Home Assistant</h2>
+        <p>Two integrations cover most of what people want, and neither needs a cloud account.</p>
+        <p><strong>Router statistics.</strong> Home Assistant's built-in <a href="https://www.home-assistant.io/integrations/upnp/">UPnP/IGD integration</a> collects network statistics straight from the router: bytes in and out, packets in and out, uptime, the WAN address and WAN connectivity status, exposed as sensors plus a binary sensor. It auto-discovers, and it needs UPnP or NAT-PMP enabled on the router — on OpenWrt that is the <code>miniupnpd</code> package. Enabling UPnP on a router is not free: it lets LAN devices ask for port mappings. If that trade bothers you, skip the integration and poll the router another way.</p>
+        <p><strong>A coordinator over the network.</strong> If your Zigbee or Thread radio has to live somewhere other than the Home Assistant box — a shed, a garage, the middle of a long house — Zigbee2MQTT accepts a TCP endpoint in place of a local serial device, for example <code>port: tcp://192.168.1.12:6638</code>. It also supports mDNS discovery for tested network coordinators: SLZB-06, UZG-01 and CZC-01. An OpenWrt box with a 5 V USB port becomes the power and network drop for that radio. Read the <a href="https://www.zigbee2mqtt.io/guide/configuration/adapter-settings.html">adapter settings documentation</a> before ordering hardware; it lists which coordinators have been tested on the network path.</p>
+        <p>Related: <a href="openwrt-wireguard">WireGuard on OpenWrt</a> for reaching the house from outside without port forwarding.</p>
+
+        <h2>Gotchas worth knowing before you flash</h2>
+        <ul>
+          <li><strong>Flash size decides what you can install.</strong> Attended sysupgrade and <code>owut</code> need room; so does anything with a web UI on top. 128 MB of flash is a much better floor than 16 MB.</li>
+          <li><strong>Per-revision support is real.</strong> The Archer AX23 example is v1 only. Router vendors change chips mid-life without renaming the box.</li>
+          <li><strong>The wiki is bot-walled.</strong> Community documentation on openwrt.org is fine in a browser, but automated fetches return an Anubis challenge. Keep local copies of the pages for your hardware.</li>
+          <li><strong>24.10 packages won't load on 25.12, or the reverse.</strong> Plan the upgrade as a migration, not an update.</li>
+          <li><strong>Don't put the router and the Zigbee radio on the same USB 3 controller.</strong> It is the classic interference story, and it is why extension cables exist.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Networking and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>What is OpenWrt, in one paragraph?</h3>
+        <p>OpenWrt is a Linux-based firmware for routers and other small network devices, maintained as an open-source project rather than by a hardware vendor. It replaces the stock firmware with a writable filesystem and a package manager, so you can add features — VPN servers, DNS filtering, network monitoring — without buying new hardware.</p>
+        <h3>Is OpenWrt Linux?</h3>
+        <p>Yes. OpenWrt is a Linux distribution built for embedded network hardware, and it is packaged like one: builds are cut per release and per device target. Since release 25.12 the package manager is apk, the Alpine Package Keeper, replacing opkg.</p>
+        <h3>Which routers have official OpenWrt support?</h3>
+        <p>The project's official downloads index lists 2,187 device profiles with builds for 24.10.8 and/or 25.12.6 as of early November 2026. Check a specific model in the OpenWrt Firmware Selector by target and profile name before you buy; support is per model and sometimes per hardware revision.</p>
+        <h3>Does the OpenWrt Firmware Selector keep my installed packages?</h3>
+        <p>The selector can build an image with packages baked in, which is how attended sysupgrade works. On 25.12 attended sysupgrade is installed in LuCI by default and rebuilds an image with your installed packages while preserving configuration. Devices with larger flash also get the <code>owut</code> command-line tool.</p>
+        <h3>Should I run OpenWrt on my main router or on a separate box?</h3>
+        <p>On the main router if you want one device doing routing, Wi-Fi and filtering. Run it on a separate box — a travel router or an x86 mini PC — if you would rather not risk the house network while learning, or if you want the router and the Zigbee or Thread coordinator in different places.</p>
+        <h3>How do I get router statistics into Home Assistant?</h3>
+        <p>Enable UPnP or NAT-PMP on the router — <code>miniupnpd</code> is the OpenWrt package for it — and add Home Assistant's built-in UPnP/IGD integration. It creates sensors for bytes and packets in and out, uptime and the WAN address, plus a binary sensor for WAN connectivity, and it is auto-discoverable.</p>
+        <h3>Is 24.10 still supported, and how do I move to 25.12?</h3>
+        <p>24.10 is in security maintenance only. The project put end of life at September 2026 and recommends migrating to 25.12. Move with attended sysupgrade where your device has the flash for it, keep a copy of your configuration, and expect to reinstall packages by hand if you script the upgrade: 24.10 is opkg-only and does not accept apk packages.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://github.com/openwrt/openwrt/releases">OpenWrt release notes (25.12.6, 24.10.8)</a>; <a href="https://downloads.openwrt.org/releases/25.12.6/targets/">official downloads index, 25.12.6</a>; <a href="https://firmware-selector.openwrt.org/">OpenWrt Firmware Selector</a>; <a href="https://www.home-assistant.io/integrations/upnp/">Home Assistant UPnP/IGD integration</a>; <a href="https://www.zigbee2mqtt.io/guide/configuration/adapter-settings.html">Zigbee2MQTT adapter settings</a>; <a href="https://www.gl-inet.com/products/gl-mt3000/">GL.iNet GL-MT3000 specifications</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
