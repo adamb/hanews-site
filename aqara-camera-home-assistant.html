@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aqara camera with Home Assistant: what actually works (2026) — HA News</title>
+  <meta name="description" content="How an Aqara camera works with Home Assistant: RTSP streaming instead of native entities, the Camera Hub G350 spec sheet, G3 and G5 Pro differences, setup steps and the gotchas around motion events.">
+  <link rel="canonical" href="https://hanews.org/aqara-camera-home-assistant">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Aqara camera with Home Assistant: what actually works (2026)", "image": "https://hanews.org/images/aqara-camera-hub-g350.png", "datePublished": "2026-11-07", "dateModified": "2026-11-07", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/aqara-camera-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do Aqara cameras work with Home Assistant without a hub?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, in a limited sense. Aqara says the Home Assistant path for its cameras is a video stream over RTSP, which Home Assistant can pull into a generic camera entity. You do not need a separate Aqara hub for that, but you do need the camera on your network and recording stays in the Aqara Home app."}}, {"@type": "Question", "name": "How do I add an Aqara camera to Home Assistant — Matter, HomeKit or RTSP?", "acceptedAnswer": {"@type": "Answer", "text": "Use RTSP. Aqara's Matter-certified device list in the Home Assistant integration contains no cameras, and the HomeKit Device integration documents switches and sensors rather than cameras, so a HomeKit-paired Aqara camera does not arrive as a camera entity in Home Assistant."}}, {"@type": "Question", "name": "Does the Aqara G350 work with Home Assistant, and what is missing?", "acceptedAnswer": {"@type": "Answer", "text": "The video does. Aqara states that for Home Assistant integration only streaming is available over RTSP. Missing: recording, the local person, animal, face, sound and gesture detection, and any per-event triggers inside Home Assistant."}}, {"@type": "Question", "name": "Can Home Assistant see Aqara camera motion events for automations?", "acceptedAnswer": {"@type": "Answer", "text": "Not from the Aqara integration. The Aqara integration in Home Assistant handles Aqara Matter devices, and no camera is on that list. Aqara keeps detection events in its own app and in HomeKit or Alexa. To automate on motion you would run the stream through a separate NVR such as Frigate."}}, {"@type": "Question", "name": "Is the Aqara G5 Pro PoE version better for a Home Assistant setup?", "acceptedAnswer": {"@type": "Answer", "text": "Usually yes. Aqara sells the G5 Pro in separate Wi-Fi and PoE versions, and a wired camera holds a stable stream far better than Wi-Fi. Aqara does not publish a readable spec table for this model on its product page, so confirm resolution and field of view with the retailer before ordering."}}, {"@type": "Question", "name": "Do Aqara cameras need a subscription or cloud account for local recording?", "acceptedAnswer": {"@type": "Answer", "text": "No subscription is needed for card recording. The G350 takes a microSD card, Class 10 or above, up to 512 GB, and can record 24/7 to the card or back up to a NAS. Aqara also offers encrypted cloud storage as an option, and HomeKit Secure Video needs iCloud+ and an Apple home hub."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Saturday, 7 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Cameras</p>
+        <h1>Aqara camera with Home Assistant: what actually works</h1>
+        <p class="byline">HA News · 7 Nov 2026</p>
+
+        <p>An Aqara camera in Home Assistant gets you a picture, not a sensor. Aqara's own product material says so directly: for the Camera Hub G350, "For Home Assistant integration, only streaming is available via RSTP" — their spelling of RTSP, the standard video streaming protocol. Home Assistant pulls that stream into a generic camera entity and shows it on a dashboard. Everything else — recording, the on-device person and animal detection, the events that would normally drive an automation — stays inside the Aqara Home app, or inside Apple Home, Google Home, Alexa or SmartThings.</p>
+
+        <p>That is not a scandal, and it does not make the cameras bad. It does mean the buy decision is different from what "Matter-certified" and "works with Home Assistant" suggest. If you want an Aqara camera because you like the hardware and you are content to watch it in Home Assistant, buy one. If you want Home Assistant to trigger lights off a person detection, an Aqara camera alone will not do it, and no amount of pairing will change that today.</p>
+
+        <figure class="figure">
+          <img src="images/aqara-camera-hub-g350.png" alt="Aqara Camera Hub G350 dual-lens pan and tilt camera" width="1920" height="600" loading="lazy">
+          <figcaption>Aqara Camera Hub G350. Source: <a href="https://www.aqara.com/en/product/camera-hub-g350/">Aqara product page</a></figcaption>
+        </figure>
+
+        <h2>Why "works with Home Assistant" is doing a lot of work here</h2>
+        <p>Home Assistant has an Aqara integration, added in release 2024.10, with an IoT class of local push — meaning the devices push state to your server over the local network instead of waiting to be polled. That sounds like exactly what you want for a camera, and it is the wrong integration to reach for.</p>
+
+        <p>The integration exists to bring Aqara's Matter devices in locally. Aqara's "Works with Home Assistant" certified list on that page names the Hub M3, the Valve Controller T1, the LED Bulb T2, the Smart Lock U200, U300 and U400, the Motion and Light Sensor P2, the Door and Window Sensor P2, the Presence Sensor FP1E and FP300, and the Light Switch H2. No camera models appear on it. You can read the list yourself in the <a href="https://www.home-assistant.io/integrations/aqara/">Aqara integration documentation</a>.</p>
+
+        <p>The other obvious route is HomeKit. Aqara supports HomeKit Secure Video on several cameras, so it is reasonable to assume Home Assistant's HomeKit Device integration would pick one up. It does not. The <a href="https://www.home-assistant.io/integrations/homekit_controller/">HomeKit Device integration</a> documents pairing over Ethernet, Wi-Fi, Bluetooth and Thread, and its supported-device material is about switches and sensors; there is no camera support documentation on that page. The practical consequence is blunt: a HomeKit-paired Aqara camera does not arrive in Home Assistant as a camera entity. It arrives in Apple Home, and Home Assistant stays outside.</p>
+
+        <h2>What you actually get, and what you don't</h2>
+        <table>
+          <thead><tr><th>Capability</th><th>In Home Assistant via RTSP</th></tr></thead>
+          <tbody>
+            <tr><td>Live video on a dashboard</td><td>Yes, through a generic camera entity pointed at the stream URL</td></tr>
+            <tr><td>Two-way audio</td><td>No. Audio and talkback stay in Aqara Home, Apple Home, Google Home, Alexa or SmartThings</td></tr>
+            <tr><td>Recording and playback</td><td>No. Recording goes to microSD, a NAS or encrypted Aqara cloud</td></tr>
+            <tr><td>Person, animal, face, sound, gesture detection</td><td>No. Aqara runs this on-device and reports it to its own app</td></tr>
+            <tr><td>Motion or person triggers for automations</td><td>No, not from the camera. Needs an external NVR such as Frigate reading the stream</td></tr>
+            <tr><td>Pan, tilt and zoom control</td><td>No. Move the camera in the Aqara app</td></tr>
+          </tbody>
+        </table>
+        <p>If that table disappoints you, the honest alternative is to treat the camera as a plain video source and let Home Assistant do the thinking. A stream into Frigate or another NVR gives you detections as events you can automate on, at the cost of running a second piece of software and a machine with enough CPU or a Coral-class accelerator. The camera becomes a lens; the intelligence moves to your server.</p>
+
+        <h2>The Camera Hub G350, per the spec sheet</h2>
+        <p>The G350 (model CH-C14E, or CH-C14DE depending on region) is the model Aqara is pushing now, and it is the most interesting one for a Home Assistant house because it is also a hub. Aqara markets it as "the world's first Matter-certified camera" — a marketing claim, and worth reading alongside the note above that no camera appears on Aqara's Home Assistant compatibility list.</p>
+        <table>
+          <thead><tr><th>Spec</th><th>Aqara Camera Hub G350</th></tr></thead>
+          <tbody>
+            <tr><td>Lenses</td><td>Dual: wide plus telephoto, 360° pan and zoom</td></tr>
+            <tr><td>Resolution</td><td>3840 × 2160 (wide), 2560 × 1440 (telephoto)</td></tr>
+            <tr><td>Field of view</td><td>133° diagonal (wide), 43° (telephoto)</td></tr>
+            <tr><td>Focal length and aperture</td><td>2.8 mm / 8 mm, f/1.6</td></tr>
+            <tr><td>Video</td><td>H.264 at 20 fps</td></tr>
+            <tr><td>Power</td><td>5 V ⎓ 2 A over USB-C</td></tr>
+            <tr><td>Radios</td><td>Wi-Fi 802.11 a/b/g/n/ac/ax on 2.4 and 5 GHz; Zigbee/Thread 802.15.4; Bluetooth</td></tr>
+            <tr><td>Storage</td><td>microSD, Class 10 or above, up to 512 GB (card not included); NAS backup; encrypted cloud</td></tr>
+            <tr><td>Siren</td><td>95 dB</td></tr>
+            <tr><td>Size</td><td>123 × 85 × 68 mm</td></tr>
+            <tr><td>Environment</td><td>-10 °C to 45 °C, 0–95 % RH non-condensing</td></tr>
+          </tbody>
+        </table>
+        <p>Two things in that table matter more than the numbers. The first is the radio list: 802.15.4 for Zigbee and Thread plus Bluetooth, which is why Aqara calls it a Camera Hub. It can act as the hub for Aqara's own Zigbee accessories, and it can serve as a Thread border router for a Matter network. The second is card storage: 24/7 recording to a microSD card, with an optional backup to a NAS, is genuinely local recording. Nothing in that path needs a subscription. Aqara's <a href="https://www.aqara.com/en/product/camera-hub-g350/">product page</a> is the source for every line above.</p>
+
+        <h3>The Apple Home caveat, in Aqara's own footnote</h3>
+        <p>Aqara lists HomeKit Secure Video, Home Assistant, Google Home, Alexa and SmartThings as supported ecosystems, with live view, recordings and two-way audio. Its footnote then trims that: inside Apple Home the resolution is capped at 1080p and may drop further on a poor network, and HomeKit Secure Video requires an iCloud+ plan and an Apple home hub. So the 4K sensor and the Apple Home experience are not the same thing.</p>
+
+        <h2>The detection engine is the real product</h2>
+        <p>Aqara runs local AI detection for person, animal, face, smile, sound and gesture, and uses those results for notifications, recordings and automations inside its own app. That is a serious feature set, and it is exactly the part Home Assistant cannot see. If your reason for buying is "I want the camera to know a person from a cat", Aqara does that well and locally — it just does it in Aqara Home. If your reason is "I want Home Assistant to know a person is on the porch at 2 a.m. and turn on the lights", the camera will not tell it.</p>
+
+        <h2>G3, G5 Pro and E1: the rest of the line</h2>
+        <p><strong>Camera Hub G3.</strong> 2K, 1296p, local AI-powered recognition, HomeKit Secure Video support. It is the older hub-camera, and Aqara's footnote for it is the clearest statement of the split: AI and storage inside the Aqara Home app can be performed locally, but third-party cloud storage such as HomeKit Secure Video may need an additional service. Same RTSP-only story for Home Assistant, and a lower-resolution sensor.</p>
+        <p><strong>Camera Hub G5 Pro.</strong> Sold in two separate versions, Wi-Fi and PoE. The PoE version is the one to look at for a Home Assistant house: one cable for power and network, no Wi-Fi jitter in the stream, and no battery or adapter to fail. One warning — Aqara's product page renders its spec table client-side, and no readable spec table could be pulled from the page, whose metadata shows it was last updated 2025-02-19. Do not order on a remembered resolution or field of view. Check the retailer's listing, or Aqara's own PDF datasheet, before you buy.</p>
+        <p><strong>Camera E1.</strong> An indoor camera from 2025. The product page exists, but the readable content was too thin to quote specifications from, so we are not quoting any. Treat it as a small indoor model and verify the details at the point of sale.</p>
+
+        <h2>Putting one into Home Assistant</h2>
+        <ol>
+          <li>Set the camera up in the Aqara Home app first. It needs to be on your network and on your account before anything else can talk to it.</li>
+          <li>Find the stream setting for that camera in the app and turn RTSP on if it is offered. Aqara does not document this toggle in the material we read, so look for it under the camera's settings before you rely on it. If there is no such option on your model or firmware, Home Assistant cannot pull the stream at all.</li>
+          <li>In Home Assistant, go to Settings, then Devices &amp; services, then Add integration, and choose Generic Camera.</li>
+          <li>Paste the stream URL, usually of the form rtsp://user:password@camera-ip:554/path, and save. Give the camera a DHCP reservation on your router so the address does not move.</li>
+          <li>If you want detections, point the same URL at Frigate or another NVR and build your automations from that, not from the camera.</li>
+        </ol>
+        <p>Keep the camera on an IoT VLAN or at least off your main trust zone. A camera that holds a cloud account and a local stream is exactly the kind of device you do not want reaching the rest of the house. <a href="devices.html">More device guides</a> are in the Devices section.</p>
+
+        <h2>Gotchas worth knowing before you buy</h2>
+        <ul>
+          <li><strong>No native entities.</strong> No Aqara camera is on Home Assistant's Aqara integration list, so "works with Home Assistant" for cameras means an RTSP stream, not motion, AI or siren entities.</li>
+          <li><strong>Detection stays in the vendor app.</strong> Person, vehicle and sound automations live in Aqara Home, Apple Home or Alexa unless you add an NVR.</li>
+          <li><strong>RTSP is per camera and is not documented.</strong> Enable it in Aqara Home before assuming Home Assistant can see anything.</li>
+          <li><strong>Apple Home is a separate, lower-resolution path.</strong> 1080p cap inside Apple Home, and HomeKit Secure Video needs iCloud+ and an Apple home hub.</li>
+          <li><strong>A cloud account is involved in setup.</strong> The local recording is real, but the camera is commissioned through Aqara's app and account. Plan for that if you are strict about local-only.</li>
+        </ul>
+
+        <h2>Which one to pick</h2>
+        <p><strong>For a Home Assistant house that wants one good camera:</strong> the Camera Hub G350. Dual lens, 4K wide, 360° pan, card recording, and it doubles as a Zigbee and Thread radio. <a href="https://www.amazon.com/s?k=Aqara+Camera+Hub+G350&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Camera Hub G350 on Amazon</a>.</p>
+        <p><strong>For an outdoor run where cable is easy:</strong> the G5 Pro PoE version, for the stable stream. <a href="https://www.amazon.com/s?k=Aqara+Camera+Hub+G5+Pro+PoE&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Camera Hub G5 Pro PoE on Amazon</a>.</p>
+        <p><strong>For a cheaper indoor second camera:</strong> the G3, if 2K is enough and you already have Aqara hubs around. <a href="https://www.amazon.com/s?k=Aqara+Camera+Hub+G3&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Camera Hub G3 on Amazon</a>.</p>
+        <p><strong>Pairing it with Aqara's other gear:</strong> the cameras share an app and account with the <a href="aqara-doorbell-home-assistant">Aqara doorbell</a>, the <a href="aqara-presence-sensor-home-assistant">presence sensor</a> and the <a href="aqara-smart-lock-home-assistant">smart locks</a>, which is where the ecosystem argument actually holds up.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Do Aqara cameras work with Home Assistant without a hub?</h3>
+        <p>Yes, in a limited sense. Aqara says the Home Assistant path for its cameras is a video stream over RTSP, which Home Assistant can pull into a generic camera entity. You do not need a separate Aqara hub for that, but you do need the camera on your network and recording stays in the Aqara Home app.</p>
+        <h3>How do I add an Aqara camera to Home Assistant — Matter, HomeKit or RTSP?</h3>
+        <p>Use RTSP. Aqara's Matter-certified device list in the Home Assistant integration contains no cameras, and the HomeKit Device integration documents switches and sensors rather than cameras, so a HomeKit-paired Aqara camera does not arrive as a camera entity in Home Assistant.</p>
+        <h3>Does the Aqara G350 work with Home Assistant, and what is missing?</h3>
+        <p>The video does. Aqara states that for Home Assistant integration only streaming is available over RTSP. Missing: recording, the local person, animal, face, sound and gesture detection, and any per-event triggers inside Home Assistant.</p>
+        <h3>Can Home Assistant see Aqara camera motion events for automations?</h3>
+        <p>Not from the Aqara integration. The Aqara integration in Home Assistant handles Aqara Matter devices, and no camera is on that list. Aqara keeps detection events in its own app and in HomeKit or Alexa. To automate on motion you would run the stream through a separate NVR such as Frigate.</p>
+        <h3>Is the Aqara G5 Pro PoE version better for a Home Assistant setup?</h3>
+        <p>Usually yes. Aqara sells the G5 Pro in separate Wi-Fi and PoE versions, and a wired camera holds a stable stream far better than Wi-Fi. Aqara does not publish a readable spec table for this model on its product page, so confirm resolution and field of view with the retailer before ordering.</p>
+        <h3>Do Aqara cameras need a subscription or cloud account for local recording?</h3>
+        <p>No subscription is needed for card recording. The G350 takes a microSD card, Class 10 or above, up to 512 GB, and can record 24/7 to the card or back up to a NAS. Aqara also offers encrypted cloud storage as an option, and HomeKit Secure Video needs iCloud+ and an Apple home hub.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.aqara.com/en/product/camera-hub-g350/">Aqara Camera Hub G350</a>; <a href="https://www.aqara.com/en/product/camera-hub-g3/">Aqara Camera Hub G3</a>; <a href="https://www.aqara.com/en/product/camera-hub-g5-pro/">Aqara Camera Hub G5 Pro</a>; <a href="https://www.aqara.com/en/product/camera-e1/">Aqara Camera E1</a>; <a href="https://www.home-assistant.io/integrations/aqara/">Home Assistant Aqara integration</a>; <a href="https://www.home-assistant.io/integrations/homekit_controller/">Home Assistant HomeKit Device integration</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
