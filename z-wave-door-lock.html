@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best Z-Wave door lock for Home Assistant (2026) — HA News</title>
+  <meta name="description" content="Which Z-Wave door lock to buy for Home Assistant in 2026: the Schlage Connect as the reference pick, S2 secure inclusion, Z-Wave JS setup, lock jam and keypad events, and why the field is narrowing.">
+  <link rel="canonical" href="https://hanews.org/z-wave-door-lock">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best Z-Wave door lock for Home Assistant (2026)", "image": "https://hanews.org/images/schlage-connect-be469-camelot.jpg", "datePublished": "2026-11-07", "dateModified": "2026-11-07", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/z-wave-door-lock"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I need a Z-Wave hub to use a Z-Wave door lock?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, but the hub does not have to be a vendor product. A Z-Wave lock has no Wi-Fi radio, so it needs a Z-Wave controller: a USB stick such as the Home Assistant Connect ZWA-2 in the machine running Home Assistant, driving the Z-Wave JS integration. There is no cloud account in that path."}}, {"@type": "Question", "name": "What does S2 secure inclusion mean for a door lock?", "acceptedAnswer": {"@type": "Answer", "text": "S2 is the encrypted pairing mode for Z-Wave Plus devices. When you add a lock, Z-Wave JS asks for the device-specific key printed on the lock or its packaging, so the network key is exchanged over an authenticated channel instead of in the clear. Unlocking a door is exactly the traffic you want encrypted."}}, {"@type": "Question", "name": "Z-Wave or Thread/Matter for a smart lock in 2026?", "acceptedAnswer": {"@type": "Answer", "text": "Both are local and neither needs a vendor cloud. Z-Wave has the longer track record for locks and a mature integration in Home Assistant, but needs a Z-Wave radio. Thread/Matter is where most new lock launches are going and works with the Matter integration, but needs a Thread border router. Buy the radio your house already has."}}, {"@type": "Question", "name": "How do I get lock jam, keypad and tamper events into Home Assistant automations?", "acceptedAnswer": {"@type": "Answer", "text": "A Z-Wave lock reports these as notification events, separate from the lock entity's locked/unlocked state. The Z-Wave JS integration documents notification and value-updated events, so a notification event carrying a jam or keypad code can trigger an automation that also reads the lock entity state. Check which events the specific model actually sends before relying on them."}}, {"@type": "Question", "name": "Will a Z-Wave lock still work if my hub or internet is down?", "acceptedAnswer": {"@type": "Answer", "text": "The lock keeps working as a lock. Codes stored on the device still open the door, and the key still works, whether or not the hub is reachable. What stops is remote control and any automation that depends on Home Assistant. Nothing about a Z-Wave lock depends on an internet connection, unlike a Wi-Fi lock tied to a vendor app."}}, {"@type": "Question", "name": "Can I move an existing Z-Wave lock to a new hub without losing my codes?", "acceptedAnswer": {"@type": "Answer", "text": "Usually yes, with a caveat. User codes live on the lock, not in the hub, so re-including the device on a new controller normally leaves the codes intact. Exclude the lock from the old network first, then include it on the new one with S2. Code slots and any schedules are worth re-checking after the move, since behaviour varies by model."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Saturday, 7 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Locks</p>
+        <h1>The best Z-Wave door lock for Home Assistant (2026)</h1>
+        <p class="byline">HA News · 7 Nov 2026</p>
+
+        <p>A Z-Wave door lock is a deadbolt with a Z-Wave radio instead of a Wi-Fi one. It talks to a controller you own — normally a USB stick in the machine running Home Assistant — and it never phones a manufacturer's server to open your front door. That is the whole appeal, and it is why people still ask for one in 2026 even though almost every new lock ships as Thread/Matter or Wi-Fi.</p>
+
+        <p>The honest answer to "which Z-Wave door lock should I buy" is shorter than it used to be. <strong>The Schlage Connect is the reference model:</strong> still sold, still described by Schlage as a Z-Wave Plus lock with S2 security, and the one Home Assistant users are most likely to find documented pairing steps for. Below: what it is, what Home Assistant needs on its side, the inclusion steps that don't leave you locked out of your own network, and the caveats — including the fact that the field of current Z-Wave locks is narrow and getting narrower.</p>
+
+        <figure class="figure">
+          <img src="images/schlage-connect-be469-camelot.jpg" alt="Schlage Connect smart deadbolt in the Camelot trim, aged bronze finish, exterior view" width="1280" height="1280" loading="lazy">
+          <figcaption>Schlage Connect smart deadbolt, Camelot trim. Image: <a href="https://www.schlage.com/en/home/smart-locks/connect.html">Schlage</a></figcaption>
+        </figure>
+
+        <h2>The pick: Schlage Connect</h2>
+        <p>Schlage's own product page describes the Connect as combining "advanced features with the enhanced security of Z-Wave Plus", and says the lock "incorporates Z-Wave Plus S2 enhanced security, providing an additional layer of encryption". S2 is not a marketing word here — it is the inclusion mode Z-Wave JS prompts you for when you pair a lock, and it is the reason pairing a lock takes an extra thirty seconds compared with pairing a plug.</p>
+
+        <p>The model family is BE469, sold in two trims: Camelot and Century. The finishes show up in Schlage's own image filenames as three-digit codes — 716, 619, 625 — which is the usual Schlage shorthand for aged bronze, satin nickel and bright chrome. If you go shopping, treat "BE469ZP" as the Z-Wave Plus SKU in this family.</p>
+
+        <table>
+          <thead><tr><th>Spec</th><th>Schlage Connect</th></tr></thead>
+          <tbody>
+            <tr><td>Radio</td><td>Z-Wave Plus</td></tr>
+            <tr><td>Security</td><td>Z-Wave Plus S2, encrypted inclusion</td></tr>
+            <tr><td>Model family</td><td>BE469, trims Camelot (CAM) and Century (CEN)</td></tr>
+            <tr><td>Finishes seen on vendor page</td><td>716, 619, 625</td></tr>
+            <tr><td>Voice assistants</td><td>Amazon Alexa, through a compatible hub</td></tr>
+            <tr><td>Home Assistant path</td><td>Z-Wave JS integration, secure inclusion</td></tr>
+            <tr><td>Wi-Fi</td><td>None — this is the Z-Wave model</td></tr>
+            <tr><td>Apple Home Keys</td><td>Not on Connect; that feature belongs to other Schlage models</td></tr>
+          </tbody>
+        </table>
+        <p>Schlage states that "all Schlage Connect smart locks work with Amazon Alexa", with lock, unlock and status by voice through a compatible hub. In a Home Assistant house the Alexa path is optional; Home Assistant is the hub, and the Alexa skill is a second way in if you want it. Check <a href="https://www.amazon.com/s?k=Schlage+Connect+BE469&amp;tag=hanews01-20" rel="sponsored nofollow">Schlage Connect BE469 on Amazon</a> for current price and stock.</p>
+
+        <h2>What Home Assistant needs on its side</h2>
+        <p>Z-Wave is a first-class integration in Home Assistant with its own app, Z-Wave JS, and onboarding flows for adding and removing devices. If you are starting a Z-Wave network from nothing, Home Assistant documents its own adapter, the Connect ZWA-2, alongside the Connect ZBT-2 it sells for Zigbee and Thread. One radio governs one network; locks, switches and sensors all live on it together.</p>
+        <p>Two questions on the integration's FAQ page are worth reading before you pair anything: "Should I use Secure Inclusion?" and "Where can I see the security keys in the Z-Wave JS app?" The first tells you why you want S2 on a lock specifically. The second matters because the network security keys are what let a device rejoin after a controller rebuild — lose them and every device has to be paired again, one at a time, standing at the door.</p>
+
+        <h2>Setup order that avoids dead ends</h2>
+        <ol>
+          <li><strong>Get the radio working first.</strong> Add the Z-Wave JS integration and confirm the controller is up before any lock is involved. A stick that is not talking to Home Assistant will look exactly like a lock that refuses to pair.</li>
+          <li><strong>Note the DSK before you start.</strong> Z-Wave S2 pairing asks for the device-specific key — the five-digit groups printed on the lock or its packaging. Have it in hand; the lock is usually mounted on a door by the time you get to this step.</li>
+          <li><strong>Include in secure mode and accept S2.</strong> When Z-Wave JS offers the security options, take S2. Pairing a lock without it leaves the unlock command travelling unencrypted across your mesh.</li>
+          <li><strong>Name the device and its entities immediately.</strong> Home Assistant will happily create <code>lock.node_12</code> and let you rename it six months later when you have three of them.</li>
+          <li><strong>Back up the keys.</strong> Do this once, after the first device joins. It is the single cheapest insurance in a Z-Wave network.</li>
+        </ol>
+
+        <h2>Where the useful data lives: jam, tamper, keypad</h2>
+        <p>A lock entity only tells you locked or unlocked. Everything that actually matters for a house arrives as something else: a jam when the bolt hits the strike plate, a tamper alert, a keypad code being entered, a low battery warning. For Z-Wave devices the integration documents notification events and value-updated events, and that is the channel these arrive on.</p>
+        <p>The practical consequence: build automations against the event, not the state. "Bolt jammed after the door was locked" is a notification event you can act on — retract, notify, unlock. "Lock state changed to unlocked" will also fire when someone legitimately comes home, which is not a problem you want to solve at 2 a.m. Check which events a specific model actually emits before you write the automation around them, because that list is per-device, not per-protocol.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>Gotchas before you order</h2>
+        <ul>
+          <li><strong>Schlage's page mixes features across its whole range.</strong> "Built-in Wi-Fi" and "Apple Home Keys" belong to the Encode and Sense lines, not to Connect. Only Z-Wave Plus S2 and Alexa attach to this model. If a review tells you the Connect has Wi-Fi, the review is wrong.</li>
+          <li><strong>A Z-Wave lock cannot talk to your phone directly.</strong> No hub, no remote unlock. If you want a lock with no controller at all, you want a Wi-Fi or Bluetooth model, and you are accepting the vendor cloud that comes with it.</li>
+          <li><strong>The field is narrowing.</strong> Schlage's 404s and dead product pages are the norm now: Kwikset's current navigation leads with Halo and Aura models that are Wi-Fi and Bluetooth, and Yale's Assure Lock 2 pages did not resolve when we checked. Yale and Kwikset have both sold Z-Wave locks, and Yale has shipped Z-Wave modules for the Assure line — but which Z-Wave SKUs remain current is not something we could confirm from vendor pages this pass, so we are not going to quote specs for them. Verify before you buy, not after.</li>
+          <li><strong>One lock, one network.</strong> A Z-Wave device is included in exactly one network. Moving house means excluding and re-including, not just carrying the hub.</li>
+          <li><strong>Battery life is a spec-sheet number.</strong> Motor-driven deadbolts draw hard; cold weather and frequent remote unlocks draw harder. Treat any published figure as an upper bound and set a low-battery alert the week you install it.</li>
+        </ul>
+
+        <h2>Z-Wave or Thread/Matter in 2026</h2>
+        <p>If you already run Z-Wave for switches and sensors, adding a Z-Wave lock is the cheap move: no new radio, no new app, one more device on a network that already works. If you are starting from nothing, the calculus is different. Most lock launches this year are Thread/Matter or Wi-Fi, and a Matter lock joins Home Assistant through the Matter integration without a vendor bridge — the Aqara U400 is the example we covered in <a href="aqara-smart-lock-home-assistant">Aqara smart lock with Home Assistant</a>. What Matter costs you is a Thread border router, and what it buys you is a lock that also answers to Apple Home and Google without a second hub.</p>
+        <p>Z-Wave's advantage is maturity, not momentum. The integration has been through years of lock quirks, the S2 flow is well documented, and the notification events are exposed cleanly. That is worth something on a front door. For the radio-level comparison, see <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a>, and for the controller side see <a href="z-wave-hub">the Z-Wave hub guide</a>.</p>
+
+        <h2>FAQ</h2>
+        <h3>Do I need a Z-Wave hub to use a Z-Wave door lock?</h3>
+        <p>Yes, but the hub does not have to be a vendor product. A Z-Wave lock has no Wi-Fi radio, so it needs a Z-Wave controller: a USB stick such as the Home Assistant Connect ZWA-2 in the machine running Home Assistant, driving the Z-Wave JS integration. There is no cloud account in that path.</p>
+        <h3>What does S2 secure inclusion mean for a door lock?</h3>
+        <p>S2 is the encrypted pairing mode for Z-Wave Plus devices. When you add a lock, Z-Wave JS asks for the device-specific key printed on the lock or its packaging, so the network key is exchanged over an authenticated channel instead of in the clear. Unlocking a door is exactly the traffic you want encrypted.</p>
+        <h3>Z-Wave or Thread/Matter for a smart lock in 2026?</h3>
+        <p>Both are local and neither needs a vendor cloud. Z-Wave has the longer track record for locks and a mature integration in Home Assistant, but needs a Z-Wave radio. Thread/Matter is where most new lock launches are going and works with the Matter integration, but needs a Thread border router. Buy the radio your house already has.</p>
+        <h3>How do I get lock jam, keypad and tamper events into Home Assistant automations?</h3>
+        <p>A Z-Wave lock reports these as notification events, separate from the lock entity's locked/unlocked state. The Z-Wave JS integration documents notification and value-updated events, so a notification event carrying a jam or keypad code can trigger an automation that also reads the lock entity state. Check which events the specific model actually sends before relying on them.</p>
+        <h3>Will a Z-Wave lock still work if my hub or internet is down?</h3>
+        <p>The lock keeps working as a lock. Codes stored on the device still open the door, and the key still works, whether or not the hub is reachable. What stops is remote control and any automation that depends on Home Assistant. Nothing about a Z-Wave lock depends on an internet connection, unlike a Wi-Fi lock tied to a vendor app.</p>
+        <h3>Can I move an existing Z-Wave lock to a new hub without losing my codes?</h3>
+        <p>Usually yes, with a caveat. User codes live on the lock, not in the hub, so re-including the device on a new controller normally leaves the codes intact. Exclude the lock from the old network first, then include it on the new one with S2. Code slots and any schedules are worth re-checking after the move, since behaviour varies by model.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.schlage.com/en/home/smart-locks/connect.html">Schlage Connect smart deadbolt</a>; <a href="https://www.home-assistant.io/integrations/zwave_js/">Home Assistant Z-Wave JS integration</a></dd>
+          <dt>Related</dt>
+          <dd><a href="z-wave-hub">The Z-Wave hub for Home Assistant</a>; <a href="aqara-smart-lock-home-assistant">Aqara smart lock with Home Assistant</a>; <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
