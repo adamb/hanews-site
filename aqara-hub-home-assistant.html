@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aqara Hub M3 with Home Assistant: Matter bridge setup (2026) — HA News</title>
+  <meta name="description" content="How the Aqara Hub M3 works with Home Assistant: pairing the hub as a Matter bridge, which Zigbee device types come through, what stays behind in the Aqara app, and M3 vs M100 vs M2.">
+  <link rel="canonical" href="https://hanews.org/aqara-hub-home-assistant">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Aqara Hub M3 with Home Assistant: Matter bridge setup (2026)", "datePublished": "2026-11-08", "dateModified": "2026-11-08", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/aqara-hub-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does the Aqara Hub M3 work with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, as a Matter bridge. You commission the hub into Home Assistant's Matter integration, and the Zigbee devices paired to the hub appear in Home Assistant as Matter devices. It arrives as one device with children, not as a vendor integration."}}, {"@type": "Question", "name": "Do I still need the Aqara app if I use the hub with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Aqara's own FAQ says Matter accessories must be configured through the Aqara Home app, and the Matter pairing code is issued from the vendor app. Aqara Home is the account gate for setup and firmware even though Matter itself runs locally."}}, {"@type": "Question", "name": "Which Aqara hub should I buy for Home Assistant: M3, M100, or M2?", "acceptedAnswer": {"@type": "Answer", "text": "Pick by the devices you own. The M3 and the M100 both publish the same fourteen-row Zigbee-to-Matter device-type table, so the bridging surface is documented as identical; the M3 is the one Aqara describes as its Matter controller for Matter-over-Thread accessories. The M2 appears in Home Assistant's own Matter documentation as an example bridge, which is the safest citation if you want a known-working path."}}, {"@type": "Question", "name": "Will my Aqara Zigbee sensors show up in Home Assistant through the M3?", "acceptedAnswer": {"@type": "Answer", "text": "Only device types on Aqara's bridging list do: lights, outlets, switches, air conditioners, window coverings, cameras, thermostats, IR devices, door locks, temperature sensors, humidity sensors, TVOC sensors, buttons and floor heating. Home Assistant's docs also warn that not every device in an ecosystem gets bridged, so check your specific model."}}, {"@type": "Question", "name": "Can I use Aqara devices in Home Assistant without the Aqara cloud?", "acceptedAnswer": {"@type": "Answer", "text": "The traffic can stay local, the setup cannot. Bridging a hub over Matter makes it use local communication rather than Aqara's cloud-based integration, which is what Home Assistant's docs recommend. But the hub is commissioned in the Aqara Home app first, and that needs an account."}}, {"@type": "Question", "name": "Is the Aqara hub a Thread border router, a Matter bridge, or both?", "acceptedAnswer": {"@type": "Answer", "text": "Aqara's FAQ describes the Hub M3 as the Matter controller you need before adding Matter-over-Thread accessories, and its product page documents a Zigbee-to-Matter bridge table. That is a bridging and controller role on the Aqara side. Whether a given model is certified as a Thread border router is not spelled out in that FAQ, so confirm it on the product page before you rely on it as your only Thread radio."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 8 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Aqara</p>
+        <h1>Aqara Hub M3 with Home Assistant: bridge, controller, or both?</h1>
+        <p class="byline">HA News · 8 Nov 2026</p>
+
+        <p>You can put the Aqara Hub M3 into Home Assistant, but not the way most people imagine. The hub does not expose an Aqara API that Home Assistant reads. It publishes your Zigbee devices as Matter devices, and Home Assistant picks them up through its Matter integration as if a small Matter bridge had appeared on the network. <strong>The M3 is the Aqara-side gadget; Home Assistant is the other end of a one-way bridge.</strong></p>
+
+        <p>That distinction decides everything that follows: which devices come through, in what shape, and what you still have to do in the Aqara app afterwards. If you want Aqara sensors in Home Assistant with no vendor hub at all, a Zigbee coordinator is the cheaper answer — see <a href="zigbee-hub">the best Zigbee hub for Home Assistant</a>. This page is for the other case: you own Aqara gear, possibly an M3, and want to know what the bridge actually carries.</p>
+
+        <h2>What Aqara says the M3 is for</h2>
+        <p>Aqara's product page describes the Hub M3 as the Matter controller on its side of the fence. Its own FAQ states that adding Matter accessories — Matter over Thread, for example — requires a Matter controller such as the Hub M3, that the hub must first be set up in the Aqara Home app, and that the accessories are then configured on screen. Read plainly: the M3 is not only a Zigbee hub, it is the thing Aqara expects to run the Matter half of your setup.</p>
+
+        <p>The same page carries Aqara's Zigbee-to-Matter device-type mapping table, which is the useful part for anyone wiring this into Home Assistant. It is a list of what the hub can present as a Matter bridge. Fourteen rows, and the list is worth reading before you buy, because anything not on it is not documented as bridged.</p>
+
+        <h2>What the bridge exposes</h2>
+        <table>
+          <thead><tr><th>#</th><th>Device type in Aqara's Zigbee-to-Matter table</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Light</td></tr>
+            <tr><td>2</td><td>Outlet</td></tr>
+            <tr><td>3</td><td>Switch</td></tr>
+            <tr><td>4</td><td>Air conditioner</td></tr>
+            <tr><td>5</td><td>Window covering</td></tr>
+            <tr><td>6</td><td>Camera</td></tr>
+            <tr><td>7</td><td>Thermostat</td></tr>
+            <tr><td>8</td><td>IR device</td></tr>
+            <tr><td>9</td><td>Door lock</td></tr>
+            <tr><td>10</td><td>Temperature sensor</td></tr>
+            <tr><td>11</td><td>Humidity sensor</td></tr>
+            <tr><td>12</td><td>TVOC sensor</td></tr>
+            <tr><td>13</td><td>Button</td></tr>
+            <tr><td>14</td><td>Floor heating</td></tr>
+          </tbody>
+        </table>
+        <p>Source for the list: <a href="https://www.aqara.com/en/product/hub-m3/">Aqara Hub M3 product page</a>. The M100 page carries the identical fourteen-row table, so Aqara documents the same bridging surface for the smaller hub — a detail that matters in the buying section below.</p>
+
+        <h2>The Home Assistant half</h2>
+        <p>Home Assistant's Matter integration is not a single program. It runs its own Matter controller as a separate Matter Server app, and the integration talks to that server over a WebSocket. You do not have to think about this on a normal day, but it explains two things: the Matter Server has to be running before anything commissions, and a restart of Home Assistant is not the same as a restart of the Matter fabric.</p>
+        <p>The important limit is direction. Home Assistant is a Matter controller only. It cannot act as a bridge, and it cannot turn devices it already knows into Matter devices. Bridging is one-way: vendor hub into Home Assistant. So the M3 can hand its Zigbee devices to Home Assistant, and Home Assistant cannot hand anything back. If you were hoping to expose a Z-Wave lock or an ESPHome sensor to Apple Home by way of the M3, that is the wrong tool — that is the <a href="matter.html">Matter</a> bridge question, and Home Assistant's role in it is covered in our <a href="explainer-matter-15">Matter 1.5 explainer</a>.</p>
+
+        <h2>Setup, in order</h2>
+        <ol>
+          <li><strong>Set up the M3 in the Aqara Home app first.</strong> Aqara's FAQ is explicit that the hub has to be configured in its app before Matter accessories can be added. Pair the Zigbee devices you want bridged at the same time — they are what the bridge will carry.</li>
+          <li><strong>Enable the hub's Matter pairing mode.</strong> Home Assistant's documentation describes the general procedure: turn on Matter pairing in the vendor app, and the hub returns a pairing code. Note the code; it is the only thing Home Assistant needs from the Aqara side.</li>
+          <li><strong>Commission the hub in Home Assistant.</strong> Settings, Devices &amp; services, Add integration, Matter. You will need the Home Assistant Companion app on a phone for this step, because the app carries the Matter credentials and the Bluetooth path to the device. Doing it from a desktop browser is the usual reason people get stuck.</li>
+          <li><strong>Name things once.</strong> Bridged devices arrive with whatever names the Aqara app gave them. Renaming them in Home Assistant does not rename them in Aqara Home, and a later re-pair can reset your labels.</li>
+          <li><strong>Set firmware expectations.</strong> Home Assistant can push Matter OTA updates to commissioned devices. Whether a given Aqara firmware ships over Matter or only through Aqara Home is a per-model question; if the hub shows an update in the Aqara app first, take it there.</li>
+        </ol>
+        <p>Two error messages account for most failed attempts, both documented by Home Assistant: "Matter is unavailable", which usually means the Matter Server is not running, and "this device requires a border router", which means the Thread side of the path is missing rather than the Matter side.</p>
+
+        <h2>Compatibility, honestly</h2>
+        <p>Home Assistant's documentation lists the Aqara Hub M2 among its examples of a Matter bridge, alongside the SwitchBot Hub 2, the IKEA Dirigera and the Philips Hue Bridge. That is the closest thing to an official blessing you will get for an Aqara hub in this role, and it is worth knowing the M3 is not named in that list — you are relying on Aqara's own bridging table plus the Matter standard, not on a tested-by-Home-Assistant statement.</p>
+        <p>The documentation also sets three expectations that apply to any branded bridge, and they are the ones that surprise people:</p>
+        <ul>
+          <li><strong>Not every device gets bridged.</strong> The SwitchBot Hub 2 at firmware 1.5 exposes its curtain, lock and blind over Matter but not its light. Expect per-device-class gaps with Aqara too, and check the device type against the table above before assuming.</li>
+          <li><strong>A bridged device is a reduced device.</strong> The documentation uses the Hue Bridge to make the point: bridging can expose fewer entities and attributes than a native integration. An Aqara motion sensor under the bridge may report motion and not the light-level or battery detail you would get from ZHA or Zigbee2MQTT.</li>
+          <li><strong>An account is the gate.</strong> Vendors may require an account and app before Matter support can be enabled, even though Matter itself runs locally. For Aqara, the Aqara Home account is what issues the pairing code and what delivers firmware.</li>
+        </ul>
+        <p>On the plus side, the reason to bother is real. Home Assistant's docs note that an Aqara hub natively uses a cloud-based integration, and that bridging it over Matter switches it to local communication. If your Aqara gear currently depends on the cloud integration, this is the migration path.</p>
+
+        <h2>Multi-admin: the M3 does not have to pick a side</h2>
+        <p>Matter supports multi-fabric, also called multi-admin. One bridged hub can be joined to more than one controller at the same time, so the M3 can sit in Home Assistant and in Apple Home together. Practically that means an Aqara door lock can be visible to Home Assistant automations and to Siri, without a second hub and without HomeKit bridging tricks. It also means you should decide, before commissioning, which controller owns the naming and the automations — duplicating a device across two fabrics is easy, keeping two sets of names in sync is not.</p>
+
+        <h2>M3, M100, or M2</h2>
+        <p><strong>M3</strong> is the one Aqara frames as the Matter controller for Matter-over-Thread accessories, and it publishes the fourteen-row Zigbee-to-Matter table. If you are adding Matter-over-Thread devices to an Aqara-first house and want one app for the lot, this is the intended box. <a href="https://www.amazon.com/s?k=Aqara+Hub+M3&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Hub M3 on Amazon</a>.</p>
+        <p><strong>M100</strong> carries the same fourteen-row table on its product page, so for pure Zigbee-to-Matter bridging Aqara documents no difference in what gets exposed. If your aim is only to lift existing Zigbee sensors into Home Assistant, the smaller hub is the cheaper route to the same documented bridge. <a href="https://www.amazon.com/s?k=Aqara+Hub+M100&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Hub M100 on Amazon</a>.</p>
+        <p><strong>M2</strong> is the model Home Assistant's own documentation names as an example Matter bridge. It is older hardware, and Aqara's newer tables do not describe it, but if you want the path someone has already written down, this is the one with a citation behind it. <a href="https://www.amazon.com/s?k=Aqara+Hub+M2&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Hub M2 on Amazon</a>.</p>
+        <p><strong>Skip all three</strong> if what you actually want is Aqara sensors in Home Assistant with the fewest moving parts. A USB Zigbee coordinator plus ZHA or Zigbee2MQTT gives you every entity and attribute the device has, no vendor account, and no second app — see <a href="zigbee-hub">the coordinator guide</a> and, for the radio-level comparison, <a href="article-thread-network">Thread vs Zigbee in practice</a>. The hub route wins when you want the Aqara app's own features, or when the devices are already paired and you would rather not re-pair a house.</p>
+
+        <h2>Gotchas worth knowing before you buy</h2>
+        <ul>
+          <li><strong>It is a bridge, not a portal.</strong> Devices go Aqara to Home Assistant. Nothing goes back, and Home Assistant cannot become a Matter bridge.</li>
+          <li><strong>Your phone is part of the install.</strong> Commissioning needs the Companion app for the Matter credentials. Budget for that on the day.</li>
+          <li><strong>Feature loss is normal, not a fault.</strong> Bridged entities are thinner than native ones. If you need battery levels and diagnostic attributes, bridge fewer devices and pair the important ones natively.</li>
+          <li><strong>The account does not go away.</strong> Local traffic, yes. Local setup, no. Pairing codes come from Aqara Home.</li>
+          <li><strong>Check the device class against the table.</strong> Fourteen types are documented as bridged. A sensor outside that list is not promised anything, and Home Assistant's docs say outright that ecosystem bridges leave gaps.</li>
+          <li><strong>Multi-admin is a decision, not a bonus.</strong> The hub can join Home Assistant and Apple Home at once, but pick which controller owns names and automations before you commission, or you will maintain two of everything.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Does the Aqara Hub M3 work with Home Assistant?</h3>
+        <p>Yes, as a Matter bridge. You commission the hub into Home Assistant's Matter integration, and the Zigbee devices paired to the hub appear in Home Assistant as Matter devices. It arrives as one device with children, not as a vendor integration.</p>
+        <h3>Do I still need the Aqara app if I use the hub with Home Assistant?</h3>
+        <p>Yes. Aqara's own FAQ says Matter accessories must be configured through the Aqara Home app, and the Matter pairing code is issued from the vendor app. Aqara Home is the account gate for setup and firmware even though Matter itself runs locally.</p>
+        <h3>Which Aqara hub should I buy for Home Assistant: M3, M100, or M2?</h3>
+        <p>Pick by the devices you own. The M3 and the M100 both publish the same fourteen-row Zigbee-to-Matter device-type table, so the bridging surface is documented as identical; the M3 is the one Aqara describes as its Matter controller for Matter-over-Thread accessories. The M2 appears in Home Assistant's own Matter documentation as an example bridge, which is the safest citation if you want a known-working path.</p>
+        <h3>Will my Aqara Zigbee sensors show up in Home Assistant through the M3?</h3>
+        <p>Only device types on Aqara's bridging list do: lights, outlets, switches, air conditioners, window coverings, cameras, thermostats, IR devices, door locks, temperature sensors, humidity sensors, TVOC sensors, buttons and floor heating. Home Assistant's docs also warn that not every device in an ecosystem gets bridged, so check your specific model.</p>
+        <h3>Can I use Aqara devices in Home Assistant without the Aqara cloud?</h3>
+        <p>The traffic can stay local, the setup cannot. Bridging a hub over Matter makes it use local communication rather than Aqara's cloud-based integration, which is what Home Assistant's docs recommend. But the hub is commissioned in the Aqara Home app first, and that needs an account.</p>
+        <h3>Is the Aqara hub a Thread border router, a Matter bridge, or both?</h3>
+        <p>Aqara's FAQ describes the Hub M3 as the Matter controller you need before adding Matter-over-Thread accessories, and its product page documents a Zigbee-to-Matter bridge table. That is a bridging and controller role on the Aqara side. Whether a given model is certified as a Thread border router is not spelled out in that FAQ, so confirm it on the product page before you rely on it as your only Thread radio.</p>
+
+        <p>More device coverage sits in <a href="devices.html">Devices</a>.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.aqara.com/en/product/hub-m3/">Aqara Hub M3</a>; <a href="https://www.aqara.com/en/product/hub-m100/">Aqara Hub M100</a>; <a href="https://www.home-assistant.io/integrations/matter/">Home Assistant Matter integration</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
