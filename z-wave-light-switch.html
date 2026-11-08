@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best Z-Wave light switch for Home Assistant (2026) — HA News</title>
+  <meta name="description" content="Picking a Z-Wave light switch for Home Assistant: Zooz ZEN71 and ZEN72, Leviton's Decora Smart DZ6HD dimmer, neutral-wire and 3-way requirements, load ratings, SmartStart pairing and the gotchas.">
+  <link rel="canonical" href="https://hanews.org/z-wave-light-switch">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best Z-Wave light switch for Home Assistant (2026)", "image": "https://hanews.org/images/zooz-zen71.png", "datePublished": "2026-11-08", "dateModified": "2026-11-08", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/z-wave-light-switch"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do Z-Wave light switches need a neutral wire?", "acceptedAnswer": {"@type": "Answer", "text": "The switches below do. Leviton's DZ6HD specifications list hot, neutral, load and ground as required, and Zooz's 700-series wall switches are wired into the mains circuit in the box. If your switch box only has a hot and a switched leg, a battery-powered Z-Wave scene controller or a no-neutral switch from another line is the practical route; nothing on this shortlist works without a neutral."}}, {"@type": "Question", "name": "Can a Z-Wave switch work in a 3-way circuit without an add-on switch?", "acceptedAnswer": {"@type": "Answer", "text": "Yes for both picks here. Leviton says the DZ6HD takes an optional traveler for multi-switch applications and needs no add-on module, and Zooz says the ZEN71 handles single pole or three-way using a regular switch in the other box."}}, {"@type": "Question", "name": "Do Z-Wave switches work without a hub or the internet?", "acceptedAnswer": {"@type": "Answer", "text": "They work without the internet, because the radio link is local. You still need a controller: a Z-Wave adapter plus the Z-Wave JS server, which in Home Assistant is normally the Z-Wave JS app installed when you plug in the adapter. Physical paddle operation continues even if the controller is down, because the switch is the load-bearing device."}}, {"@type": "Question", "name": "Z-Wave switch vs Zigbee: do I need a different hub?", "acceptedAnswer": {"@type": "Answer", "text": "You need a different radio, not necessarily a different hub. Home Assistant talks to either through an adapter: a Z-Wave adapter for Z-Wave, a Zigbee coordinator for Zigbee. The two protocols do not interoperate, so a Zigbee coordinator cannot hear a Z-Wave switch."}}, {"@type": "Question", "name": "Will a Z-Wave dimmer work with dimmable LED bulbs at low wattage?", "acceptedAnswer": {"@type": "Answer", "text": "Check the LED rating, not the incandescent one. Leviton rates the DZ6HD at 300W of dimmable LED or CFL against 600W incandescent and fluorescent. A handful of low-wattage LED bulbs sits far below that ceiling, but dimming quality at the bottom of the range still varies by bulb, so keep the make and model consistent across a circuit."}}, {"@type": "Question", "name": "Is an Aqara T1 switch Z-Wave?", "acceptedAnswer": {"@type": "Answer", "text": "No. Aqara's switch line is Zigbee, not Z-Wave, and it will not join a Z-Wave network no matter which adapter you buy. If you already run Z-Wave, buy a Z-Wave switch; if you are choosing a radio from scratch, read Zigbee vs Z-Wave first."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 8 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html" aria-current="page">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Buyer's guide · Z-Wave</p>
+        <h1>The best Z-Wave light switch for Home Assistant (2026)</h1>
+        <p class="byline">HA News · 8 Nov 2026</p>
+
+        <p>A Z-Wave light switch is the least glamorous purchase in a smart home and the one you will still be using in ten years. It replaces the wall switch, keeps working when the software doesn't, and joins a mesh that is deliberately slower and smaller than Wi-Fi. If you are already committed to Z-Wave, the shortlist is short: Zooz's 700-series wall switches for price and configurability, Leviton's Decora Smart line for certified build quality and a genuine 3-way without an add-on module.</p>
+
+        <p><strong>Our pick for most boxes is the Zooz ZEN71 if you want on/off and the Zooz ZEN72 if you want dimming</strong>, because both run the same platform, both pair by SmartStart, and both take a regular switch as a 3-way companion. Choose the Leviton DZ6HD dimmer when you want a mainstream brand, a bigger LED load rating, or a faceplate that can be re-coloured without replacing the switch.</p>
+
+        <p>One caveat before you read further: everything on this list needs a neutral wire in the box, and everything on this list needs a Z-Wave controller. Neither is negotiable. The rest is detail.</p>
+
+        <figure class="figure">
+          <img src="images/zooz-zen71.png" alt="Zooz 700-series Z-Wave Plus on/off wall switch, model ZEN71" width="600" height="600" loading="lazy">
+          <figcaption>Zooz ZEN71, the on/off model in the 700-series wall switch line. Credit: Zooz product image.</figcaption>
+        </figure>
+
+        <h2>At a glance</h2>
+        <table>
+          <thead><tr><th>Switch</th><th>Type</th><th>3-way</th><th>Best for</th></tr></thead>
+          <tbody>
+            <tr><td>Zooz ZEN71</td><td>On/off</td><td>Regular switch as traveller, no companion module</td><td>The default choice for non-dimmable loads</td></tr>
+            <tr><td>Zooz ZEN72</td><td>Dimmer</td><td>Same 700-series platform</td><td>Tuning ramp rate and minimum brightness</td></tr>
+            <tr><td>Leviton DZ6HD</td><td>Dimmer</td><td>Traveller optional, no add-on module</td><td>Big LED loads, mainstream brand, colour kits</td></tr>
+            <tr><td>Zooz ZEN73 / ZEN75</td><td>Toggle / heavy duty</td><td>Toggle SKUs are separate models</td><td>Old toggle faceplates and heavy loads</td></tr>
+          </tbody>
+        </table>
+
+        <h2>1. Zooz ZEN71: the on/off switch to start with</h2>
+        <p>The ZEN71 is the non-dimming model in Zooz's 700-series wall switch line. That matters more than it sounds: plenty of houses have a switch that runs a fluorescent tube, a fan, or a receptacle, and a dimmer in that box is the wrong device. An on/off switch rated for the load is the right one.</p>
+        <p>Wiring is single pole, or 3-way using a regular switch in the other box, with no add-on or traveller companion to buy. Zooz supports SmartStart for inclusion, so the switch can be added by scanning a code rather than running the classic inclusion dance, and it supports over-the-air firmware updates where the hub does. Because the switches are mains-powered, they also repeat the mesh: Zooz describes the line as expanding the range of the network, which is the quiet reason to buy wall switches instead of smart bulbs in a Z-Wave house. LED indicator colour and behaviour, plus the power-failure state, are set through hub parameters.</p>
+        <p>Check <a href="https://www.amazon.com/s?k=Zooz+ZEN71+Z-Wave+switch&amp;tag=hanews01-20" rel="sponsored nofollow">Zooz ZEN71 on Amazon</a>. Full source: <a href="https://www.getzooz.com/zooz-zen71-on-off-switch/">Zooz ZEN71 product page</a>.</p>
+
+        <h2>2. Zooz ZEN72: the dimmer with the knobs you actually want</h2>
+        <p>The ZEN72 is the dimmer version of the same platform, which means the installation story is identical and only the load changes. What it adds is tunability: ramp rate, manual dimming speed and minimum brightness are configurable, and the switch reports on/off state and brightness to the hub immediately after a paddle tap, so automations do not lag behind the physical switch.</p>
+        <p>There are four LED indicator colours and paddle colour-replacement kits for faceplate matching, and Zooz builds the ZEN72 with reduced depth for crowded or shallow boxes, which is the specification that decides whether a job takes twenty minutes or an afternoon. SmartStart is supported, as on the ZEN71.</p>
+        <p>Check <a href="https://www.amazon.com/s?k=Zooz+ZEN72+dimmer&amp;tag=hanews01-20" rel="sponsored nofollow">Zooz ZEN72 on Amazon</a>. Full source: <a href="https://www.getzooz.com/zooz-zen72-dimmer/">Zooz ZEN72 product page</a>.</p>
+
+        <figure class="figure">
+          <img src="images/zooz-zen72.png" alt="Zooz 700-series Z-Wave Plus dimmer, model ZEN72" width="600" height="600" loading="lazy">
+          <figcaption>Zooz ZEN72 dimmer, same 700-series platform as the ZEN71. Credit: Zooz product image.</figcaption>
+        </figure>
+
+        <h2>3. Leviton Decora Smart DZ6HD: the conservative pick</h2>
+        <p>Leviton sells the 600W Decora Smart with Z-Wave Plus Technology Dimmer as model DZ6HD-1BZ. It is a dimmer, not an on/off switch, and the load ratings are the reason to consider it: 300W of dimmable LED or CFL, 600W of incandescent and fluorescent.</p>
+        <p>Hot, neutral, load and ground are all required. For multi-switch (3-way) applications a traveller is optional and no add-on module is needed, which is the same convenience Zooz offers by a different route. Faceplate colour is a separate accessory, the DDKIT, available in black, gray, brown, light almond, ivory and white, so a kitchen remodel does not mean new switches.</p>
+        <p>The same family includes a 15A Decora Smart Z-Wave Plus switch and a 1000W dimmer for heavier loads. Leviton's page did not expose model numbers for those two during this pass, so treat them as names to look up rather than part numbers to quote.</p>
+        <p>Check <a href="https://www.amazon.com/s?k=Leviton+DZ6HD+Z-Wave+dimmer&amp;tag=hanews01-20" rel="sponsored nofollow">Leviton DZ6HD on Amazon</a>. Full source: <a href="https://www.leviton.com/en/products/dz6hd-1bz">Leviton DZ6HD product page</a>.</p>
+
+        <figure class="figure">
+          <img src="images/leviton-dz6hd.jpg" alt="Leviton Decora Smart 600W Z-Wave Plus dimmer, model DZ6HD" width="1000" height="1000" loading="lazy">
+          <figcaption>Leviton Decora Smart 600W Z-Wave Plus dimmer (DZ6HD). Credit: Leviton product image.</figcaption>
+        </figure>
+
+        <h2>4. Match the faceplate, not the SKU</h2>
+        <p>A detail that catches people mid-order: Decora-style and toggle paddle are separate models, not adapters. Zooz's own switch range lists the ZEN71 on/off switch, the ZEN72 dimmer, the ZEN73 S2 toggle switch, the ZEN74 S2 toggle dimmer, the ZEN75 heavy duty wall switch, the ZEN76 S2 700-series switch and the ZEN77 S2 dimmer. If the rest of the house is old toggle switches, buying a Decora paddle means a new faceplate in that room; buying the toggle SKU means it matches. Decide before you order, because the function and the face are priced and shipped separately.</p>
+
+        <h2>What not to buy by mistake</h2>
+        <p>Two traps. First, Inovelli's Red Series is real, and Inovelli's own navigation lists it alongside the White Series (Matter/Thread) and Blue Series (Zigbee) — but the product detail page returned a 404 during this pass and the collection page rendered only navigation, so we are not quoting model numbers, load ratings or anything else about it here. Look it up directly before buying.</p>
+        <p>Second, Aqara. Aqara's switch line, including the T1, is Zigbee, not Z-Wave. It will not join a Z-Wave network regardless of which adapter you own. If you are still choosing a radio, read <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a> before you buy six of anything.</p>
+
+        <h2>The hub side: what has to exist for the switch to be smart</h2>
+        <p>Home Assistant's Z-Wave integration controls a network through a Z-Wave adapter and a Z-Wave JS server. The standard path is to plug the adapter into the Home Assistant host, which installs the Z-Wave JS app. From there the integration covers the things buyers ask about after the fact: SmartStart as an alternative to classic inclusion, S2 security keys, network backup and restore, migrating to a new adapter, and pushing firmware updates to devices from inside Home Assistant. The docs version shown during this pass was 2026.11.0.</p>
+        <p>If you have not bought a controller yet, start with our guide to <a href="z-wave-hub">choosing a Z-Wave hub</a>. The short version: one adapter, one network, and back up the stick before you touch anything.</p>
+
+        <h2>Installing one, in order</h2>
+        <ol>
+          <li>Kill the breaker. Confirm with a tester at the switch, not by the light going out.</li>
+          <li>Check for a neutral bundle in the box. No neutral, no Z-Wave wall switch from this list.</li>
+          <li>Photograph the existing wiring before you disconnect it, including the traveller in a 3-way.</li>
+          <li>Wire hot, neutral, load and ground. In a 3-way, follow the manufacturer's diagram for the traveller and leave the other box's regular switch in place.</li>
+          <li>Restore power. The switch should click or light its indicator before it is ever paired.</li>
+          <li>Pair by SmartStart if the hub supports it, otherwise run classic inclusion from the Z-Wave integration, holding the paddle as the manual instructs.</li>
+          <li>Set the parameters you care about — indicator colour, ramp rate, minimum brightness, power-failure state — then rename the entity before you build automations on it.</li>
+          <li>Back up the Z-Wave network once the switch is in and responding. Doing it after the second switch is easier than after the tenth.</li>
+        </ol>
+
+        <h2>Gotchas worth knowing before the electrician arrives</h2>
+        <p><strong>Dimming a load that shouldn't be dimmed.</strong> If the circuit feeds a receptacle, a fan motor or a fluorescent fixture, buy the on/off switch (ZEN71) rather than a dimmer. A dimmer in that box is a fire-risk conversation, not a preference.</p>
+        <p><strong>Low-wattage LED flicker.</strong> The LED rating is the one that matters. Leviton's 300W LED figure is generous for a residential circuit, but dimming behaviour at the bottom of the range varies by bulb, so keep one make and model across a circuit and test before you buy a case.</p>
+        <p><strong>The mesh is built from mains devices.</strong> Battery devices do not repeat. Every one of these switches makes the network stronger; a house full of Z-Wave sensors and no switches is a fragile network.</p>
+        <p><strong>Local by default, cloud only if you add it.</strong> Z-Wave itself needs no account and no internet. Your automations run on the controller. If a vendor app is part of your plan, that is a separate cloud dependency you are choosing, not one the protocol imposes.</p>
+        <p><strong>Firmware is not automatic.</strong> Over-the-air updates exist on both the Zooz line and through Home Assistant's integration, but they only happen when you trigger them, and only where the hub supports OTA for that device.</p>
+
+        <h2>Related</h2>
+        <ul>
+          <li><a href="z-wave-hub">Choosing a Z-Wave hub or adapter for Home Assistant</a></li>
+          <li><a href="shelly-home-assistant">Shelly in Home Assistant</a> — the Wi-Fi alternative when you cannot pull a neutral</li>
+          <li><a href="z-wave-door-lock">Z-Wave door locks</a> — same network, same stick, different failure modes</li>
+          <li><a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a></li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Do Z-Wave light switches need a neutral wire?</h3>
+        <p>The switches below do. Leviton's DZ6HD specifications list hot, neutral, load and ground as required, and Zooz's 700-series wall switches are wired into the mains circuit in the box. If your switch box only has a hot and a switched leg, a battery-powered Z-Wave scene controller or a no-neutral switch from another line is the practical route; nothing on this shortlist works without a neutral.</p>
+        <h3>Can a Z-Wave switch work in a 3-way circuit without an add-on switch?</h3>
+        <p>Yes for both picks here. Leviton says the DZ6HD takes an optional traveler for multi-switch applications and needs no add-on module, and Zooz says the ZEN71 handles single pole or three-way using a regular switch in the other box.</p>
+        <h3>Do Z-Wave switches work without a hub or the internet?</h3>
+        <p>They work without the internet, because the radio link is local. You still need a controller: a Z-Wave adapter plus the Z-Wave JS server, which in Home Assistant is normally the Z-Wave JS app installed when you plug in the adapter. Physical paddle operation continues even if the controller is down, because the switch is the load-bearing device.</p>
+        <h3>Z-Wave switch vs Zigbee: do I need a different hub?</h3>
+        <p>You need a different radio, not necessarily a different hub. Home Assistant talks to either through an adapter: a Z-Wave adapter for Z-Wave, a Zigbee coordinator for Zigbee. The two protocols do not interoperate, so a Zigbee coordinator cannot hear a Z-Wave switch.</p>
+        <h3>Will a Z-Wave dimmer work with dimmable LED bulbs at low wattage?</h3>
+        <p>Check the LED rating, not the incandescent one. Leviton rates the DZ6HD at 300W of dimmable LED or CFL against 600W incandescent and fluorescent. A handful of low-wattage LED bulbs sits far below that ceiling, but dimming quality at the bottom of the range still varies by bulb, so keep the make and model consistent across a circuit.</p>
+        <h3>Is an Aqara T1 switch Z-Wave?</h3>
+        <p>No. Aqara's switch line is Zigbee, not Z-Wave, and it will not join a Z-Wave network no matter which adapter you buy. If you already run Z-Wave, buy a Z-Wave switch; if you are choosing a radio from scratch, read Zigbee vs Z-Wave first.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.getzooz.com/zooz-zen71-on-off-switch/">Zooz ZEN71 on/off switch</a>; <a href="https://www.getzooz.com/zooz-zen72-dimmer/">Zooz ZEN72 dimmer</a>; <a href="https://www.leviton.com/en/products/dz6hd-1bz">Leviton DZ6HD-1BZ</a>; <a href="https://www.home-assistant.io/integrations/zwave_js/">Home Assistant Z-Wave integration</a>; <a href="https://inovelli.com/collections/red-series">Inovelli Red Series</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
