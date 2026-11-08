@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Assistant Connect ZBT-2: Zigbee and Thread adapter, spec and setup (2026) — HA News</title>
+  <meta name="description" content="The Home Assistant Connect ZBT-2 in detail: MG24 radio and ESP32-S3 bridge, 460800 baud, external antenna, Zigbee or Thread one at a time, ZHA and Zigbee2MQTT setup, migration from a ZBT-1, and the gotchas before you buy.">
+  <link rel="canonical" href="https://hanews.org/home-assistant-connect-zbt-2">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Home Assistant Connect ZBT-2: Zigbee and Thread adapter, spec and setup (2026)", "image": "https://hanews.org/images/zbt-2-still-life-1280.webp", "datePublished": "2026-11-08", "dateModified": "2026-11-08", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-assistant-connect-zbt-2"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the Home Assistant Connect ZBT-2 and what does it replace?", "acceptedAnswer": {"@type": "Answer", "text": "It is Nabu Casa's USB radio adapter for Home Assistant, covering Zigbee 3.0 and Thread. It replaces the Connect ZBT-1, previously sold as SkyConnect, which the product page now lists as discontinued."}}, {"@type": "Question", "name": "Can the ZBT-2 run Zigbee and Thread at the same time?", "acceptedAnswer": {"@type": "Answer", "text": "No. Nabu Casa tested multiprotocol operation on the ZBT-1, found it inconsistent and damaging to stability, says it does not plan to implement it, and recommends one dedicated adapter per protocol."}}, {"@type": "Question", "name": "Is the ZBT-2 a good Zigbee coordinator, and does it work with Zigbee2MQTT?", "acceptedAnswer": {"@type": "Answer", "text": "Home Assistant's ZHA documentation names the Connect ZBT-2 as the recommended choice if you do not have a coordinator yet. Nabu Casa's product FAQ says many people run it with Zigbee2MQTT and points to Zigbee2MQTT's adapter-migration documentation."}}, {"@type": "Question", "name": "How do I migrate an existing Zigbee network to a ZBT-2?", "acceptedAnswer": {"@type": "Answer", "text": "Home Assistant ships a migration wizard for Zigbee and for Thread, and the product page says it covers the vast majority of adapters. Some sticks, ConBee among them, need specific firmware installed first."}}, {"@type": "Question", "name": "Do I need the ZBT-2 for Matter, or only for Thread devices?", "acceptedAnswer": {"@type": "Answer", "text": "Only for Thread. Matter controllers talk to Thread devices through a Thread border router, so if your Thread devices already reach a border router you own, the ZBT-2 is not required. It is one way to give Home Assistant its own border router."}}, {"@type": "Question", "name": "How does the ZBT-2 compare with a Sonoff ZBDongle-E or Dongle Max?", "acceptedAnswer": {"@type": "Answer", "text": "We could not verify current Sonoff specifications during this pass, so we do not quote them. The general rule stands: firmware build decides whether an adapter acts as a coordinator or a router, and ZHA and Zigbee2MQTT support varies by model, so check their adapter lists before buying."}}, {"@type": "Question", "name": "Does the ZBT-2 support Power over Ethernet?", "acceptedAnswer": {"@type": "Answer", "text": "No. Nabu Casa says PoE did not fit the product's design goals for simplicity and peak performance, and that it remains under exploration. The ZBT-2 is USB-C, 5 V DC at 500 mA, with a 1.5 m USB-C cable in the box."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 8 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Device · Zigbee &amp; Thread</p>
+        <h1>Home Assistant Connect ZBT-2: the spec, the setup, and what it replaces</h1>
+        <p class="byline">HA News · 8 Nov 2026</p>
+
+        <p>The Home Assistant Connect ZBT-2 is a USB radio adapter made by Nabu Casa, the company that employs most of Home Assistant's core developers. It is positioned as the easiest way to start with Zigbee <em>or</em> Thread — including Matter devices that talk over Thread — and it replaces the Connect ZBT-1, sold from 2022 as SkyConnect, which the product page now lists as discontinued.</p>
+
+        <p>The short answer to the query behind this page: if you need a radio for a Home Assistant box and you do not already own one, the ZBT-2 is the sensible default. Home Assistant's own ZHA documentation says so in as many words — "If you do not have a coordinator yet, the Home Assistant Connect ZBT-2 is the recommended choice" (<a href="https://www.home-assistant.io/integrations/zha/">ZHA docs</a>). If you already run a working ZBT-1 with a mesh you are happy with, the case for upgrading is convenience, not necessity. And if you assumed one stick would give you Zigbee and Thread at once, it will not.</p>
+
+        <figure class="figure">
+          <img src="images/zbt-2-still-life-1280.webp" alt="Home Assistant Connect ZBT-2, a white and semi-transparent adapter with an external antenna on a round base" width="1280" height="887" loading="lazy">
+          <figcaption>Home Assistant Connect ZBT-2. Image: Nabu Casa / Home Assistant, <a href="https://www.home-assistant.io/connect/zbt-2/">product page</a></figcaption>
+        </figure>
+
+        <h2>What is inside</h2>
+        <p>Two chips, doing two different jobs. A Silicon Labs MG24 handles the 2.4 GHz radio for Zigbee 3.0 and Thread. An ESP32-S3 sits alongside it as the USB-serial bridge, the part that presents the radio to the host as a serial port (<a href="https://www.home-assistant.io/connect/zbt-2/">Home Assistant product page</a>). Splitting those roles is what makes the next number possible.</p>
+
+        <p>The serial link runs at 460,800 baud. On the ZBT-1 it was 115,200, over an MG21 radio and a CP2102N USB chip. Nabu Casa describes the change as a four-times improvement in adapter speed and credits it with better device responsiveness. Baud rate is not a marketing abstraction here: it is the ceiling on how fast the stick can hand messages to Home Assistant, and it is the clearest generational difference between the two products.</p>
+
+        <h2>The spec sheet</h2>
+        <table>
+          <thead><tr><th>Spec</th><th>Connect ZBT-2</th></tr></thead>
+          <tbody>
+            <tr><td>Radio SoC</td><td>Silicon Labs MG24 (Zigbee 3.0 / Thread)</td></tr>
+            <tr><td>USB bridge</td><td>ESP32-S3</td></tr>
+            <tr><td>Serial speed</td><td>460,800 baud (ZBT-1: 115,200)</td></tr>
+            <tr><td>Frequency</td><td>2400–2483.5 MHz</td></tr>
+            <tr><td>Transmit power</td><td>10 dBm (Europe), 8 dBm (rest of world)</td></tr>
+            <tr><td>Antenna</td><td>External, 24 mm diameter × 164 mm, on a base; 4.16 dBi peak gain, omnidirectional</td></tr>
+            <tr><td>Power and data</td><td>USB-C, 5 V DC, 500 mA</td></tr>
+            <tr><td>In the box</td><td>Antenna and base, 1.5 m USB-C cable (USB 2.0/3.0), quickstart, warranty and safety notes</td></tr>
+            <tr><td>Size and weight</td><td>83 × 83 × 179 mm, 157 g</td></tr>
+            <tr><td>Enclosure</td><td>Polycarbonate, white and semi-transparent</td></tr>
+            <tr><td>Environment</td><td>Indoor use only, 0–65 °C (antenna −40 to +85 °C), non-condensing</td></tr>
+          </tbody>
+        </table>
+        <p>All figures in that table come from the <a href="https://www.home-assistant.io/connect/zbt-2/">product page</a>. Note the two transmit figures: 10 dBm in Europe, 8 dBm elsewhere, which is a regulatory difference rather than a model difference.</p>
+
+        <p>The antenna is the part people underestimate. It is not a stub on the PCB; it is a 164 mm external whip on a stand, and the enclosure is 179 mm tall to hold it. That means the ZBT-2 wants a little physical room — a USB port on the back of a shelf-mounted mini PC is fine, a port buried against a metal case is not. It also means the adapter is heavier than a dongle at 157 g, so a loose USB extension cable will sag.</p>
+
+        <h2>One radio, one protocol</h2>
+        <p>This is the single most misunderstood thing about the ZBT-2, and Nabu Casa is unusually direct about it: the adapter does not do Zigbee and Thread at the same time.</p>
+
+        <p>The company tried the alternative. It tested multiprotocol operation — the MultiPAN arrangement that shares one radio between Zigbee and Thread — on the ZBT-1, found it inconsistent, found it damaged stability, says it does not plan to implement it on the ZBT-2, and recommends one dedicated adapter per protocol (<a href="https://www.home-assistant.io/connect/zbt-2/">product page</a>). That is a rare thing in this market: a vendor telling you to buy two of its product rather than pretending one will do.</p>
+
+        <p>Practically, you decide per stick. A Zigbee house gets a Zigbee adapter. A Matter-over-Thread house gets a Thread adapter. A house with both — which is most houses two years from now — gets two adapters, or one adapter plus a border router it already owns, such as a HomePod or a Nest Hub. If you are still choosing a mesh radio at all, <a href="zigbee-vs-thread">Zigbee vs Thread</a> lays out the trade; if you already know you want Thread, <a href="article-thread-network">what a Thread network actually is</a> is the background.</p>
+
+        <h2>Using it for Thread (the Matter path)</h2>
+        <p>Thread is the radio layer under Matter-over-Thread devices: locks, sensors, some lights. Those devices do not talk to your phone or your server directly. They talk to a Thread border router, which bridges the mesh onto your IP network.</p>
+
+        <p>Home Assistant can be that border router. The <a href="https://www.home-assistant.io/integrations/thread/">Thread integration</a> does two jobs: it stores Thread network credentials, and it tracks the networks it can see. It appears on its own when Home Assistant detects a border router — there is nothing to install from the app store first, and no YAML.</p>
+
+        <p>To turn a ZBT-2 into a border router, you add the adapter and flash it with OpenThread RCP firmware through the OpenThread Border Router app. The documentation covers both starting cases separately: making Home Assistant the first Thread network in the house, and adding a Home Assistant border router alongside a network that already exists — the common situation when an Apple TV or a Google speaker got there first. There is also a dedicated section on migrating a Thread network to a new adapter, which is the section you want when swapping a ZBT-1 for a ZBT-2 (<a href="https://www.home-assistant.io/integrations/thread/">Thread integration docs</a>).</p>
+
+        <p>One piece of vocabulary saves confusion. The Thread Group's "Built on Thread: requires border router" logo means Thread is the only radio in that device — it has no Wi-Fi fallback. A device wearing that logo is not broken when it refuses to pair; it is waiting for a border router that is reachable and shares its credentials.</p>
+
+        <h2>Using it for Zigbee</h2>
+        <p>Zigbee needs a coordinator: exactly one per network. ZHA is hardware-independent, needs one adapter plugged into the machine running Home Assistant, and does the rest from the UI. Coverage and capacity do not come from the coordinator — they come from mains-powered routers, the plugs and bulbs that stay energised and pass messages along (<a href="https://www.home-assistant.io/integrations/zha/">ZHA docs</a>).</p>
+
+        <p>The order that works: pair mains-powered devices first, spread through the house, then battery sensors near them. Do it the other way round and you will spend an evening wondering why a motion sensor two rooms away keeps dropping.</p>
+
+        <p>Zigbee2MQTT is a supported path too. Nabu Casa's FAQ says many people run the ZBT-2 with Z2M "and are seeing great results", and points at Zigbee2MQTT's own adapter-migration documentation. If you are weighing the two stacks, <a href="zigbee-hub">the Zigbee hub guide</a> covers coordinator choices and what each integration asks of you; the short version is that ZHA is the built-in path and Z2M is the one with more knobs.</p>
+
+        <h2>Migrating an existing network</h2>
+        <p>You do not have to re-pair everything. Home Assistant ships migration wizards for both Zigbee and Thread, and the product page states they cover "the vast majority of adapters". The exception worth knowing: some sticks need specific firmware before they can hand over their network — ConBee is the example the page gives.</p>
+
+        <p>Two rules make a migration survivable. Back up first, because a coordinator swap rewrites the network key material. And do not run the old and new coordinator at the same time; a Zigbee network with two coordinators on one channel is a network that argues with itself.</p>
+
+        <h2>Gotchas before you order</h2>
+        <ul>
+          <li><strong>No PoE.</strong> Nabu Casa says Power over Ethernet did not fit the design goals of simplicity and peak performance, and that it remains under exploration. There is no Ethernet port. If your server is in a basement and your radios need to be upstairs, plan for a USB extension, not a network cable.</li>
+          <li><strong>Indoors only.</strong> The rating is 0–65 °C, non-condensing, indoor use. A garage in the tropics is a maybe; a shed is a no. The antenna itself is rated wider, −40 to +85 °C, but the electronics are not.</li>
+          <li><strong>One protocol per stick.</strong> Covered above, and worth repeating because it is the mistake people make on day one.</li>
+          <li><strong>The case opens on purpose.</strong> There are no clips and no glue, and the board exposes pins and pads for flashing. That is a design decision, not a manufacturing shortcut: it means the radio can be reflashed with other firmware later without destroying the enclosure.</li>
+          <li><strong>USB 2.0 cable in the box, USB 3.0 ports on your server.</strong> The included cable is rated for both. Keep the adapter on an extension lead rather than directly in a crowded hub — USB 3 radios and 2.4 GHz antennas are famously bad neighbours, and the ZBT-2's antenna is the reason it can sit away from the case.</li>
+        </ul>
+
+        <h2>What else is out there</h2>
+        <p>Readers ask about the Sonoff coordinators — the ZBDongle-E and the Dongle Max — in the same breath as the ZBT-2, and they are a legitimate alternative family: cheaper, widely used, and supported by both ZHA and Zigbee2MQTT. We are not going to quote their specifications here. Sonoff's product pages returned 404 during this pass, and a spec table copied from memory is worse than no table at all. What holds regardless: the firmware build decides whether a given stick acts as a coordinator or a router, support differs by model and by firmware generation, and the authoritative lists are ZHA's tested-adapter table and Zigbee2MQTT's supported-adapters page. Check the model against those before you buy, not after.</p>
+
+        <p>What the official adapter buys you is not better radio physics. It is that Nabu Casa maintains the firmware for the ZHA team and can push updates from inside Home Assistant, and that a migration wizard exists for the product you are holding. You are paying for the boring part working.</p>
+
+        <h2>Should you buy one</h2>
+        <p><strong>Buy</strong> if you are starting a Zigbee network on Home Assistant and own no coordinator, or if you want Home Assistant to be a Thread border router rather than borrowing Apple's or Google's. One adapter per protocol, so budget for two if you want both.</p>
+        <p><strong>Wait</strong> if you are running a ZBT-1 that works. The four-times serial speed is real but it is a responsiveness improvement, not a new capability, and a coordinator swap on a large mesh costs an evening. Move when you are already touching the network, or when the ZBT-1's discontinuation makes replacement firmware a question.</p>
+        <p><strong>Look elsewhere</strong> if you need PoE, run the radio outdoors, or want a coordinator that lives on Ethernet and never touches the server's USB bus. That is a different product class and the ZBT-2 is deliberately not in it.</p>
+        <p>Current price and stock sit on the listing, not here: <a href="https://www.amazon.com/s?k=Home+Assistant+Connect+ZBT-2&amp;tag=hanews01-20" rel="sponsored nofollow">Home Assistant Connect ZBT-2 on Amazon</a>.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, Zigbee and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>What is the Home Assistant Connect ZBT-2 and what does it replace?</h3>
+        <p>It is Nabu Casa's USB radio adapter for Home Assistant, covering Zigbee 3.0 and Thread. It replaces the Connect ZBT-1, previously sold as SkyConnect, which the product page now lists as discontinued.</p>
+        <h3>Can the ZBT-2 run Zigbee and Thread at the same time?</h3>
+        <p>No. Nabu Casa tested multiprotocol operation on the ZBT-1, found it inconsistent and damaging to stability, says it does not plan to implement it, and recommends one dedicated adapter per protocol.</p>
+        <h3>Is the ZBT-2 a good Zigbee coordinator, and does it work with Zigbee2MQTT?</h3>
+        <p>Home Assistant's ZHA documentation names the Connect ZBT-2 as the recommended choice if you do not have a coordinator yet. Nabu Casa's product FAQ says many people run it with Zigbee2MQTT and points to Zigbee2MQTT's adapter-migration documentation.</p>
+        <h3>How do I migrate an existing Zigbee network to a ZBT-2?</h3>
+        <p>Home Assistant ships a migration wizard for Zigbee and for Thread, and the product page says it covers the vast majority of adapters. Some sticks, ConBee among them, need specific firmware installed first.</p>
+        <h3>Do I need the ZBT-2 for Matter, or only for Thread devices?</h3>
+        <p>Only for Thread. Matter controllers talk to Thread devices through a Thread border router, so if your Thread devices already reach a border router you own, the ZBT-2 is not required. It is one way to give Home Assistant its own border router.</p>
+        <h3>How does the ZBT-2 compare with a Sonoff ZBDongle-E or Dongle Max?</h3>
+        <p>We could not verify current Sonoff specifications during this pass, so we do not quote them. The general rule stands: firmware build decides whether an adapter acts as a coordinator or a router, and ZHA and Zigbee2MQTT support varies by model, so check their adapter lists before buying.</p>
+        <h3>Does the ZBT-2 support Power over Ethernet?</h3>
+        <p>No. Nabu Casa says PoE did not fit the product's design goals for simplicity and peak performance, and that it remains under exploration. The ZBT-2 is USB-C, 5 V DC at 500 mA, with a 1.5 m USB-C cable in the box.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee and Matter releases. <a href="brief-2026-11-02">Read the latest</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/connect/zbt-2/">Home Assistant Connect ZBT-2</a>; <a href="https://www.home-assistant.io/integrations/thread/">Home Assistant Thread integration</a>; <a href="https://www.home-assistant.io/integrations/zha/">Home Assistant ZHA integration</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
