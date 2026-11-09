@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aqara doorbell with Home Assistant: G4 vs G410 (2026) — HA News</title>
+  <meta name="description" content="How the Aqara Video Doorbell G4 and the Doorbell Camera Hub G410 work with Home Assistant: what pairs over HomeKit Device, when RTSP works, setup steps and the battery caveats.">
+  <link rel="canonical" href="https://hanews.org/aqara-doorbell-home-assistant">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Aqara doorbell with Home Assistant: G4 vs G410 (2026)", "image": "https://hanews.org/images/aqara-g410-doorbell.png", "datePublished": "2026-11-07", "dateModified": "2026-11-07", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/aqara-doorbell-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does the Aqara Video Doorbell G4 work with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Partly. The G4 pairs with Home Assistant through the HomeKit Device integration, and a doorbell press arrives as a device automation trigger. Home Assistant does not create a camera entity for it, and the G4 does not offer an RTSP stream, so it cannot feed Frigate or a dashboard camera card."}}, {"@type": "Question", "name": "Why does Home Assistant only show a doorbell press and no camera for my Aqara doorbell?", "acceptedAnswer": {"@type": "Answer", "text": "Home Assistant's HomeKit Device integration lists stateless accessories such as doorbells as supported for automation triggers, but cameras are not on its supported-device list. Home Assistant's own documentation warns that an unsupported device may pair and appear in the Device Registry without Home Assistant creating entities."}}, {"@type": "Question", "name": "Aqara G4 vs G410 — which one should I put on Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "The G410 if you can hardwire it to a low-voltage supply: Aqara documents RTSP support for third-party clients including Home Assistant, so the video can go to Frigate or go2rtc and the button can still come through HomeKit Device. Pick the G4 if it will run on batteries and you only want the press to fire automations."}}, {"@type": "Question", "name": "Does the Aqara G410 support RTSP for Frigate or go2rtc?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, but only when the doorbell is wired to a low-voltage power supply. Aqara's announcement says the G410 supports RTSP and can stream to third-party clients such as Home Assistant; a footnote on the same release limits that support to hardwired installations, so a battery-only G410 does not publish an RTSP stream."}}, {"@type": "Question", "name": "Do I need an Aqara hub or a subscription to use the G4 or G410?", "acceptedAnswer": {"@type": "Answer", "text": "No hub is required for either model. Both ship with a chime repeater that holds the microSD card and repeats the signal. Local recording to microSD needs no subscription; Aqara includes a free 7-day cloud tier, and HomeKit Secure Video requires an iCloud subscription and an Apple home hub."}}, {"@type": "Question", "name": "Can Home Assistant use Aqara's on-device face recognition?", "acceptedAnswer": {"@type": "Answer", "text": "Not through the documented Home Assistant path. Aqara describes face recognition on the G4 as running locally on the device and triggering Aqara Home automations. Home Assistant's HomeKit Device integration documents doorbell presses as triggers and does not list camera or face-recognition entities for these models, so plan on Aqara Home for the face step."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Saturday, 7 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Cameras &amp; doorbells</p>
+        <h1>Aqara doorbell with Home Assistant: G4 vs G410 (2026)</h1>
+        <p class="byline">HA News · 7 Nov 2026</p>
+
+        <p>An Aqara video doorbell will talk to Home Assistant, but not the way most buyers expect. Home Assistant's own Aqara integration covers only Aqara's <em>Matter</em> devices, and its certified list has locks, sensors, bulbs, switches and a valve controller on it — no cameras and no doorbells (<a href="https://www.home-assistant.io/integrations/aqara/">Home Assistant Aqara integration</a>). Both Aqara doorbells are instead HomeKit accessories, so the path is the <strong>HomeKit Device</strong> integration. What you get on the other side depends entirely on the model: the current <strong>Doorbell Camera Hub G410</strong> can publish an RTSP stream for Frigate, go2rtc or Home Assistant's Generic Camera when it is hardwired; the older <strong>Video Doorbell G4</strong> gives you a button press and nothing else. Neither one gives you a camera entity in Home Assistant out of the box.</p>
+
+        <figure class="figure">
+          <img src="images/aqara-g410-doorbell.png" alt="Aqara Doorbell Camera Hub G410 mounted beside a blue front door" width="1268" height="713" loading="lazy">
+          <figcaption>Aqara Doorbell Camera Hub G410 at a front door. Image: Aqara</figcaption>
+        </figure>
+
+        <h2>What the two doorbells actually are</h2>
+        <p>The G4 is the older, cheaper-feeling design: a 1080p camera with a 162-degree field of view and infrared night vision, a six-cell AA battery pack rated for "up to 4 months" on Aqara's own assumption of 35 wake-ups and 6-second clips a day, and an indoor Chime Repeater that holds the microSD slot (up to 512 GB) where nobody outside can reach it (<a href="https://www.aqara.com/en/product/smart-video-doorbell-g4/">Aqara G4 product page</a>).</p>
+        <p>The G410 is the current model, announced globally on 10 July 2025 and marketed as Aqara's first "doorbell camera hub" (<a href="https://www.aqara.com/en/news/aqara-expands-security-camera-portfolio-with-first-doorbell-camera-hub">Aqara announcement</a>). It steps up to a 2K sensor with an f/1.8 lens and a 175-degree field of view, and adds an mmWave presence sensor to cut false alerts. The "hub" in the name is literal: it also works as a Matter Controller, a Thread Border Router and an Aqara Zigbee hub, and Aqara claims support for more than 50 types of third-party Matter devices.</p>
+
+        <table>
+          <thead><tr><th>Spec</th><th>Video Doorbell G4</th><th>Doorbell Camera Hub G410</th></tr></thead>
+          <tbody>
+            <tr><td>Camera</td><td>1080p, 162° FOV, IR night vision</td><td>2K, f/1.8, 175° FOV, mmWave presence</td></tr>
+            <tr><td>Power</td><td>6 × AA battery; or 12-24 V AC/DC wired with batteries as backup</td><td>6 × LR6 AA; main unit 12-24 V AC 0.2 A or 12-24 V DC 0.5 A</td></tr>
+            <tr><td>Battery life claim</td><td>"Up to 4 months" at 35 wake-ups and 6-second clips per day</td><td>"Up to five months" at 10 wake-ups per day</td></tr>
+            <tr><td>Storage</td><td>microSD up to 512 GB, in the indoor Chime Repeater</td><td>microSD up to 512 GB (Class 10+, not included), in the chime/hub</td></tr>
+            <tr><td>RTSP</td><td>Not documented</td><td>Documented, hardwired only</td></tr>
+            <tr><td>Hub radios</td><td>Chime Repeater only (95 dB, USB-C)</td><td>Zigbee/Thread 802.15.4, Wi-Fi 2.4/5 GHz, Bluetooth</td></tr>
+            <tr><td>Operating range</td><td>Not specified on the product page</td><td>-18 °C to +50 °C</td></tr>
+          </tbody>
+        </table>
+        <p>Specs above from the <a href="https://www.aqara.com/en/product/doorbell-camera-hub-g410-specs">G410 spec sheet</a> and the <a href="https://www.aqara.com/en/product/smart-video-doorbell-g4/">G4 product page</a>.</p>
+
+        <h2>The short answer: buy the G410 if you can hardwire it</h2>
+        <p>For a Home Assistant household, the deciding line is not resolution or price. It is whether the doorbell will be wired to a transformer. Aqara states that the G410 "supports RTSP protocol" and can "stream to third-party clients like Home Assistant over the local network", naming NVR software such as Frigate. A footnote on the same release narrows that: RTSP is only available when the doorbell is hardwired to a low-voltage power supply. On batteries you do not get an RTSP stream (<a href="https://www.aqara.com/en/news/aqara-expands-security-camera-portfolio-with-first-doorbell-camera-hub">Aqara announcement, footnote 2</a>).</p>
+        <p>That is the whole decision. Wire a G410 and you have a normal IP camera on your LAN that Home Assistant can ingest; leave it on batteries and it behaves like a cloud doorbell with a HomeKit side door. The G4 has no documented RTSP path at all, so it is a button and an Aqara app camera, full stop.</p>
+
+        <h2>How the G410 reaches Home Assistant</h2>
+        <p>There are two separate jobs, and it helps to treat them separately: video and the button press.</p>
+        <p><strong>Video.</strong> Once the G410 is wired, point a stream consumer at its RTSP URL. Frigate is the usual choice because it handles detection and recording on your own hardware; go2rtc is the lighter option if you only want the feed on a dashboard; Home Assistant's Generic Camera integration will also take an RTSP URL and produce a camera entity. Aqara does not document the exact URL path on its public pages, so read it from the Aqara Home app after enabling the stream rather than guessing. 24/7 recording needs two things at once — a microSD card and constant wired power — per footnote 4 of the same release. Without the card you get live view, not a local archive.</p>
+        <p><strong>The button.</strong> Pair the same doorbell with Home Assistant as a HomeKit accessory. Home Assistant's HomeKit Device documentation lists "Automation triggers (HomeKit 'stateless' accessories like buttons, remotes and doorbells)" as supported, which means a press surfaces as a device automation trigger rather than as a sensor you can read (<a href="https://www.home-assistant.io/integrations/homekit_controller/">Home Assistant HomeKit Device</a>). Use that trigger to flash lights, pause the TV, or send a notification.</p>
+        <p>What you do not get is a camera entity through HomeKit: cameras are not on Home Assistant's supported-device list, and the docs are blunt about the consequence — "If your device is not on this list then you may still be able to pair it, and it will be visible in the Device Registry. But Home Assistant may not create entities." That sentence describes the doorbell-camera case exactly.</p>
+
+        <h2>How the G4 reaches Home Assistant</h2>
+        <p>The same HomeKit Device route gives you less. A G4 pairs, appears in the Device Registry, and contributes a doorbell press trigger. There is no camera entity and no RTSP URL, because Aqara's G4 page never mentions RTSP; its "local streaming" claims refer to Google and Alexa smart displays and to HomeKit Secure Video, not to a stream you can pull into an NVR (<a href="https://www.aqara.com/en/product/smart-video-doorbell-g4/">Aqara G4 product page</a>).</p>
+        <p>For a lot of houses that is enough. A press is the event that matters — announce "someone's at the door" on the kitchen speaker, turn on the porch light, push a notification with the camera snapshot from the Aqara app. If you want the video inside Home Assistant, the G4 is the wrong purchase.</p>
+        <p>One more G4 caveat while you are planning: automatic backup to an SMB NAS is described by Aqara as a future feature ("in the future the videos can be backed up automatically to an SMB NAS"), not something shipping today. Do not buy it expecting a native NVR handoff.</p>
+
+        <h2>Setup: pairing either doorbell with HomeKit Device</h2>
+        <ol>
+          <li>Make sure Home Assistant has <code>zeroconf</code> — in practice <code>default_config</code> — so HomeKit accessories are discovered on the LAN.</li>
+          <li>If the doorbell is already in Apple Home, remove it there first. Home Assistant's docs are explicit: the device must be "on your network, but not paired with another HomeKit controller". One controller per accessory.</li>
+          <li>Put the doorbell into pairing mode and note the HomeKit code printed on the device or its packaging.</li>
+          <li>In Home Assistant, go to Settings, then Devices &amp; services. The accessory should appear as a discovered HomeKit Device; otherwise choose Add integration and pick HomeKit Device.</li>
+          <li>Enter the pairing code. The doorbell lands in the Device Registry.</li>
+          <li>Build a device automation on the doorbell trigger. Home Assistant does not create duplicate events for device-automation triggers, so do not also build an event listener for the same press.</li>
+          <li>For the G410, enable the RTSP stream in the Aqara app while wired, then add the URL to Frigate, go2rtc or Generic Camera.</li>
+        </ol>
+
+        <h2>Gotchas before you buy</h2>
+        <ul>
+          <li><strong>Battery mode changes what you own.</strong> RTSP on the G410 and 24/7 microSD recording on both models need wired power. Battery mode is event clips only on the G4, and no RTSP on the G410.</li>
+          <li><strong>HomeKit Secure Video is not free.</strong> On the G410 it caps resolution at 1200p and needs an iCloud subscription plus an Apple home hub. It is a cloud path, not a local one.</li>
+          <li><strong>Local storage lives indoors.</strong> The microSD slot sits in the chime repeater, which is good for security and annoying if you want to swap cards without walking inside.</li>
+          <li><strong>The Aqara integration will not help.</strong> It covers Matter devices only; cameras and doorbells are absent from the certified list, so there is no official local-push entity for video.</li>
+          <li><strong>No subscription needed for local storage.</strong> Both models record to microSD without a plan, and the G4 page lists 7 days of free cloud storage included. That free tier is a cloud dependency, so decide whether you want it on.</li>
+        </ul>
+
+        <h2>Which to buy</h2>
+        <p><strong>Aqara Doorbell Camera Hub G410</strong> — the pick for Home Assistant, provided you can supply 12-24 V AC or DC at the door. It is the only one of the two with a documented RTSP path, and it doubles as a Thread Border Router and Zigbee hub if you need one at the front of the house. Check <a href="https://www.amazon.com/s?k=Aqara+Doorbell+Camera+Hub+G410&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Doorbell Camera Hub G410 on Amazon</a> for current price and stock.</p>
+        <p><strong>Aqara Smart Video Doorbell G4</strong> — the pick when there is no wiring at the door and you only need the press in Home Assistant. It is cheaper, it runs on AA cells, and its chime repeater covers a normal house. Check <a href="https://www.amazon.com/s?k=Aqara+Video+Doorbell+G4&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Video Doorbell G4 on Amazon</a> for current price and stock.</p>
+        <p>If video in Home Assistant is the actual goal, compare the wider field before committing — our <a href="zigbee-hub">Zigbee hub guide</a> covers the radio side of an Aqara-heavy house, <a href="matter">Matter &amp; Thread</a> explains what the G410's border router is doing, and <a href="aqara-smart-lock-home-assistant">Aqara smart locks</a> covers the other device most people put on the same door. The <a href="ha">Home Assistant section</a> has the rest of the stack.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Does the Aqara Video Doorbell G4 work with Home Assistant?</h3>
+        <p>Partly. The G4 pairs with Home Assistant through the HomeKit Device integration, and a doorbell press arrives as a device automation trigger. Home Assistant does not create a camera entity for it, and the G4 does not offer an RTSP stream, so it cannot feed Frigate or a dashboard camera card.</p>
+        <h3>Why does Home Assistant only show a doorbell press and no camera for my Aqara doorbell?</h3>
+        <p>Home Assistant's HomeKit Device integration lists stateless accessories such as doorbells as supported for automation triggers, but cameras are not on its supported-device list. Home Assistant's own documentation warns that an unsupported device may pair and appear in the Device Registry without Home Assistant creating entities.</p>
+        <h3>Aqara G4 vs G410 — which one should I put on Home Assistant?</h3>
+        <p>The G410 if you can hardwire it to a low-voltage supply: Aqara documents RTSP support for third-party clients including Home Assistant, so the video can go to Frigate or go2rtc and the button can still come through HomeKit Device. Pick the G4 if it will run on batteries and you only want the press to fire automations.</p>
+        <h3>Does the Aqara G410 support RTSP for Frigate or go2rtc?</h3>
+        <p>Yes, but only when the doorbell is wired to a low-voltage power supply. Aqara's announcement says the G410 supports RTSP and can stream to third-party clients such as Home Assistant; a footnote on the same release limits that support to hardwired installations, so a battery-only G410 does not publish an RTSP stream.</p>
+        <h3>Do I need an Aqara hub or a subscription to use the G4 or G410?</h3>
+        <p>No hub is required for either model. Both ship with a chime repeater that holds the microSD card and repeats the signal. Local recording to microSD needs no subscription; Aqara includes a free 7-day cloud tier, and HomeKit Secure Video requires an iCloud subscription and an Apple home hub.</p>
+        <h3>Can Home Assistant use Aqara's on-device face recognition?</h3>
+        <p>Not through the documented Home Assistant path. Aqara describes face recognition on the G4 as running locally on the device and triggering Aqara Home automations. Home Assistant's HomeKit Device integration documents doorbell presses as triggers and does not list camera or face-recognition entities for these models, so plan on Aqara Home for the face step.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-11-02">Read the latest</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.aqara.com/en/product/smart-video-doorbell-g4/">Aqara Smart Video Doorbell G4</a>; <a href="https://www.aqara.com/en/news/aqara-expands-security-camera-portfolio-with-first-doorbell-camera-hub">Aqara Doorbell Camera Hub G410 announcement</a>; <a href="https://www.aqara.com/en/product/doorbell-camera-hub-g410-specs">G410 specifications</a>; <a href="https://www.home-assistant.io/integrations/homekit_controller/">Home Assistant HomeKit Device</a>; <a href="https://www.home-assistant.io/integrations/aqara/">Home Assistant Aqara integration</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

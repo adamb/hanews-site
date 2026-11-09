@@ -354,4 +354,40 @@
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://hanews.org/aqara-smart-lock-home-assistant</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hanews.org/aqara-doorbell-home-assistant</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hanews.org/aqara-camera-home-assistant</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hanews.org/home-assistant-docker</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hanews.org/best-mini-pc-home-assistant</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://hanews.org/home-assistant-green-vs-raspberry-pi</loc>
+    <lastmod>2026-11-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

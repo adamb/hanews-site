@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aqara smart lock with Home Assistant: U400 and U100 (2026) — HA News</title>
+  <meta name="description" content="How the Aqara smart lock lineup works with Home Assistant: the Matter-over-Thread U400, the Zigbee U100 and its Aqara hub, what a Thread border router changes, setup steps and the gotchas.">
+  <link rel="canonical" href="https://hanews.org/aqara-smart-lock-home-assistant">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Aqara smart lock with Home Assistant: U400 and U100 (2026)", "image": "https://hanews.org/images/aqara-u100-product.png", "datePublished": "2026-11-07", "dateModified": "2026-11-07", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/aqara-smart-lock-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does the Aqara Smart Lock U400 work with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The U400 speaks Matter over Thread, and Aqara lists Home Assistant among the ecosystems it works with by design. You need a Thread border router on your network and the Matter integration in Home Assistant, which runs its own Matter controller locally. No Aqara cloud account sits in the path once the lock is commissioned."}}, {"@type": "Question", "name": "Do I need an Aqara hub to use the U100 with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "For Home Assistant, yes. The U100 is a Zigbee lock, and Aqara's footnotes say a Matter-supported Aqara hub plus a Matter controller are required to reach Matter ecosystems, and an Aqara Zigbee 3.0 hub is required for automations and remote unlock. Aqara does not document pairing the U100 directly to ZHA or Zigbee2MQTT."}}, {"@type": "Question", "name": "Aqara U100 vs U400: which should I buy for a Home Assistant house?", "acceptedAnswer": {"@type": "Answer", "text": "If Home Assistant is your primary controller, the U400. It is Matter over Thread, so it joins Home Assistant directly through the Matter integration with no Aqara hub in the middle. The U100 makes sense if you already run an Aqara hub and want Zigbee, or you want Apple Home Key on a lock without a Thread network."}}, {"@type": "Question", "name": "Does a Matter lock need a Thread border router, and does Home Assistant Green count?", "acceptedAnswer": {"@type": "Answer", "text": "A Matter lock on Thread needs a Thread border router on the same network. Home Assistant throws a 'this device requires a border router' error without one. Home Assistant Green has no Thread radio, so it cannot act as that border router on its own; you need a separate Thread adapter or a border router device. Check the current Home Assistant Connect hardware page for what each unit ships with."}}, {"@type": "Question", "name": "Can I keep the lock in Apple Home and still use it in Home Assistant at the same time?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Matter supports multiple administrators. Instead of re-commissioning the lock, share it from Apple Home to Home Assistant using the share-device flow, and the lock then answers to both ecosystems. Home Assistant documents this multi-fabric approach in its Matter integration docs."}}, {"@type": "Question", "name": "What is the best smart lock for Home Assistant: Matter over Thread or Z-Wave?", "acceptedAnswer": {"@type": "Answer", "text": "Both are local and neither needs a vendor cloud. Matter over Thread is the direction most new locks are heading and pairs with the Matter integration built into Home Assistant; Z-Wave locks have a longer track record and a mature integration, but need a Z-Wave radio in your Home Assistant machine. Pick the protocol your house already has radios for."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Saturday, 7 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Locks</p>
+        <h1>Aqara smart lock with Home Assistant: U400 and U100</h1>
+        <p class="byline">HA News · 7 Nov 2026</p>
+
+        <p>The question people actually ask is narrower than "is this lock good". It is: does the Aqara smart lock work with Home Assistant, and what do I have to buy to make that true? The answer depends entirely on which Aqara lock you pick, because the two current models sit on two different radios. <strong>The U400 is Matter over Thread and joins Home Assistant directly. The U100 is Zigbee and reaches Home Assistant through an Aqara hub that exposes it as a Matter device.</strong> Same brand, same fingerprint reader, two different wiring diagrams.</p>
+
+        <p>This guide is built from Aqara's own product pages and Home Assistant's Matter integration documentation, linked at the bottom. It covers what each lock is, what Home Assistant needs on its side, the setup order that avoids dead ends, and the caveats Aqara prints in its own footnotes.</p>
+
+        <figure class="figure">
+          <img src="images/aqara-u100-product.png" alt="Aqara smart lock shown from both sides: keypad and fingerprint reader on the exterior panel, thumbturn on the interior panel" width="408" height="358" loading="lazy">
+          <figcaption>Aqara smart lock, exterior keypad panel and interior thumbturn. Image: <a href="https://www.aqara.com/en/product/smart-lock-u100/">Aqara</a></figcaption>
+        </figure>
+
+        <h2>The short answer</h2>
+        <p>If Home Assistant is your primary controller, the U400 is the cleaner purchase. It speaks Matter over Thread, and Aqara says on its product page that the lock "works by design with Apple Home, Home Assistant, Google Home, Amazon Alexa, Samsung SmartThings". There is no Aqara bridge in the middle and no Aqara account holding the device hostage — Home Assistant's Matter integration runs its own Matter controller locally, over your Wi-Fi or Thread network.</p>
+
+        <p>The U100 is the older Zigbee design. Aqara's page describes it as "built on Zigbee protocol", compatible with Matter and other ecosystems "with a Matter-supported Aqara hub and a Matter controller". Read the footnotes carefully: the hub is not optional for Home Assistant users, and an Aqara Zigbee 3.0 hub is also listed as required for automations and remote unlock. Aqara does not document pairing the U100 directly to ZHA or Zigbee2MQTT, so do not count on that path.</p>
+
+        <h2>What the U400 is</h2>
+        <p>The U400 is a full deadbolt replacement with a fingerprint reader, keypad, NFC and ultra-wideband hands-free unlock. Aqara's spec sheet makes it one of the better-equipped Matter locks on paper.</p>
+
+        <table>
+          <thead><tr><th>Spec</th><th>Aqara Smart Lock U400</th></tr></thead>
+          <tbody>
+            <tr><td>Protocol</td><td>Matter over Thread</td></tr>
+            <tr><td>Entry methods</td><td>Fingerprint, keypad (permanent, offline and scheduled codes, anti-peep), app, voice, mechanical key, NFC card, Apple Home Key in Wallet, Samsung Wallet Digital Home Key via SmartThings</td></tr>
+            <tr><td>Fingerprint</td><td>Up to 50 prints, unlock in 0.3 s, up to 98.6% recognition rate</td></tr>
+            <tr><td>Hands-free</td><td>UWB unlock with iPhone or Apple Watch; Aliro-enabled; requires a Thread-enabled Apple home hub (HomePod mini or Apple TV 4K)</td></tr>
+            <tr><td>Power</td><td>Rechargeable battery, up to 6 months per charge; USB-C charging in place without removing the battery or cover; low-battery notice at 20%; separate USB-C emergency port for a power bank</td></tr>
+            <tr><td>Auto-lock</td><td>Gyro sensor locks on close; no door contact sensor needed</td></tr>
+            <tr><td>Modes</td><td>Night Latch Mode (admin-only unlock from outside, free exit from inside); Do Not Disturb mutes routine alerts, keeps forced-entry, door-ajar and critical alerts</td></tr>
+          </tbody>
+        </table>
+
+        <p>Two lines in that table matter more than the rest for a Home Assistant house. The first is <em>Matter over Thread</em>: that is the whole integration story, and it is why the U400 needs a border router rather than a hub. The second is the gyro-based auto-lock, which means you do not have to buy or wire a separate door sensor to get "lock when the door shuts".</p>
+
+        <p>The UWB unlock is the one feature that pulls you toward Apple hardware: Aqara's page ties hands-free unlock to a Thread-enabled Apple home hub. It is a nice trick, not a Home Assistant feature, and you should not buy the lock for it if you do not own a HomePod mini or Apple TV 4K already. Aqara also notes the lock pairs with its Doorbell Camera Hub G410 to see and unlock from Apple Home — again, an Apple-side feature.</p>
+
+        <h2>What the U100 is</h2>
+        <p>The U100 is the keypad-plus-fingerprint deadbolt that made Aqara's name in locks. It is a straightforward, well-specified Zigbee lock with a matte anti-peep keypad and locally stored fingerprints.</p>
+
+        <table>
+          <thead><tr><th>Spec</th><th>Aqara Smart Lock U100</th></tr></thead>
+          <tbody>
+            <tr><td>Protocol</td><td>Zigbee; Matter exposure requires a Matter-supported Aqara hub plus a Matter controller</td></tr>
+            <tr><td>Apple</td><td>Apple Home and Home Key support is native; Home Key works when the Apple device is out of power</td></tr>
+            <tr><td>Fingerprint</td><td>Up to 50 prints, 98.6% recognition rate, stored locally</td></tr>
+            <tr><td>Keypad</td><td>Matte, anti-peep; permanent, periodic and one-time passwords; one-time codes generated locally so they work while the lock is offline</td></tr>
+            <tr><td>Door status</td><td>Sensing plus gyro-based auto-lock after close (Aqara's footnote said status indication and logging were planned at publication)</td></tr>
+            <tr><td>Build</td><td>Complies with the same safety standard as BHMA Level 3; IP65, which Aqara notes applies to the outer panel only</td></tr>
+            <tr><td>Emergency entry</td><td>Mechanical key plus USB-C emergency charging port</td></tr>
+            <tr><td>Security</td><td>End-to-end encryption with 128-bit AES; fingerprints stored locally</td></tr>
+          </tbody>
+        </table>
+
+        <p>That "outer panel only" note on the IP65 rating is the kind of detail that gets lost in a product listing. It means the exterior half is rated for weather; the interior half is an indoor part. If your door is exposed to driven rain, plan the installation with that in mind rather than assuming the whole lock is sealed.</p>
+
+        <p>Aqara also prints a caveat about IFTTT support on the U100 page: it "may be unavailable by the time of the launch". Treat IFTTT as a bonus that may not exist, not as part of your automation plan. For Home Assistant users this is irrelevant, since the point of the exercise is to keep automations local anyway.</p>
+
+        <h2>What Home Assistant needs on its side</h2>
+        <p>Home Assistant's Matter integration does not lean on anyone else's controller. It runs its own Matter controller as the Matter Server app and talks to it over a WebSocket, and it controls Matter devices on a local Wi-Fi or Thread network. There is no vendor cloud account in that path, which is the reason a Matter lock belongs on a Home Assistant shopping list at all.</p>
+
+        <p>Three practical requirements follow, and each one is a step people get wrong:</p>
+        <ul>
+          <li><strong>A Thread border router, for Thread devices.</strong> Without one, Home Assistant reports that "this device requires a border router" and commissioning stops. Home Assistant Green has no Thread radio built in, so a Green on its own is not a border router. See <a href="home-assistant-green">Home Assistant Green</a> for what that box does and does not include, and <a href="article-thread-network">how a Thread network fits together</a> if border routers versus controllers is still fuzzy.</li>
+          <li><strong>The Home Assistant Companion app for commissioning.</strong> Matter commissioning happens from the iOS or Android app. A desktop browser will tell you that you need the Companion app, which is a confusing dead end if you only ever use the web UI.</li>
+          <li><strong>Decide multi-admin before you pair.</strong> Matter allows several administrators. A lock that already lives in Apple Home or Google Home can be shared into Home Assistant through the share-device flow instead of being re-commissioned, so it answers to both ecosystems at once. That is the sane path if the lock is already installed and working in Apple Home.</li>
+        </ul>
+
+        <h2>Setting up the U400, in order</h2>
+        <ol>
+          <li>Confirm a Thread border router is on the network and that Home Assistant can see the Thread network. Do this before you touch the lock; it is the single most common failure point.</li>
+          <li>Install the lock and power it up. Keep the battery charged — commissioning with a low battery is a bad time.</li>
+          <li>Open the Home Assistant Companion app on your phone, go to Settings, then Devices &amp; services, and add the Matter integration if it is not already there.</li>
+          <li>Commission the lock. Scan the Matter pairing code from the app, not from a desktop browser.</li>
+          <li>If the lock is already in Apple Home, choose the share-device flow instead of re-pairing, so both ecosystems keep working.</li>
+          <li>Set codes, fingerprints and auto-lock in the Aqara app first, then build Home Assistant automations on top of the lock entity.</li>
+          <li>Check for firmware updates. Home Assistant's Matter integration handles Matter OTA device updates, and it also exposes a Matter network map and diagnostics when you need to see what the mesh looks like.</li>
+        </ol>
+
+        <h2>Setting up the U100, in order</h2>
+        <ol>
+          <li>Add the U100 to an Aqara Zigbee 3.0 hub using the Aqara app. This is required, not optional, for automations and remote unlock.</li>
+          <li>Make sure that hub is a Matter-supported model, since the hub is what exposes the lock to Matter at all.</li>
+          <li>Add the hub to Home Assistant through the Matter integration, exactly as you would any other Matter device, with the Companion app.</li>
+          <li>The lock then arrives in Home Assistant as a Matter device through the hub. Its Zigbee link is between the lock and the hub; Home Assistant never talks Zigbee to it.</li>
+          <li>Keep the Aqara app for the things Home Assistant does not cover: fingerprint enrolment, one-time codes, and firmware.</li>
+        </ol>
+
+        <h2>Which one to buy</h2>
+        <p><strong>For a Home Assistant-first house: the U400.</strong> Matter over Thread, direct commissioning, no hub, no Aqara account in the control path, and a gyro that removes the need for a door sensor. The cost is that you need a Thread border router, and the UWB party trick only works with Apple hardware. Check <a href="https://www.amazon.com/s?k=Aqara+Smart+Lock+U400&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Smart Lock U400 on Amazon</a> for current price and stock.</p>
+
+        <p><strong>If you already run an Aqara hub, or want Apple Home Key without Thread: the U100.</strong> It is a mature Zigbee lock with local fingerprint storage, native Home Key, and one-time codes that generate offline. It gets to Home Assistant through the hub, so you are maintaining two systems instead of one. Check <a href="https://www.amazon.com/s?k=Aqara+Smart+Lock+U100&amp;tag=hanews01-20" rel="sponsored nofollow">Aqara Smart Lock U100 on Amazon</a> for current price and stock.</p>
+
+        <p>If your house is already built on Z-Wave and you do not want a second radio type, a Z-Wave lock is a legitimate alternative with a long track record; see <a href="z-wave-hub">the Z-Wave hub guide</a> for what that radio needs. And if you have not settled the radio question at all, <a href="zigbee-vs-z-wave">Zigbee vs Z-Wave</a> covers the older pair while <a href="matter.html">Matter &amp; Thread</a> covers where locks are heading. The full hardware index sits in <a href="devices.html">Devices</a>.</p>
+
+        <h2>Gotchas worth knowing before you order</h2>
+        <ul>
+          <li><strong>Each ecosystem needs its own Thread-enabled Matter controller.</strong> Aqara says this plainly. One border router serves the mesh; every ecosystem you want to control the lock from still needs a controller on that mesh.</li>
+          <li><strong>No direct Zigbee pairing for the U100.</strong> Aqara documents Matter exposure through its hub. It does not document ZHA or Zigbee2MQTT pairing, so treat that as unsupported even if a forum thread claims otherwise.</li>
+          <li><strong>The U200 is a different lock.</strong> Aqara's retrofit model has its own specifications, which are not covered here. Do not assume U400 features carry over.</li>
+          <li><strong>Battery life is a spec-sheet number.</strong> Aqara quotes up to six months per charge for the U400. Fingerprint reads, UWB unlocks and cold weather all draw on that. The 20% low-battery notification is the signal to act, and the separate USB-C emergency port is the fallback if you ignore it.</li>
+          <li><strong>Plan the fallback entry.</strong> Both locks ship with a mechanical key. Keep it somewhere that is not inside the house.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Does the Aqara Smart Lock U400 work with Home Assistant?</h3>
+        <p>Yes. The U400 speaks Matter over Thread, and Aqara lists Home Assistant among the ecosystems it works with by design. You need a Thread border router on your network and the Matter integration in Home Assistant, which runs its own Matter controller locally. No Aqara cloud account sits in the path once the lock is commissioned.</p>
+        <h3>Do I need an Aqara hub to use the U100 with Home Assistant?</h3>
+        <p>For Home Assistant, yes. The U100 is a Zigbee lock, and Aqara's footnotes say a Matter-supported Aqara hub plus a Matter controller are required to reach Matter ecosystems, and an Aqara Zigbee 3.0 hub is required for automations and remote unlock. Aqara does not document pairing the U100 directly to ZHA or Zigbee2MQTT.</p>
+        <h3>Aqara U100 vs U400: which should I buy for a Home Assistant house?</h3>
+        <p>If Home Assistant is your primary controller, the U400. It is Matter over Thread, so it joins Home Assistant directly through the Matter integration with no Aqara hub in the middle. The U100 makes sense if you already run an Aqara hub and want Zigbee, or you want Apple Home Key on a lock without a Thread network.</p>
+        <h3>Does a Matter lock need a Thread border router, and does Home Assistant Green count?</h3>
+        <p>A Matter lock on Thread needs a Thread border router on the same network. Home Assistant throws a "this device requires a border router" error without one. Home Assistant Green has no Thread radio, so it cannot act as that border router on its own; you need a separate Thread adapter or a border router device. Check the current Home Assistant Connect hardware page for what each unit ships with.</p>
+        <h3>Can I keep the lock in Apple Home and still use it in Home Assistant at the same time?</h3>
+        <p>Yes. Matter supports multiple administrators. Instead of re-commissioning the lock, share it from Apple Home to Home Assistant using the share-device flow, and the lock then answers to both ecosystems. Home Assistant documents this multi-fabric approach in its Matter integration docs.</p>
+        <h3>What is the best smart lock for Home Assistant: Matter over Thread or Z-Wave?</h3>
+        <p>Both are local and neither needs a vendor cloud. Matter over Thread is the direction most new locks are heading and pairs with the Matter integration built into Home Assistant; Z-Wave locks have a longer track record and a mature integration, but need a Z-Wave radio in your Home Assistant machine. Pick the protocol your house already has radios for.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.aqara.com/en/product/smart-lock-u400/">Aqara Smart Lock U400</a>; <a href="https://www.aqara.com/en/product/smart-lock-u100/">Aqara Smart Lock U100</a>; <a href="https://www.home-assistant.io/integrations/matter/">Home Assistant Matter integration</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Assistant Docker: the container install, step by step (2026) — HA News</title>
+  <meta name="description" content="How to run Home Assistant in Docker: the official container command and compose file, USB radio passthrough, updates, and the stop-timeout and jemalloc gotchas that bite first-time installs.">
+  <link rel="canonical" href="https://hanews.org/home-assistant-docker">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Home Assistant Docker: the container install, step by step (2026)", "datePublished": "2026-11-08", "dateModified": "2026-11-08", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-assistant-docker"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I install add-ons (apps) in Home Assistant Container?", "acceptedAnswer": {"@type": "Answer", "text": "No. Home Assistant's installation docs state that the Container install type does not have access to apps (formerly called add-ons). If you want the app store, Home Assistant recommends Home Assistant OS instead."}}, {"@type": "Question", "name": "Does Home Assistant Docker work on Docker Desktop for Mac or Windows?", "acceptedAnswer": {"@type": "Answer", "text": "No. The official docs are explicit: Docker Desktop will not work, you must use Docker Engine. That means a Linux host, or a Linux virtual machine."}}, {"@type": "Question", "name": "How do I update Home Assistant when I run it in Docker?", "acceptedAnswer": {"@type": "Answer", "text": "Pull the same stable tag again, stop and remove the container, then start a new one from the updated image. With compose it is docker compose pull followed by docker compose up -d. Your config lives in the mounted /config volume, so it survives the swap."}}, {"@type": "Question", "name": "How do I pass a Zigbee or Z-Wave USB stick into the Home Assistant container?", "acceptedAnswer": {"@type": "Answer", "text": "Map the device node into the container with --device /dev/ttyUSB0:/dev/ttyUSB0 on the command line, or a devices: list in compose. The user running the container needs read and write permission on that /dev/tty node."}}, {"@type": "Question", "name": "Do I need a mini PC to run Home Assistant Docker, or will a Raspberry Pi do?", "acceptedAnswer": {"@type": "Answer", "text": "Either works, because Container needs an existing OS rather than specific hardware. Home Assistant's own docs recommend flashing Home Assistant OS onto your own hardware, and offer the container or virtual machine path for people who already run Linux, macOS or Windows hosts."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 8 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html" aria-current="page">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Home Assistant</p>
+        <h1>Home Assistant in Docker: the container install, step by step</h1>
+        <p class="byline">HA News · 8 Nov 2026</p>
+
+        <p>Home Assistant Docker is the "Container" install type: Home Assistant Core running as a single process inside one container, on a machine where you already manage the operating system. There is no supervisor, no app store and no operating system layer underneath. You get the same automations, dashboards and integrations, in a package you update with <code>docker pull</code> instead of an update button. <strong>If you want apps (add-ons), don't do this</strong> — the official docs say Container does not have access to them and point you at Home Assistant OS. If you already run Linux and want Home Assistant to be one more service in the stack, it is a short install with a few sharp edges covered below.</p>
+
+        <h2>What you get, and what you give up</h2>
+        <p>The installation page splits people three ways: buy a Home Assistant Green with the software preinstalled, flash Home Assistant OS onto your own Pi or x86-64 box (the docs recommend this for bring-your-own hardware), or "use a container or virtual machine". Container is the third path — aimed at hosts that already have Linux, macOS or Windows on them (<a href="https://www.home-assistant.io/installation/">Home Assistant installation docs</a>, currently showing release 2026.11.0).</p>
+        <p>The trade is explicit in the docs: the Container install type "does not have access to apps". Apps are what Home Assistant now calls add-ons, and they are managed by the Supervisor, which only exists on Home Assistant OS and the supervised install. No Supervisor also means no one-click backups from the UI and no add-on store to pull ESPHome, Zigbee2MQTT or Mosquitto from.</p>
+        <p>In exchange you get a component you control: your own OS updates, your own reverse proxy, your own firewall, your own backup plan, and Home Assistant as one container among many. For someone already running Docker on a home server, that is usually the point.</p>
+
+        <h2>Requirements</h2>
+        <ul>
+          <li>An operating system you administer, plus a container runtime. The docs specify <strong>Docker Engine 23.0.0 or later</strong>.</li>
+          <li>Not Docker Desktop. The docs state plainly: "Docker Desktop will not work; you must use Docker Engine." On a Mac or Windows machine that means a Linux VM, not Docker Desktop on the host.</li>
+          <li>A directory on the host to hold the config. Everything that matters — <code>configuration.yaml</code>, the SQLite recorder database, secrets — lives there.</li>
+        </ul>
+        <p>All of this comes from <a href="https://www.home-assistant.io/installation/linux">Home Assistant's Linux/container installation page</a>.</p>
+
+        <h2>The official run command</h2>
+        <p>This is the canonical command from the docs, unmodified apart from the two placeholders:</p>
+        <pre><code>docker run -d \
+  --name homeassistant \
+  --privileged \
+  --restart=unless-stopped \
+  -e TZ=MY_TIME_ZONE \
+  -v /PATH_TO_YOUR_CONFIG:/config \
+  -v /run/dbus:/run/dbus:ro \
+  --network=host \
+  ghcr.io/home-assistant/home-assistant:stable</code></pre>
+        <p>Line by line, because each flag is load-bearing:</p>
+        <ul>
+          <li><code>--name homeassistant</code> — stable handle for <code>docker restart</code>, <code>docker logs</code> and the update steps later.</li>
+          <li><code>--privileged</code> — Home Assistant wants broad device access; the official command grants it.</li>
+          <li><code>--restart=unless-stopped</code> — comes back after a host reboot, stays down if you deliberately stopped it.</li>
+          <li><code>-e TZ=...</code> — timezone, so schedules fire at the right local time.</li>
+          <li><code>-v /PATH_TO_YOUR_CONFIG:/config</code> — your config directory, mapped to <code>/config</code> inside the container, which is where the app expects it (the image's workdir is <code>/usr/src</code>).</li>
+          <li><code>-v /run/dbus:/run/dbus:ro</code> — D-Bus, optional but required for the Bluetooth integration.</li>
+          <li><code>--network=host</code> — host networking, which the official command uses. Discovery (mDNS, SSDP) and the web UI then behave as if Home Assistant were installed natively.</li>
+        </ul>
+        <p>The image itself comes from GHCR: <code>ghcr.io/home-assistant/home-assistant:stable</code>. Once it is up, the UI is at <code>http://&lt;host&gt;:8123</code> (<a href="https://www.home-assistant.io/installation/linux">installation docs</a>).</p>
+
+        <h2>The compose equivalent</h2>
+        <p>The docs publish a <code>compose.yaml</code> with the same intent. Its fields: <code>container_name: homeassistant</code>, <code>image: "ghcr.io/home-assistant/home-assistant:stable"</code>, volume mappings for <code>/PATH_TO_YOUR_CONFIG:/config</code>, <code>/etc/localtime:/etc/localtime:ro</code> and <code>/run/dbus:/run/dbus:ro</code>, <code>restart: unless-stopped</code>, <code>stop_grace_period: 60s</code>, <code>privileged: true</code>, <code>network_mode: host</code>, and a <code>TZ</code> environment variable. Start it with <code>docker compose up -d</code>.</p>
+        <p>Note the one field the CLI version does not spell out: <code>stop_grace_period: 60s</code>. That is the fix for the most common first-week complaint, below.</p>
+
+        <h2>Passing through a Zigbee or Z-Wave stick</h2>
+        <p>A USB radio is not in the container unless you map it. On the command line:</p>
+        <pre><code>--device /dev/ttyUSB0:/dev/ttyUSB0</code></pre>
+        <p>Or in compose:</p>
+        <pre><code>devices:
+  - /dev/ttyUSB0:/dev/ttyUSB0</code></pre>
+        <p>The user running the container needs read and write access to the <code>/dev/tty*</code> node. Do not run the radio over a network serial bridge or a VPN — the docs warn the serial link cannot cope with dropped packets. If the stick must sit away from the server, use a USB extension cable, not a network hop. Choosing a radio is a separate decision; <a href="zigbee-hub">the Zigbee hub guide</a> covers coordinators, and <a href="z-wave-hub">the Z-Wave hub guide</a> covers the other radio.</p>
+
+        <h2>Updating</h2>
+        <p>There is no in-app updater in a container. The docs give three steps: pull the same tag, stop and remove the container, re-run it.</p>
+        <pre><code>docker pull ghcr.io/home-assistant/home-assistant:stable
+docker stop homeassistant
+docker rm homeassistant
+# then re-run the docker run command</code></pre>
+        <p>With compose it is <code>docker compose pull</code> then <code>docker compose up -d</code>. Your config is in the volume, so it survives the container swap. This is also the moment to add any flag you missed the first time — see the next section, because some settings are fixed at creation.</p>
+
+        <h2>Gotchas that bite first installs</h2>
+        <h3>The stop timeout is too short</h3>
+        <p>Docker's default stop timeout is 10 seconds, then SIGTERM becomes SIGKILL. Home Assistant often needs longer to close its SQLite recorder database. The symptoms in the docs are a log line about an "Ended unfinished session" and a warning that "The system could not validate that the sqlite3 database at //config/home-assistant_v2.db was shutdown cleanly". The image itself allows 240 seconds of graceful stop (<code>ENV S6_SERVICES_GRACETIME=240000</code> in the <a href="https://raw.githubusercontent.com/home-assistant/core/dev/Dockerfile">official Dockerfile</a>); Docker's 10-second default is what cuts it short. Fix: <code>--stop-timeout 60</code> on the CLI, or <code>stop_grace_period: 60s</code> in compose.</p>
+        <h3>And the fix does not apply to an existing container</h3>
+        <p>The timeout is baked in when the container is created. Restarting an existing container keeps the old value. You have to recreate it — <code>docker compose up -d</code> after editing the file, or <code>docker rm</code> and re-run.</p>
+        <h3>jemalloc on large-page ARM hardware</h3>
+        <p>jemalloc is enabled by default for memory use and Python speed. On hardware with a page size above 4K — some ARM64 SoCs — it fails at startup with <code>&lt;jemalloc&gt;: Unsupported system page size</code>. Disable it with <code>-e DISABLE_JEMALLOC=true</code> or <code>DISABLE_JEMALLOC: true</code> in compose.</p>
+        <h3>No UI on the LAN</h3>
+        <p>Modern distributions firewall the host by default. If <code>http://&lt;host&gt;:8123</code> times out from another machine but works locally, open the port: <code>sudo ufw allow 8123/tcp</code> on Debian or Ubuntu.</p>
+        <h3><code>docker exec</code> is not a root shell</h3>
+        <p>The image is built on an S6-overlay base: <code>FROM ${BUILD_FROM}</code>, a <code>rootfs</code> overlay copied in, Python dependencies installed with uv, labelled <code>io.hass.type="core"</code> under Apache-2.0 (<a href="https://raw.githubusercontent.com/home-assistant/core/dev/Dockerfile">Dockerfile</a>). Because s6 is PID 1, <code>docker exec</code> drops you into a supervised environment rather than a plain shell. The supported way to change anything is to edit files in <code>/config</code> and restart Home Assistant — via Settings, System, the power icon, Restart; the <code>homeassistant.restart</code> action; or <code>docker restart homeassistant</code>.</p>
+
+        <h2>What the image already includes</h2>
+        <p>Two things surprise people who assume Container means a bare core. First, the image ships its own <code>go2rtc</code> binary, pinned at 1.9.15, so camera streaming works without an add-on. Second, the build is partly generated by hassfest (<code>python3 -m script.hassfest -p docker</code>), which keeps the container definition in step with core. Both from the <a href="https://raw.githubusercontent.com/home-assistant/core/dev/Dockerfile">official Dockerfile</a>.</p>
+
+        <h2>Which hardware</h2>
+        <p>Container has no hardware requirement beyond "an OS you administer", so the question is what you already own. A Raspberry Pi running Raspberry Pi OS with Docker is the cheap path; an x86-64 mini PC is the faster one, and the usual pick once you add a few cameras or a large recorder database. If you are starting from a Pi, <a href="home-assistant-raspberry-pi">running Home Assistant on a Raspberry Pi</a> covers the board-specific details; if you would rather not manage an OS at all, <a href="home-assistant-green">the Home Assistant Green</a> ships with the software preinstalled and keeps the app store. There is no official minimum spec for the container itself beyond Docker Engine 23.0.0 and a host OS — anything more specific would be invented.</p>
+        <p>For a mini PC, the safe filter is RAM first and storage second, since the recorder database grows with every entity you keep history for. Browse <a href="https://www.amazon.com/s?k=mini+PC+home+assistant&amp;tag=hanews01-20" rel="sponsored nofollow">mini PCs commonly used for Home Assistant on Amazon</a>.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Can I install add-ons (apps) in Home Assistant Container?</h3>
+        <p>No. Home Assistant's installation docs state that the Container install type does not have access to apps (formerly called add-ons). If you want the app store, Home Assistant recommends Home Assistant OS instead.</p>
+        <h3>Does Home Assistant Docker work on Docker Desktop for Mac or Windows?</h3>
+        <p>No. The official docs are explicit: Docker Desktop will not work, you must use Docker Engine. That means a Linux host, or a Linux virtual machine.</p>
+        <h3>How do I update Home Assistant when I run it in Docker?</h3>
+        <p>Pull the same stable tag again, stop and remove the container, then start a new one from the updated image. With compose it is <code>docker compose pull</code> followed by <code>docker compose up -d</code>. Your config lives in the mounted <code>/config</code> volume, so it survives the swap.</p>
+        <h3>How do I pass a Zigbee or Z-Wave USB stick into the Home Assistant container?</h3>
+        <p>Map the device node into the container with <code>--device /dev/ttyUSB0:/dev/ttyUSB0</code> on the command line, or a <code>devices:</code> list in compose. The user running the container needs read and write permission on that <code>/dev/tty</code> node.</p>
+        <h3>Do I need a mini PC to run Home Assistant Docker, or will a Raspberry Pi do?</h3>
+        <p>Either works, because Container needs an existing OS rather than specific hardware. Home Assistant's own docs recommend flashing Home Assistant OS onto your own hardware, and offer the container or virtual machine path for people who already run Linux, macOS or Windows hosts.</p>
+        <p>We publish a daily brief on Home Assistant, Matter and device releases. <a href="brief-2026-11-02">Read the latest</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/installation/linux">Home Assistant container installation (Linux)</a>; <a href="https://www.home-assistant.io/installation/">Home Assistant installation index</a>; <a href="https://raw.githubusercontent.com/home-assistant/core/dev/Dockerfile">Home Assistant core Dockerfile</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best mini PC for Home Assistant (2026) — HA News</title>
+  <meta name="description" content="Which mini PC to run Home Assistant on: HAOS on generic x86-64, Home Assistant Green, ODROID-H5, GMKtec and Beelink picks, the 4Kn SSD boot trap, and OpenWrt on the same box.">
+  <link rel="canonical" href="https://hanews.org/best-mini-pc-home-assistant">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best mini PC for Home Assistant (2026)", "image": "https://hanews.org/images/odroid-h5-h5cc.jpg", "datePublished": "2026-11-09", "dateModified": "2026-11-09", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/best-mini-pc-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What's the best mini PC to run Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Any 64-bit x86-64 mini PC with UEFI boot and a 512-byte-sector boot drive, running Home Assistant OS. The ODROID-H5 is a strong current pick; a Beelink EQ14 or GMKtec G3S-class Intel N-series box works well on a budget."}}, {"@type": "Question", "name": "Do I need a mini PC for Home Assistant, or is HA Green enough?", "acceptedAnswer": {"@type": "Answer", "text": "For most homes Home Assistant Green is enough: it is the official pre-flashed hub, and you just plug in power and Ethernet. A mini PC makes sense when you want x86 software, more storage for recordings, or a second use for the box."}}, {"@type": "Question", "name": "Home Assistant Green vs Raspberry Pi 5: which should I buy?", "acceptedAnswer": {"@type": "Answer", "text": "Home Assistant Green is a purpose-built appliance with Home Assistant OS preinstalled and profits that support the Open Home Foundation. A Raspberry Pi 5 is a general single-board computer you install HAOS on yourself; check the Raspberry Pi product page for current specifications."}}, {"@type": "Question", "name": "Can I run OpenWrt on the same x86 mini PC that runs Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Official OpenWrt x86/64 builds exist and boot on any UEFI x86 PC, and some people combine router and Home Assistant duties on one box through virtualization or containers. Most people are better served by separate boxes: keep the router simple so a Home Assistant reboot does not take the network down."}}, {"@type": "Question", "name": "Which x86 mini PC CPU (N95/N100/N150) is enough for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Home Assistant itself is light. Intel's low-power Alder Lake-N and Twin Lake parts listed by makers — the N95 in the GMKtec G3S, the N150 in the Beelink EQ14 — are in the class of hardware people run HAOS on comfortably, with headroom for add-ons depending on what else the box does."}}, {"@type": "Question", "name": "How do I install Home Assistant OS on a generic x86-64 mini PC?", "acceptedAnswer": {"@type": "Answer", "text": "Follow the official generic-x86 installation guide: write the HAOS image to a USB drive, boot the mini PC from it in UEFI mode, and let the installer take over. The boot medium must support 512-byte logical sectors, which rules out some NVMe SSDs that are 4Kn only."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 9 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html" aria-current="page">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Home Assistant hardware</p>
+        <h1>The best mini PC for Home Assistant (2026)</h1>
+        <p class="byline">HA News · 9 Nov 2026</p>
+
+        <p>The short answer: <strong>you don't need a special mini PC for Home Assistant — you need any 64-bit x86-64 PC that boots in UEFI mode, running Home Assistant OS.</strong> That is the official install path for generic x86 hardware, and it is what most of the small Intel and AMD boxes on the market are built for. If you want to skip the picking entirely, Home Assistant Green is the official pre-built appliance. If you want one concrete x86 pick, the ODROID-H5 stands out on pure specification: onboard 10 GbE networking and four M.2 slots, at a price and power draw meant for running around the clock.</p>
+        <p>This guide walks through what the software actually requires, which boxes meet it, where the common buying trap is (it involves NVMe SSDs), and when a mini PC is the wrong answer. If you would rather run Home Assistant in Docker on a machine you already have, see our guide to <a href="home-assistant-docker.html">Home Assistant in Docker</a>.</p>
+
+        <h2>What Home Assistant needs from the hardware</h2>
+        <p>The Home Assistant installation documentation for generic x86-64 hardware is short, because the requirements are modest. The system must be 64-bit and must boot UEFI. One line in that documentation matters more than any CPU figure: <strong>the boot medium must support 512-byte logical sectors — 512n, or 512e emulated.</strong> Some NVMe SSDs are formatted 4Kn (4 KB sectors) only, and Home Assistant OS cannot boot from them. That is the single most common way buyers pick a mini PC that technically fits the spec and then refuses to boot the installer.</p>
+        <p>Beyond that, the machine is doing far less work than a desktop. Home Assistant's core, plus a handful of integrations and add-ons, runs comfortably on the low-power Intel N-series and equivalent AMD parts that fill the mini PC market. What actually shapes your choice is everything else you plan to put on the same box: camera recording and detection, database retention, voice processing, and how much storage you want for all of it.</p>
+        <p>The official documentation describes two install types on x86. The recommended one is Home Assistant OS written to a USB drive or installed directly from a boot medium. The alternative is Home Assistant Container, the Docker-based setup, which shares the same generic-x86 documentation page but asks more of you: you assemble the pieces (core, MQTT broker, add-ons you want) rather than getting them in one appliance-style image. Home Assistant's own guidance is that HAOS remains the recommended install for most users.</p>
+
+        <h2>Pick 1: Home Assistant Green — the official appliance</h2>
+        <p>The easiest "should I buy a mini PC?" answer is: don't. <strong>Home Assistant Green</strong> is the official hub from Nabu Casa, the company behind Home Assistant. Setup is literally plug in power, plug in Ethernet, and follow the guided setup in the app — with the caveat that the initial setup requires an internet connection. There is no image to flash and no UEFI setting to find.</p>
+        <p>Two things worth knowing. First, Green is an ARM machine, not x86 — Nabu Casa designed and built it as an appliance, and the generic x86-64 documentation does not apply to it. Second, buying it supports the projects: Nabu Casa's profits fund Home Assistant and ESPHome through the Open Home Foundation. If Green's storage or processing ceiling ever feels tight, that is the point at which a mini PC earns its place. Read our full write-up of <a href="home-assistant-green.html">Home Assistant Green</a>.</p>
+
+        <h2>Pick 2: ODROID-H5 — the serious x86 board</h2>
+        <p>Hardkernel's ODROID-H4 Plus is discontinued — the product page is out of stock and points buyers to its successor — so the current part is the <strong>ODROID-H5</strong>. Per Hardkernel's own product page, the H5 carries onboard 10 GbE networking and four M.2 slots: three PCIe Gen3 x2 and one PCIe Gen3 x1. That is enough to hold NVMe SSDs, SATA cards, additional network cards, Wi-Fi 6E or Wi-Fi 7 adapters, or AI accelerators. The whole design is aimed at low power draw for a machine that runs 24 hours a day, which is exactly the duty cycle of a home automation server.</p>
+        <figure class="figure">
+          <img src="images/odroid-h5-h5cc.jpg" alt="Hardkernel ODROID-H5 single-board computer with attached heat sink" width="510" height="375" loading="lazy">
+          <figcaption>ODROID-H5. Source: <a href="https://www.hardkernel.com/shop/odroid-h5/">Hardkernel product page</a> (image © Hardkernel)</figcaption>
+        </figure>
+        <p>Check <a href="https://www.amazon.com/s?k=ODROID-H5&amp;tag=hanews01-20" rel="sponsored nofollow">ODROID-H5 on Amazon</a> for current price and stock, and the Hardkernel page for the full spec sheet. As a bare board it assumes you will add your own memory and storage — and remember the 512-byte-sector rule when picking that NVMe drive.</p>
+
+        <h2>Picks 3–5: budget x86 boxes from the mini PC makers</h2>
+        <p>The big catalog of Intel N-series mini PCs is, spec-for-spec, interchangeable as far as Home Assistant is concerned. What varies between makers is build quality, storage configuration, and whether the product page you are reading is still live. All of the models below were verified against the manufacturers' current catalogs.</p>
+        <ul>
+          <li><strong>GMKtec G3S</strong> (Intel Alder Lake-N95): listed on the official GMKtec catalog. The same catalog lists the higher-tier <strong>NucBox G3 Ultra</strong> (Intel Pentium Gold 7505) and <strong>G5S</strong> (Celeron N5095). Check <a href="https://www.amazon.com/s?k=GMKtec+G3S&amp;tag=hanews01-20" rel="sponsored nofollow">GMKtec G3S on Amazon</a>.</li>
+          <li><strong>Beelink EQ14</strong> (Intel N150): the current EQ-series model listed on Beelink's official site. Beelink's older specific product URLs have gone 404 while the Shopify catalog rotates, so treat the catalog page as the source of truth. Check <a href="https://www.amazon.com/s?k=Beelink+EQ14&amp;tag=hanews01-20" rel="sponsored nofollow">Beelink EQ14 on Amazon</a>.</li>
+          <li><strong>Minisforum</strong>: a caution rather than a pick. Minisforum's budget-relevant page for the NAB5 returns 404, and no current N100/N150-specific Minisforum product page could be verified; the catalog lists models such as the M5S (Ryzen 3 5400U) and M2 Pro S (i7-1185G7), which are more machine than Home Assistant needs. If you shop in that catalog, verify the exact model and the boot-drive sector format before buying.</li>
+        </ul>
+        <p>A generic box of this type running HAOS is entirely legitimate — the official x86-64 install path exists precisely so that <em>any</em> 64-bit UEFI machine works. Check <a href="https://www.amazon.com/s?k=Intel+N150+mini+pc&amp;tag=hanews01-20" rel="sponsored nofollow">Intel N150 mini PCs on Amazon</a> to survey the field.</p>
+
+        <h2>The buying checklist</h2>
+        <ol>
+          <li><strong>64-bit x86-64, UEFI boot.</strong> Every machine above qualifies per its maker's documentation.</li>
+          <li><strong>Boot drive with 512-byte logical sectors (512n/512e).</strong> Verify before buying, especially with bare NVMe SSDs; 4Kn-only drives will not boot HAOS.</li>
+          <li><strong>Ethernet on board.</strong> Home Assistant expects a wired connection; Green and the ODROID boards have one built in, as do essentially all catalog mini PCs.</li>
+          <li><strong>Storage for what the box will hold.</strong> Recordings, databases and add-ons grow. Two drive slots beat one.</li>
+          <li><strong>Low idle power.</strong> This runs 24/7. Low-power N-series parts and boards designed for always-on use (like the H5) pay for themselves in a year of electricity.</li>
+        </ol>
+
+        <h2>Install: two paths, one recommendation</h2>
+        <ol>
+          <li><strong>Home Assistant OS (recommended).</strong> Per the official generic-x86 guide: download the HAOS image, write it to a USB drive, boot the mini PC from it in UEFI mode, and either run it from that medium or install it to the internal drive. The machine then behaves like an appliance.</li>
+          <li><strong>Home Assistant Container (Docker).</strong> An alternative covered by the same documentation. You keep the host operating system and run Home Assistant in a container or a Docker Compose stack. More flexible, more work, and you own the updates. We cover the details in <a href="home-assistant-docker.html">Home Assistant in Docker</a>.</li>
+        </ol>
+        <p>If your previous box was a Raspberry Pi, the migration story is straightforward: take a full backup from the old install, install HAOS on the new machine, and restore. The same procedure covers a Raspberry Pi 5 — though we could not verify current Raspberry Pi 5 specifications from the primary source during research (the official product page sits behind a bot check), so treat any spec comparison against the Pi as unverified and check the Raspberry Pi product page yourself.</p>
+
+        <h2>Green vs Raspberry Pi vs mini PC, in one breath</h2>
+        <p>Home Assistant Green is the appliance: preinstalled, supported end to end, profits funding the Open Home Foundation. A Raspberry Pi is the hobbyist path: cheaper at the low end, general-purpose, and yours to configure. A mini PC is the middle path with an x86 safety net: commodity parts, real storage options, and the ability to repurpose the box if Home Assistant ever moves elsewhere. Per the Home Assistant documentation, HAOS on generic x86-64 is the standard platform for that last path, and Green is positioned as the easiest way to run the whole stack.</p>
+
+        <h2>One box for router and Home Assistant? OpenWrt on x86</h2>
+        <p>OpenWrt, the open router operating system, ships official x86/64 builds — the generic x86/64 profile is available in current releases and boots on the same class of UEFI x86 PC that runs HAOS, per the OpenWrt device database and the OpenWrt firmware selector. That makes the "one box does everything" idea technically real: a mini PC running OpenWrt as router, with Home Assistant alongside in a container or a virtual machine.</p>
+        <p>Our recommendation runs the other way. A router and a home automation server have different failure modes and different maintenance rhythms; when the combined box reboots for a Home Assistant experiment, your household internet reboots with it. If you want a router project, give it its own cheap box — OpenWrt on x86 is a fine destination, and our primer covers the decision. See <a href="openwrt.html">OpenWrt for the home</a> and our <a href="home-assistant-raspberry-pi.html">Raspberry Pi for Home Assistant</a> guide for the small-box alternative.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>What's the best mini PC to run Home Assistant?</h3>
+        <p>Any 64-bit x86-64 mini PC with UEFI boot and a 512-byte-sector boot drive, running Home Assistant OS. The ODROID-H5 is a strong current pick; a Beelink EQ14 or GMKtec G3S-class Intel N-series box works well on a budget.</p>
+        <h3>Do I need a mini PC for Home Assistant, or is HA Green enough?</h3>
+        <p>For most homes Home Assistant Green is enough: it is the official pre-flashed hub, and you just plug in power and Ethernet. A mini PC makes sense when you want x86 software, more storage for recordings, or a second use for the box.</p>
+        <h3>Home Assistant Green vs Raspberry Pi 5: which should I buy?</h3>
+        <p>Home Assistant Green is a purpose-built appliance with Home Assistant OS preinstalled and profits that support the Open Home Foundation. A Raspberry Pi 5 is a general single-board computer you install HAOS on yourself; check the Raspberry Pi product page for current specifications.</p>
+        <h3>Can I run OpenWrt on the same x86 mini PC that runs Home Assistant?</h3>
+        <p>Official OpenWrt x86/64 builds exist and boot on any UEFI x86 PC, and some people combine router and Home Assistant duties on one box through virtualization or containers. Most people are better served by separate boxes: keep the router simple so a Home Assistant reboot does not take the network down.</p>
+        <h3>Which x86 mini PC CPU (N95/N100/N150) is enough for Home Assistant?</h3>
+        <p>Home Assistant itself is light. Intel's low-power Alder Lake-N and Twin Lake parts listed by makers — the N95 in the GMKtec G3S, the N150 in the Beelink EQ14 — are in the class of hardware people run HAOS on comfortably, with headroom for add-ons depending on what else the box does.</p>
+        <h3>How do I install Home Assistant OS on a generic x86-64 mini PC?</h3>
+        <p>Follow the official generic-x86 installation guide: write the HAOS image to a USB drive, boot the mini PC from it in UEFI mode, and let the installer take over. The boot medium must support 512-byte logical sectors, which rules out some NVMe SSDs that are 4Kn only.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/green/">Home Assistant Green product page</a>; <a href="https://www.home-assistant.io/installation/generic-x86/">Home Assistant generic x86-64 installation</a>; <a href="https://www.hardkernel.com/shop/odroid-h5/">Hardkernel ODROID-H5</a>; <a href="https://www.hardkernel.com/shop/odroid-h4-plus/">Hardkernel ODROID-H4 Plus (discontinued notice)</a>; <a href="https://www.gmktec.com/">GMKtec catalog</a>; <a href="https://www.bee-link.com/">Beelink catalog</a>; <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=x86/64&amp;id=generic">OpenWrt firmware selector (x86/64)</a>; <a href="https://openwrt.org/toh/generic/generic-x86">OpenWrt device page (x86/64)</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+
+  <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

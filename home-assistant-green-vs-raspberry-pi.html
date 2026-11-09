@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Assistant Green vs Raspberry Pi: which should run your home? — HA News</title>
+  <meta name="description" content="Home Assistant Green vs Raspberry Pi for running Home Assistant: specs from Home Assistant's own pages, setup effort, expandability, Zigbee/Thread radios, power draw, and when a mini PC or Yellow makes more sense.">
+  <link rel="canonical" href="https://hanews.org/home-assistant-green-vs-raspberry-pi">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Home Assistant Green vs Raspberry Pi: which should run your home?", "image": "https://hanews.org/images/ha-green-photo-front.jpg", "datePublished": "2026-11-09", "dateModified": "2026-11-09", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-assistant-green-vs-raspberry-pi"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is Home Assistant Green better than a Raspberry Pi for running Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "For most people who want Home Assistant working with the least fuss, yes. Green is fully assembled, boots Home Assistant from built-in eMMC storage, and idles at about 1.7 W. A Raspberry Pi costs less on paper but needs a power supply, an A2-class SD card, an enclosure and manual flashing, and it runs the OS from the SD card by default."}}, {"@type": "Question", "name": "Do I need to build anything for Home Assistant Green, or is the Raspberry Pi route the DIY option?", "acceptedAnswer": {"@type": "Answer", "text": "Green is plug-and-play: power and Ethernet, then setup through the app. An internet connection is needed only for initial setup. The Raspberry Pi route is the DIY option: you buy the board, power supply and SD card, flash Home Assistant OS with Raspberry Pi Imager, and supply your own case."}}, {"@type": "Question", "name": "Can Home Assistant Green use an NVMe SSD or more storage like a Pi can?", "acceptedAnswer": {"@type": "Answer", "text": "No. Green is not expandable internally: there is no M.2 or NVMe slot, the SoC cannot be swapped, and the microSD slot is for recovery only. Expansion is via USB. A Pi can boot and store on a USB SSD, and Home Assistant Yellow has an M.2 M-key slot that takes NVMe SSDs."}}, {"@type": "Question", "name": "Does Home Assistant Green support Zigbee, Thread and Matter out of the box?", "acceptedAnswer": {"@type": "Answer", "text": "No. Green has no built-in radio, so you add a USB adapter such as Home Assistant Connect ZBT-1 or ZBT-2 for Zigbee and Thread, plus a USB stick for Z-Wave if you want it. Home Assistant Yellow has a Silicon Labs MGM210P radio for Zigbee, OpenThread and Matter built in."}}, {"@type": "Question", "name": "What happened to Home Assistant Yellow, and is it still worth buying instead?", "acceptedAnswer": {"@type": "Answer", "text": "Yellow is no longer in production but continues to receive software updates. Home Assistant recommends Green for a plug-and-play experience, plus a Connect ZBT-1 for Zigbee and Thread. Yellow is still interesting if you want its built-in radio and M.2 NVMe slot, but finding one is your problem."}}, {"@type": "Question", "name": "Can I run Home Assistant on a mini PC (x86-64) instead of either, and how does HAOS install there?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Home Assistant supports generic x86-64 hardware: install Home Assistant OS on a dedicated 64-bit, UEFI-bootable Intel or AMD PC, or run Home Assistant Container (Docker) instead of full HAOS. A mini PC is the step up when you want more headroom than Green or a Pi."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 9 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Hardware</p>
+        <h1>Home Assistant Green vs Raspberry Pi: which should run your home?</h1>
+        <p class="byline">HA News · 9 Nov 2026</p>
+
+        <p>Both can run Home Assistant. The difference is what you do before Home Assistant ever boots. <strong>Home Assistant Green is the finished appliance: plug in power and Ethernet and set it up through the app. A Raspberry Pi is the do-it-yourself route: you pick the board, power supply and card, flash Home Assistant OS yourself, and house it yourself.</strong> If the question is "which should run my home," the short answer is Green for a first system that should just work, a Pi or a mini PC if you want to tinker, expand storage or reuse hardware you own.</p>
+        <p>This comparison sticks to what Home Assistant's own documentation and product pages say — the <a href="https://www.home-assistant.io/green/">Green product page</a>, the <a href="https://www.home-assistant.io/installation/raspberrypi/">Raspberry Pi install guide</a>, the <a href="https://www.home-assistant.io/installation/generic-x86-64/">generic x86-64 install guide</a> and the <a href="https://www.home-assistant.io/yellow/">Yellow product page</a>. Where a number isn't published, we say so. For our full write-up of the Green box itself, see <a href="home-assistant-green">Home Assistant Green</a>; for the Pi-specific path, see <a href="home-assistant-raspberry-pi">Home Assistant on Raspberry Pi</a>.</p>
+
+        <figure class="figure">
+          <img src="images/ha-green-photo-front.jpg" alt="Home Assistant Green, a small green translucent square box" width="1536" height="1024" loading="lazy">
+          <figcaption>Home Assistant Green. Credit: Home Assistant (Nabu Casa), via <a href="https://www.home-assistant.io/green/">home-assistant.io</a></figcaption>
+        </figure>
+
+        <h2>What you get out of the box</h2>
+        <p>Home Assistant Green is a finished computer designed for exactly one job. Per the <a href="https://www.home-assistant.io/green/">product page</a>, it is the easiest way to start using Home Assistant: plug in power and Ethernet, and setup happens through the mobile or web app. An internet connection is required only for the initial setup — after that, Home Assistant runs locally. It's fanless, in a translucent polycarbonate enclosure wrapped around a large anodized aluminum heatsink. It measures 112 × 112 × 32 mm and weighs 340 g.</p>
+
+        <figure class="figure">
+          <img src="images/ha-green-box-contents.jpg" alt="Home Assistant Green box contents: the Green unit, power supply and Ethernet cable" width="1821" height="1024" loading="lazy">
+          <figcaption>What ships with Green: the unit, a 12 V power supply and an Ethernet cable. Credit: Home Assistant (Nabu Casa)</figcaption>
+        </figure>
+
+        <p>A Raspberry Pi setup is assembled from parts. The official <a href="https://www.home-assistant.io/installation/raspberrypi/">install path</a> is a Raspberry Pi 5 or Pi 4 with at least 2 GB of RAM, with Home Assistant OS written to a microSD card (an A2-labelled card of at least 32 GB is recommended) using Raspberry Pi Imager. Ethernet is required for the install itself; Wi-Fi can be configured afterwards. The docs add a warning worth repeating: use an appropriate power supply, not a random mobile charger. You also supply your own enclosure. The board alone looks cheap, but power supply, card and case close much of the gap with Green's all-in-one price.</p>
+
+        <h2>Specs side by side</h2>
+        <table>
+          <thead><tr><th>Spec</th><th>Home Assistant Green</th><th>Raspberry Pi (HA install path)</th></tr></thead>
+          <tbody>
+            <tr><td>SoC</td><td>Rockchip RK3566, quad-core Cortex-A55 @ 1.8 GHz</td><td>Pi 5 or Pi 4, per HA's docs (raspberrypi.com spec pages were not reachable for this piece)</td></tr>
+            <tr><td>RAM</td><td>4 GB LPDDR4X</td><td>At least 2 GB required</td></tr>
+            <tr><td>Storage</td><td>32 GB eMMC (fixed)</td><td>microSD card by default; A2 class, 32 GB+ recommended; USB SSD possible</td></tr>
+            <tr><td>Ports</td><td>2 × USB 2.0 Type-A (5 V combined), Gigabit Ethernet, HDMI (diagnostics only), microSD (recovery only)</td><td>Per board; Ethernet required for install</td></tr>
+            <tr><td>Power</td><td>12 V DC 1 A barrel supply (included); ~1.7 W idle, ~3 W load</td><td>USB-C supply you buy; HA docs warn against underpowered chargers (no idle/load figures published here)</td></tr>
+            <tr><td>Assembly</td><td>None — appliance</td><td>Flash an SD card, add PSU and case</td></tr>
+            <tr><td>Radio</td><td>None built in — add USB Connect ZBT-1/ZBT-2 for Zigbee/Thread</td><td>None built in — add a USB radio</td></tr>
+            <tr><td>What you buy</td><td>One finished box (power supply included)</td><td>Board + PSU + card + case</td></tr>
+          </tbody>
+        </table>
+        <p>The silicon difference is real but easy to overstate. Green's RK3566 uses four efficient Cortex-A55 cores; a Pi 5 uses four higher-performance Cortex-A76 cores. For typical Home Assistant loads — automations, a few hundred entities, an add-on or two — both are adequate per their makers' positioning. Nobody should pick between them on benchmark scores; pick on the shape of the machine.</p>
+
+        <h2>The Raspberry Pi route, step by step</h2>
+        <p>If you do go the DIY path, Home Assistant's Raspberry Pi guide is the sequence:</p>
+        <ol>
+          <li>Get a Raspberry Pi 5 or Pi 4 with at least 2 GB of RAM.</li>
+          <li>Get an appropriate power supply — the docs specifically warn against a phone charger.</li>
+          <li>Get an A2-class microSD card, 32 GB or larger.</li>
+          <li>Write Home Assistant OS to the card with Raspberry Pi Imager.</li>
+          <li>Insert the card, connect Ethernet, and power on. Initial setup needs the wired network.</li>
+          <li>After setup, configure Wi-Fi if you want to drop the cable.</li>
+        </ol>
+        <p>None of this is hard, and the Pi path is well documented. It's just four or five decisions Green makes for you, plus the parts list. There is also a middle ground on the DIY side: Yellow, Home Assistant's own kit. It's a carrier board for a Raspberry Pi Compute Module 4 — you supply the CM4 in the non-PoE version — with a built-in Silicon Labs MGM210P radio covering Zigbee, OpenThread and Matter, and an M.2 M-key slot (PCIe x1) for NVMe SSDs. Worth knowing for the comparison: <a href="https://www.home-assistant.io/yellow/">Yellow is no longer in production</a> but still gets software updates, and Home Assistant now recommends Green plus a Connect ZBT-1 for a plug-and-play setup. One trap from the Yellow docs: the M.2 slot takes NVMe drives, but a Google Coral accelerator does not work in it.</p>
+
+        <h2>Storage: the Pi's quiet advantage</h2>
+        <p>This is where the DIY route earns its keep. Green's 32 GB eMMC is fixed, the microSD slot is for recovery only, and there is no external-boot storage path — expansion is USB only. A Pi-based setup stores on the SD card by default, but the SD card is also the usual failure point, and one of the reasons to move to a USB SSD once a system matters. Yellow goes further with its NVMe slot.</p>
+        <p>Home Assistant's recorder and history database grows steadily; many people end up wanting more storage and more speed than an SD card. If you already know you want an SSD in the box, that points away from Green — or toward running Home Assistant on something bigger entirely. Our <a href="best-mini-pc-home-assistant">best mini PC for Home Assistant</a> guide covers that route: Home Assistant supports generic x86-64 hardware, installed as full HAOS on a dedicated 64-bit, UEFI-bootable PC, or as Home Assistant Container (Docker) on an existing machine.</p>
+
+        <h2> Radios: what either box needs for Zigbee, Thread and Z-Wave</h2>
+        <p>Neither Green nor a bare Pi has a Zigbee, Thread or Z-Wave radio. Whichever you choose, a USB adapter does the radio work — the Connect ZBT-1 or ZBT-2 covers Zigbee and Thread, and a separate USB stick covers Z-Wave. This is the same after the purchase for both boxes, so it doesn't decide the comparison; it just belongs in the budget. Our <a href="article-thread-network.html">Thread network guide</a> explains the Thread side. The one exception in this family is Yellow, whose MGM210P radio is on the board.</p>
+        <p>Green's two USB 2.0 ports share a 5 V budget, which is worth reading carefully if you plan to hang several USB devices off it — a radio plus a dongle plus anything else. Per the <a href="https://www.home-assistant.io/green/">spec sheet</a>, that's the total for both ports combined.</p>
+
+        <h2>Power draw: numbers you can plan around</h2>
+        <p>Published figures, not claims: Green idles at about 1.7 W and draws about 3 W under load, on its 12 V 1 A supply. Yellow idles at about 1.5 W — about 2.5 W with an NVMe SSD — and pulls roughly 5–9 W under load. A Pi's draw depends on the board and what's plugged into it; Home Assistant doesn't publish a figure for the Pi path, so we won't invent one. At these levels, a year of electricity is a few dollars for any of them; the practical takeaway is that all of the options are cheap to leave running, and Green is measured and quiet about it.</p>
+
+        <h2>Which one should you buy?</h2>
+        <p><strong>Buy Home Assistant Green if</strong> you're starting from zero and want the supported appliance path: assembled, housed, powered, stored on eMMC, updated by the people who make the software. That is what it exists for, and it's the box Home Assistant now recommends over Yellow.</p>
+        <p><strong>Choose the Raspberry Pi path if</strong> you want to learn the install, you already own a Pi 4 or 5 and a good PSU, or you want a USB SSD behind Home Assistant from day one. It's more work and more small decisions, in exchange for flexibility.</p>
+        <p><strong>Look at a mini PC if</strong> you expect to run heavier add-ons — NVR-style camera recording, big databases, lots of integrations — and want x86 headroom. <a href="https://www.home-assistant.io/installation/generic-x86-64/">HAOS installs on any dedicated 64-bit UEFI x86-64 machine</a>, and Docker-based Home Assistant Container is the lighter option.</p>
+        <p><strong>Chase a Yellow only</strong> for its built-in Zigbee/Thread radio and NVMe slot, knowing it's out of production and you're sourcing a CM4 for the non-PoE board yourself.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Is Home Assistant Green better than a Raspberry Pi for running Home Assistant?</h3>
+        <p>For most people who want Home Assistant working with the least fuss, yes. Green is fully assembled, boots Home Assistant from built-in eMMC storage, and idles at about 1.7 W. A Raspberry Pi costs less on paper but needs a power supply, an A2-class SD card, an enclosure and manual flashing, and it runs the OS from the SD card by default.</p>
+        <h3>Do I need to build anything for Home Assistant Green, or is the Raspberry Pi route the DIY option?</h3>
+        <p>Green is plug-and-play: power and Ethernet, then setup through the app. An internet connection is needed only for initial setup. The Raspberry Pi route is the DIY option: you buy the board, power supply and SD card, flash Home Assistant OS with Raspberry Pi Imager, and supply your own case.</p>
+        <h3>Can Home Assistant Green use an NVMe SSD or more storage like a Pi can?</h3>
+        <p>No. Green is not expandable internally: there is no M.2 or NVMe slot, the SoC cannot be swapped, and the microSD slot is for recovery only. Expansion is via USB. A Pi can boot and store on a USB SSD, and Home Assistant Yellow has an M.2 M-key slot that takes NVMe SSDs.</p>
+        <h3>Does Home Assistant Green support Zigbee, Thread and Matter out of the box?</h3>
+        <p>No. Green has no built-in radio, so you add a USB adapter such as Home Assistant Connect ZBT-1 or ZBT-2 for Zigbee and Thread, plus a USB stick for Z-Wave if you want it. Home Assistant Yellow has a Silicon Labs MGM210P radio for Zigbee, OpenThread and Matter built in.</p>
+        <h3>What happened to Home Assistant Yellow, and is it still worth buying instead?</h3>
+        <p>Yellow is no longer in production but continues to receive software updates. Home Assistant recommends Green for a plug-and-play experience, plus a Connect ZBT-1 for Zigbee and Thread. Yellow is still interesting if you want its built-in radio and M.2 NVMe slot, but finding one is your problem.</p>
+        <h3>Can I run Home Assistant on a mini PC (x86-64) instead of either, and how does HAOS install there?</h3>
+        <p>Yes. Home Assistant supports generic x86-64 hardware: install Home Assistant OS on a dedicated 64-bit, UEFI-bootable Intel or AMD PC, or run Home Assistant Container (Docker) instead of full HAOS. A mini PC is the step up when you want more headroom than Green or a Pi.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/green/">Home Assistant Green</a>; <a href="https://www.home-assistant.io/installation/raspberrypi/">Home Assistant on Raspberry Pi</a>; <a href="https://www.home-assistant.io/yellow/">Home Assistant Yellow</a>; <a href="https://www.home-assistant.io/installation/generic-x86-64/">Home Assistant on generic x86-64</a></dd>
+        </dl>
+
+        <p>Want to browse the hardware yourself? <a href="https://www.amazon.com/s?k=Home+Assistant+Green&amp;tag=hanews01-20" rel="sponsored nofollow">Home Assistant Green on Amazon</a> · <a href="https://www.amazon.com/s?k=Raspberry+Pi+5&amp;tag=hanews01-20" rel="sponsored nofollow">Raspberry Pi 5 on Amazon</a> · <a href="https://www.amazon.com/s?k=Raspberry+Pi+4&amp;tag=hanews01-20" rel="sponsored nofollow">Raspberry Pi 4 on Amazon</a></p>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
