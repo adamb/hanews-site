@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zigbee2MQTT with Home Assistant: setup, add-on, and ZHA vs Zigbee2MQTT — HA News</title>
+  <meta name="description" content="How to run Zigbee2MQTT with Home Assistant: what you need (adapter, broker, host), the add-on install, discovery configuration, pairing, coordinator picks, and ZHA vs Zigbee2MQTT.">
+  <link rel="canonical" href="https://hanews.org/zigbee2mqtt-home-assistant">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Zigbee2MQTT with Home Assistant: setup, add-on, and ZHA vs Zigbee2MQTT", "datePublished": "2026-11-09", "dateModified": "2026-11-09", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/zigbee2mqtt-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I need a separate Zigbee hub if I already run Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "No vendor hub. You need a Zigbee coordinator adapter plugged into a machine you control, plus (for Zigbee2MQTT) an MQTT broker. Zigbee2MQTT lists the three requirements as a Zigbee adapter, a host to run the service, and an MQTT broker."}}, {"@type": "Question", "name": "ZHA vs Zigbee2MQTT: which should I pick for a Home Assistant install?", "acceptedAnswer": {"@type": "Answer", "text": "ZHA is Home Assistant's built-in Zigbee gateway and needs no MQTT broker in the path. Zigbee2MQTT is a separate service that publishes devices over MQTT and typically reaches Home Assistant through discovery. Pick ZHA for the simplest single-install setup; pick Zigbee2MQTT if you want the service's device handling and wider adapter and device coverage."}}, {"@type": "Question", "name": "Which Zigbee coordinator should I buy for Zigbee2MQTT?", "acceptedAnswer": {"@type": "Answer", "text": "Zigbee2MQTT's own getting-started page recommends adapters from two families: Texas Instruments zStack (CC2652/CC1352) and Silicon Labs EmberZNet (EFR32). deCONZ adapters from Dresden Elektronik are also in its supported list. The adapter must be flashed with coordinator firmware, though some ship pre-flashed."}}, {"@type": "Question", "name": "Does Zigbee2MQTT need MQTT, and do I have to install Mosquitto?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, Zigbee2MQTT needs an MQTT broker. Mosquitto is the recommended broker but others work. In Home Assistant you add the MQTT integration under Settings, then Devices & services, then Add Integration, then MQTT."}}, {"@type": "Question", "name": "Can I run Zigbee2MQTT as a Home Assistant add-on, and what hardware does it need?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. On Home Assistant OS or a Supervised install the project calls the add-on the easiest route. It is 64-bit only (aarch64 or amd64), so 32-bit boards such as armv7 Raspberry Pi hardware cannot run it, and the docs say a Raspberry Pi 3 may be unstable — at least a Raspberry Pi 4."}}, {"@type": "Question", "name": "Can I move my devices from ZHA to Zigbee2MQTT without re-pairing everything?", "acceptedAnswer": {"@type": "Answer", "text": "Not always. Zigbee2MQTT's adapter documentation notes that migrating to a different adapter may require re-pairing all devices in some cases, so plan the move when you have time to re-pair."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 9 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Zigbee</p>
+        <h1>Zigbee2MQTT with Home Assistant: setup, add-on, and ZHA vs Zigbee2MQTT</h1>
+        <p class="byline">HA News · 9 Nov 2026</p>
+
+        <p>Zigbee2MQTT is a standalone service that turns a Zigbee coordinator into a set of Home Assistant entities over MQTT. It runs next to Home Assistant rather than inside it, and every sensor, bulb and switch shows up as an MQTT-discovered entity without a vendor bridge in the loop. <strong>Setting up Zigbee2MQTT with Home Assistant takes three parts: a Zigbee adapter, a machine to run the service, and an MQTT broker</strong> — Mosquitto is the broker the project recommends, though others work. On Home Assistant OS or a Supervised install, the easiest route is the official Zigbee2MQTT add-on, which bundles the service and a broker-facing config in one place.</p>
+
+        <p>The other question people bring to this page is <strong>ZHA vs Zigbee2MQTT</strong>. ZHA is Home Assistant's built-in Zigbee gateway: hardware-independent, connects devices straight through a coordinator, and needs no MQTT broker in the path. Zigbee2MQTT is a separate project with its own device handling and its own configuration. Both are local; neither needs a cloud account. The rest of this guide covers what each install path requires, how discovery works, coordinators that are actually supported, and the gotchas the projects themselves document.</p>
+
+        <h2>What you need before you start</h2>
+        <p>Zigbee2MQTT's getting-started page lists three requirements:</p>
+        <ul>
+          <li><strong>A Zigbee adapter</strong> — USB, GPIO, or a remote adapter over Wi-Fi or Ethernet. The radio becomes your network's coordinator.</li>
+          <li><strong>A host</strong> to run the service — a Raspberry Pi, NUC, Linux box, Windows or macOS machine all qualify.</li>
+          <li><strong>An MQTT broker</strong> — Mosquitto is recommended; other brokers work.</li>
+        </ul>
+        <p>That adapter is the part worth choosing carefully, because it holds your whole Zigbee network. Adapters must be flashed with coordinator firmware before use, though some ship pre-flashed from the factory. If you have not bought a radio yet, read <a href="zigbee-hub.html">our guide to choosing a Zigbee hub for Home Assistant</a> first — it covers the same coordinator question from the ZHA side, and the hardware overlap between the two integrations is exactly why people end up on this page.</p>
+
+        <h2>ZHA vs Zigbee2MQTT</h2>
+        <p>Both integrations talk to the same coordinator; the difference is what sits between the radio and Home Assistant.</p>
+        <p><strong>ZHA</strong> is built into Home Assistant. Per the integration's own documentation, it is a hardware-independent Zigbee gateway: devices connect directly to Home Assistant through a coordinator, with no MQTT broker anywhere in the path. It supports a wide set of device types — alarm control panel, binary sensor, button, climate (beta), cover, light, lock, number, select, sensor, siren, switch, valve and update — and its docs cover channel choice, OTA updates, groups and binding, and migrating to a new adapter.</p>
+        <p><strong>Zigbee2MQTT</strong> is a separate service that publishes device state and commands to an MQTT broker, and Home Assistant picks entities up from there through MQTT discovery. That extra hop is also where some of its flexibility comes from: the service's device database and exposure handling are its own, not Home Assistant's.</p>
+        <p>Practical framing: if you want the fewest moving parts on a Home Assistant OS box, ZHA with a supported coordinator is the shorter path. If you want the service-side features Zigbee2MQTT is known for — or you already run an MQTT broker for other things — the add-on is a clean install. Not sure Zigbee is even the right radio for your house? We compare the options in <a href="zigbee-vs-z-wave.html">Zigbee vs Z-Wave</a> and <a href="zigbee-vs-thread.html">Zigbee vs Thread</a>. Switching integration later is not a lifetime commitment in either direction, but see the re-pairing note near the end of this page before you move.</p>
+
+        <h2>Install path 1: the Home Assistant add-on</h2>
+        <p>On Home Assistant OS or a Supervised install, the project's documentation calls the Zigbee2MQTT add-on the easiest route. Two hardware constraints from the add-on's own page are worth checking before you spend an evening on it:</p>
+        <ul>
+          <li><strong>64-bit only.</strong> The add-on supports aarch64 and amd64 architectures. 32-bit boards — the docs name the Sonoff iHost and armv7 Raspberry Pi hardware — cannot run it.</li>
+          <li><strong>Raspberry Pi limits.</strong> A Raspberry Pi 3 may be unstable because of limited resources; the docs say use at least a Raspberry Pi 4.</li>
+        </ul>
+        <p>If neither applies to your box, add the add-on from Settings, then Add-ons, then the add-on store, point it at your coordinator's serial path, and let it start. The service then needs a broker to talk to — many add-on installs pair it with the Mosquitto broker add-on on the same machine.</p>
+
+        <h2>Install path 2: standalone (Docker, Linux, everything else)</h2>
+        <p>The documented install list is longer than people expect: Linux, Docker, the Home Assistant add-on, openHABian, Windows, a FreeBSD jail, and Kubernetes. If Home Assistant itself runs in Docker on a NUC, running Zigbee2MQTT as a neighbouring container is the common pattern — same host, two containers, one MQTT broker between them.</p>
+        <p>One routing note from the docs: while Home Assistant is the most common companion, Zigbee2MQTT is not Home Assistant-specific. The same service feeds openHAB or any other MQTT consumer if your setup changes later.</p>
+
+        <h2>Turning on Home Assistant discovery</h2>
+        <p>Out of the box, Zigbee2MQTT does <em>not</em> announce your devices to Home Assistant. Discovery is off by default; you switch it on in configuration.yaml:</p>
+        <pre>homeassistant:
+  enabled: true</pre>
+        <p>That one block does the work, but it has documented details worth knowing:</p>
+        <ul>
+          <li><code>discovery_topic</code> defaults to <code>homeassistant</code>, and the docs warn it must differ from your MQTT base topic — if you customized the base topic, check this.</li>
+          <li><code>status_topic</code> defaults to <code>homeassistant/status</code>.</li>
+          <li>An experimental <code>experimental_event_entities</code> option exists, as does a <code>legacy_action_sensor</code> option (default false) for the old <code>sensor_action</code> entity.</li>
+        </ul>
+        <p>On the Home Assistant side, add the MQTT integration through Settings, then Devices &amp; services, then Add Integration, then MQTT. From there entities arrive via MQTT discovery, which is the path Zigbee2MQTT uses, or manually through YAML or subentries. MQTT platforms cover lights, switches, sensors, climate, covers, locks, fans, numbers, selects, valves and more.</p>
+
+        <h2>Picking a coordinator Zigbee2MQTT actually supports</h2>
+        <p>Zigbee2MQTT groups its officially supported adapters, and the getting-started page narrows the recommendation to two chip families:</p>
+        <ul>
+          <li><strong>Texas Instruments zStack</strong> — CC2652 and CC1352 parts. Chip detail worth knowing when comparing listings: TI parts whose model number ends in P carry a power amplifier rated up to 20 dBm, versus 5 dBm on non-P variants.</li>
+          <li><strong>Silicon Labs EmberZNet</strong> — EFR32-based adapters.</li>
+        </ul>
+        <p>Adapters from the <strong>deCONZ</strong> family (Dresden Elektronik) are also in the project's supported list. The remaining groups are graded lower: not recommended, not maintained, ZiGate, and experimental ZBOSS (Nordic).</p>
+        <p>Named dongles in these families that come up constantly in the Zigbee2MQTT world include the SONOFF Zigbee 3.0 USB Dongle Plus (ZBDongle-E, EFR32MG21), the SMLIGHT SLZB-07 (also EFR32MG21), the Dresden Elektronik ConBee III, and TI CC2652P/CC1352P sticks flashed with Z-Stack coordinator firmware. <a href="https://www.amazon.com/s?k=SONOFF+ZBDongle-E&amp;tag=hanews01-20" rel="sponsored nofollow">SONOFF ZBDongle-E on Amazon</a> · <a href="https://www.amazon.com/s?k=SMLIGHT+SLZB-07&amp;tag=hanews01-20" rel="sponsored nofollow">SMLIGHT SLZB-07 on Amazon</a> · <a href="https://www.amazon.com/s?k=ConBee+III&amp;tag=hanews01-20" rel="sponsored nofollow">ConBee III on Amazon</a> · <a href="https://www.amazon.com/s?k=CC2652P+coordinator+zigbee+usb+dongle&amp;tag=hanews01-20" rel="sponsored nofollow">TI CC2652P adapters on Amazon</a>. Home Assistant's official Connect ZBT-2 also works with Zigbee2MQTT — the <a href="zigbee-hub.html">hub guide</a> covers it in detail.</p>
+        <p>Whichever stick you land on, keep it off Wi-Fi. The adapter documentation warns that Wi-Fi-connected network adapters "might have reduced stability" because the serial protocol has little fault tolerance for packet loss and latency. If the radio cannot sit next to the host, the docs recommend a remote adapter over wired Ethernet instead.</p>
+
+        <h2>Pairing devices</h2>
+        <p>Zigbee devices join only when the network permits joining. In the Zigbee2MQTT frontend, the joining button — top-right of the nav bar — opens the network for 254 seconds, and you can close it early when the sensor has paired. Pair your mains-powered devices first (plugs, bulbs); they become routers that widen the mesh, then battery sensors find a better parent.</p>
+        <p>One documented trick: the arrow beside "Permit join (All)" lets you permit joining through a specific coordinator or router. That is useful when a device picks a bad parent — the docs name Aqara devices as the classic example. The caveat is real, though: permitting join through a particular router does not guarantee the device actually keeps that router as its parent.</p>
+
+        <h2>Gotchas the docs call out</h2>
+        <p>Range and stability trouble has a documented first response: move the coordinator away from the host with a USB extension cable. Keep the docs' "Improve network range and stability" page bookmarked; it is the project's own troubleshooting ladder, and the USB extension tip is the first rung for a reason — USB 3 ports and case internals are noisy neighbours for a 2.4 GHz radio.</p>
+        <p>The second gotcha is migration. Zigbee2MQTT's adapter page notes that migrating to a different adapter may require re-pairing all devices in some cases. That matters in two directions: moving from ZHA to Zigbee2MQTT usually means re-pairing onto the new service's network, and swapping coordinators later may mean re-pairing again. Budget an afternoon, or pick the adapter you intend to keep for years and don't move.</p>
+        <p>Third: the broker is load-bearing. If MQTT goes down, Zigbee2MQTT still runs but Home Assistant sees nothing. When "all my Zigbee sensors vanished," check the broker before the radio.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Do I need a separate Zigbee hub if I already run Home Assistant?</h3>
+        <p>No vendor hub. You need a Zigbee coordinator adapter plugged into a machine you control, plus (for Zigbee2MQTT) an MQTT broker. Zigbee2MQTT lists the three requirements as a Zigbee adapter, a host to run the service, and an MQTT broker.</p>
+        <h3>ZHA vs Zigbee2MQTT: which should I pick for a Home Assistant install?</h3>
+        <p>ZHA is Home Assistant's built-in Zigbee gateway and needs no MQTT broker in the path. Zigbee2MQTT is a separate service that publishes devices over MQTT and typically reaches Home Assistant through discovery. Pick ZHA for the simplest single-install setup; pick Zigbee2MQTT if you want the service's device handling and its adapter and device coverage.</p>
+        <h3>Which Zigbee coordinator should I buy for Zigbee2MQTT?</h3>
+        <p>Zigbee2MQTT's own getting-started page recommends adapters from two families: Texas Instruments zStack (CC2652/CC1352) and Silicon Labs EmberZNet (EFR32). deCONZ adapters from Dresden Elektronik are also in its supported list. The adapter must be flashed with coordinator firmware, though some ship pre-flashed.</p>
+        <h3>Does Zigbee2MQTT need MQTT, and do I have to install Mosquitto?</h3>
+        <p>Yes, Zigbee2MQTT needs an MQTT broker. Mosquitto is the recommended broker but others work. In Home Assistant you add the MQTT integration under Settings, then Devices &amp; services, then Add Integration, then MQTT.</p>
+        <h3>Can I run Zigbee2MQTT as a Home Assistant add-on, and what hardware does it need?</h3>
+        <p>Yes. On Home Assistant OS or a Supervised install the project calls the add-on the easiest route. It is 64-bit only (aarch64 or amd64), so 32-bit boards such as armv7 Raspberry Pi hardware cannot run it, and the docs say a Raspberry Pi 3 may be unstable — at least a Raspberry Pi 4.</p>
+        <h3>Can I move my devices from ZHA to Zigbee2MQTT without re-pairing everything?</h3>
+        <p>Not always. Zigbee2MQTT's adapter documentation notes that migrating to a different adapter may require re-pairing all devices in some cases, so plan the move when you have time to re-pair.</p>
+
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-11-02.html">Read the latest</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.zigbee2mqtt.io/guide/getting-started/">Zigbee2MQTT getting started</a>; <a href="https://www.zigbee2mqtt.io/guide/configuration/homeassistant.html">Zigbee2MQTT Home Assistant discovery</a>; <a href="https://www.zigbee2mqtt.io/guide/adapters/">Zigbee2MQTT supported adapters</a>; <a href="https://www.zigbee2mqtt.io/guide/installation/03_ha_addon.html">Zigbee2MQTT Home Assistant add-on</a>; <a href="https://www.zigbee2mqtt.io/guide/usage/pairing_devices.html">Zigbee2MQTT pairing devices</a>; <a href="https://www.home-assistant.io/integrations/mqtt/">Home Assistant MQTT integration</a>; <a href="https://www.home-assistant.io/integrations/zha/">Home Assistant ZHA integration</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
