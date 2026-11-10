@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What is a Thread border router (and do you already own one)? — HA News</title>
+  <meta name="description" content="A Thread border router connects a Thread mesh to your Wi-Fi or Ethernet network. Which devices you already own act as one, how Home Assistant becomes one, and how to share Thread credentials.">
+  <link rel="canonical" href="https://hanews.org/thread-border-router">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "What is a Thread border router (and do you already own one)?", "datePublished": "2026-11-10", "dateModified": "2026-11-10", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/thread-border-router"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is a Thread border router, and do I actually need one?", "acceptedAnswer": {"@type": "Answer", "text": "A Thread border router is a device that connects a Thread mesh network to other IP-based networks such as your Wi-Fi or Ethernet. A Thread network needs one to reach anything outside its own mesh. If you run Matter devices over Thread with a phone, hub, or Home Assistant, you need at least one border router on the network."}}, {"@type": "Question", "name": "Is Home Assistant itself a Thread border router?", "acceptedAnswer": {"@type": "Answer", "text": "Not by default. Home Assistant can become one when you install the OpenThread Border Router application, which turns a supported radio into a border router. Home Assistant hardware such as Connect ZBT-1, Connect ZBT-2, and Yellow ships running Zigbee, not Thread, so enabling Thread involves manual steps. Home Assistant's Thread integration with Matter is still a work in progress."}}, {"@type": "Question", "name": "Which devices I already own are Thread border routers?", "acceptedAnswer": {"@type": "Answer", "text": "Apple devices include HomePod, HomePod mini, and Apple TV 4K models with Wi-Fi and Ethernet or Wi-Fi only (2nd and 3rd generation). Google devices include Nest Hub 2nd generation, Nest Hub Max, Nest Wifi, Nest Wifi Pro, and the Google TV Streamer. Nanoleaf and Amazon also sell border-router-capable devices, per Home Assistant's list."}}, {"@type": "Question", "name": "How do I share Thread credentials with my Android phone or iPhone?", "acceptedAnswer": {"@type": "Answer", "text": "In Home Assistant, send credentials to a phone so it can commission Thread devices. On iPhone, go to Settings, Connectivity, Thread, then Send credentials to phone. On Android, in the Companion app go to Settings, Companion app, Troubleshooting, then Sync Thread credentials. Your phone needs the credentials before adding Matter-on-Thread devices."}}, {"@type": "Question", "name": "Can I have more than one Thread border router, and what happens then?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, and many homes end up with several. Home Assistant's Thread integration tracks the Thread networks in your home and stores their credentials, so you can see which networks exist and which one is preferred. The border routers merge Thread partitions over your IP infrastructure, so multiple routers make the Thread network more resilient, but you should decide which network Home Assistant treats as preferred."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 10 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Matter &amp; Thread</p>
+        <h1>What is a Thread border router (and do you already own one)?</h1>
+        <p class="byline">HA News · 10 Nov 2026</p>
+
+        <p>A <strong>Thread border router</strong> is the device that connects a Thread mesh network to everything else: your Wi-Fi, your Ethernet switch, the internet. A Thread network can't reach any other network without one. If you plan to add Matter devices over Thread — sensors, locks, bulbs from brands like Eve, Nanoleaf or IKEA — and control them from your phone, a hub, or <a href="ha.html">Home Assistant</a>, you need a border router somewhere in the house. The good news: many people already own one and haven't noticed. A HomePod mini on a shelf or a Nest Hub in the kitchen is acting as one right now.</p>
+
+        <p>Thread itself is an IEEE 802.15.4 protocol, the same low-power radio standard that Zigbee builds on, but it is IPv6-based, carries network-layer security, and supports device-to-device and device-to-cloud connectivity. That per <a href="https://www.threadgroup.org/WhatIsThread/AboutThread/BordersRouters">the Thread Group's description</a>. In plain terms: Thread devices form a self-healing mesh that sips battery power, and the border router is the doorway between that mesh and the rest of your network. For how Thread stacks up against Zigbee in practice, read <a href="zigbee-vs-thread.html">Zigbee vs Thread</a>.</p>
+
+        <h2>What a border router actually does</h2>
+        <p>The OpenThread documentation — OpenThread being the open-source Thread implementation that most consumer products build on — lists what a border router must support. <a href="https://openthread.io/guides/border-router">Per the OpenThread border router guide</a>, the essentials are:</p>
+        <ul>
+          <li><strong>Bidirectional IP connectivity</strong> between the Thread network and Wi-Fi or Ethernet — traffic flows both ways, so an app on your phone can reach a sensor and the sensor can be reached back.</li>
+          <li><strong>Bidirectional DNS-based service discovery</strong> — mDNS on the infrastructure side, SRP on the Thread side — so devices can find each other by name without manual configuration.</li>
+          <li><strong>Thread-over-infrastructure</strong>, which merges Thread network partitions across IP links. This is what lets two border routers in different rooms keep one logical Thread network.</li>
+          <li><strong>External Thread commissioning</strong> — letting a new device join the network, driven from outside the mesh, typically from your phone.</li>
+        </ul>
+        <p>Notice what is not on the list: a vendor account, a subscription, or a hub with a screen. A border router is infrastructure. That is the part people miss when they shop for "a Thread hub" — the role is defined by function, and devices that fill the function are already scattered through Apple, Google, and Amazon product lines.</p>
+
+        <h2>Devices you already own that are Thread border routers</h2>
+        <p>Home Assistant keeps a list of devices that act as Thread border routers in <a href="https://www.home-assistant.io/integrations/thread/">its Thread integration documentation</a>. By that list:</p>
+        <ul>
+          <li><strong>Apple:</strong> HomePod (2nd generation), HomePod mini, Apple TV 4K (3rd generation, Wi-Fi + Ethernet), Apple TV 4K (2nd generation, Wi-Fi). Apple recommends the Wi-Fi + Ethernet Apple TV models as the preferred always-on border router.</li>
+          <li><strong>Google:</strong> Nest Hub (2nd gen), Nest Hub Max, Nest Wifi Pro (Wi-Fi 6E), Nest Wifi, and the Google TV Streamer (4K).</li>
+          <li><strong>Others:</strong> Nanoleaf and Amazon also sell border-router-capable devices.</li>
+        </ul>
+        <p>The practical takeaway is that most houses with a smart speaker are already running a Thread network without knowing it. If you are setting up Matter, that is good news — the hard infrastructure requirement is commonly already met. If you want to shop for a dedicated border router instead, these are the devices most commonly bought for the role:</p>
+        <ul>
+          <li><a href="https://www.amazon.com/s?k=HomePod+mini&amp;tag=hanews01-20" rel="sponsored nofollow">HomePod mini on Amazon</a> — the cheapest always-on Apple border router.</li>
+          <li><a href="https://www.amazon.com/s?k=Apple+TV+4K&amp;tag=hanews01-20" rel="sponsored nofollow">Apple TV 4K on Amazon</a> — Apple's preferred always-on border router when it has Wi-Fi and Ethernet.</li>
+          <li><a href="https://www.amazon.com/s?k=Nest+Hub+2nd+Gen&amp;tag=hanews01-20" rel="sponsored nofollow">Nest Hub (2nd gen) on Amazon</a> — Google's border router with a screen.</li>
+          <li><a href="https://www.amazon.com/s?k=Nest+Wifi+Pro&amp;tag=hanews01-20" rel="sponsored nofollow">Nest Wifi Pro on Amazon</a> — Wi-Fi 6E router and border router in one box.</li>
+        </ul>
+        <p><a href="https://www.amazon.com/s?k=Home+Assistant+Connect+ZBT-2&amp;tag=hanews01-20" rel="sponsored nofollow">Home Assistant Connect ZBT-2</a> is a different kind of border router: a USB radio for your Home Assistant machine, rather than a smart speaker that happens to include the feature. Our <a href="home-assistant-connect-zbt-2.html">Connect ZBT-2 guide</a> covers the Zigbee side of that adapter; see below for what the Thread path looks like in Home Assistant.</p>
+
+        <h2>One warning about "Built on Thread" packaging</h2>
+        <p><a href="https://www.home-assistant.io/integrations/thread/">Per Home Assistant's documentation</a>, a device whose box shows the "Built on Thread: requires border router" logo is telling you something specific: Thread is the only supported protocol on that device — there is no Wi-Fi fallback. The Matter or Apple HomeKit logos on the same box indicate which protocol handles the credentials. So reading the logos correctly matters before you buy: a Thread-only device is fine, but it will not join your network if no border router is present, and you must know who holds the credential on an existing network.</p>
+
+        <h2>Is Home Assistant itself a Thread border router?</h2>
+        <p>Not out of the box, but it can become one. <a href="https://www.home-assistant.io/integrations/thread/">Home Assistant's Thread integration</a> tracks the Thread networks in your home and stores their credentials — like a Wi-Fi password — so it can share them with phones, new hubs, or new border routers. You don't install the integration by hand; it appears automatically when Home Assistant detects a border router. The Home Assistant team says the integration is still a work in progress, and its Matter-on-Thread handling is likewise still in progress.</p>
+        <p>Turning Home Assistant into a border router means installing the OpenThread Border Router application, which drives a supported radio connected to the Home Assistant machine. One hardware note from the same documentation: Home Assistant hardware such as Connect ZBT-1, Connect ZBT-2, and Yellow ships running Zigbee rather than Thread, so enabling Thread involves manual steps. You are switching a capable radio to a different job, not plugging in something new.</p>
+
+        <h2>Setting up: two starting points in the Thread panel</h2>
+        <p>In Home Assistant, go to <strong>Settings &gt; Connectivity &gt; Thread</strong>. What you see there decides which path you take.</p>
+        <h3>Case 1: no third-party Thread networks yet</h3>
+        <p>Install the OpenThread Border Router app and Home Assistant creates a Thread network for you, named <strong>ha-thread-xxxx</strong> — the last four digits are the network's PAN ID. Confirm the Home Assistant logo appears under "Preferred network" so you know Home Assistant treats this as the network its devices should use.</p>
+        <h3>Case 2: existing Thread networks, e.g. from a HomePod or Nest Hub</h3>
+        <p>If a phone or another border router already has networks listed in the panel, you can bring those credentials into Home Assistant instead of creating a competing network. <a href="https://www.home-assistant.io/integrations/thread/">Per Home Assistant's Thread documentation</a>, use "Send credentials to Home Assistant" in the Companion app (Settings &gt; Connectivity &gt; Thread), then "Make preferred network" so Home Assistant adopts the right one, and then install the OpenThread Border Router so Home Assistant's radio joins that existing network rather than forming a separate one.</p>
+        <p>Choosing between these two cases matters more than it looks. If you have both Google and Apple devices in the house, you can end up running multiple Thread networks side by side — each with its own credential. Thread itself can merge partitions across IP links, but you still have to decide which single network Home Assistant marks as preferred, or devices commissioned to it will join whichever mesh has the credential.</p>
+
+        <h2>Sharing Thread credentials with your phone</h2>
+        <p>Your phone needs Thread credentials before it can add new Matter-on-Thread devices, and the flow is different per platform:</p>
+        <ul>
+          <li><strong>iPhone:</strong> use <strong>Settings &gt; Connectivity &gt; Thread &gt; Send credentials to phone</strong>.</li>
+          <li><strong>Android:</strong> open the Home Assistant Companion app and use <strong>Settings &gt; Companion app &gt; Troubleshooting &gt; Sync Thread credentials</strong>. It reports "Added network from Home Assistant to this device" when done.</li>
+        </ul>
+        <p>This is the credential-sharing pain the Thread ecosystem still carries, and it's the reason the Thread integration stores credentials in the first place: Home Assistant effectively becomes the ledger of who knows what. If a new border router appears on the network — you plug in another HomePod mini, or buy a Nest Wifi Pro — Home Assistant will start listing it alongside the networks it already knows.</p>
+        <p>For a broader walk through planning a Thread network this way, see <a href="article-thread-network.html">our Thread network guide</a>.</p>
+
+        <h2>Why several border routers, not one</h2>
+        <p>Thread networks tolerate multiple border routers by design: the Thread-over-infrastructure feature merges partitions across your IP links, and OpenThread's documentation treats the border router role as infrastructural rather than exclusive. That is why Apple recommends the always-on Apple TV line as its preferred border router — battery-powered or intermittently-available routers create a network whose doorway opens and closes. Multiple always-on border routers give the mesh resilience and more radio coverage, at the cost of bookkeeping: every mesh that exists in your home should be visible in Home Assistant's Thread panel, and you should mark exactly one as preferred.</p>
+
+        <h2>Troubleshooting</h2>
+        <p>The Home Assistant Thread documentation covers the usual failure classes, and they are worth reading before buying a single new device: IPv6 issues (border routing requires IPv6 to flow on your home network), changing the Thread channel when it clashes with neighbouring networks or Wi-Fi, pairing failures, and reading OpenThread Border Router logs. Start at <a href="https://www.home-assistant.io/integrations/thread/">the integration's troubleshooting section</a> before replacing any hardware — most pairing failures in this stack trace back to a credential the device never received, not a broken border router.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>What is a Thread border router, and do I actually need one?</h3>
+        <p>A Thread border router is a device that connects a Thread mesh network to other IP-based networks such as your Wi-Fi or Ethernet. A Thread network needs one to reach anything outside its own mesh. If you run Matter devices over Thread with a phone, hub, or Home Assistant, you need at least one border router on the network.</p>
+        <h3>Is Home Assistant itself a Thread border router?</h3>
+        <p>Not by default. Home Assistant can become one when you install the OpenThread Border Router application, which turns a supported radio into a border router. Home Assistant hardware such as Connect ZBT-1, Connect ZBT-2, and Yellow ships running Zigbee, not Thread, so enabling Thread involves manual steps. Home Assistant's Thread integration with Matter is still a work in progress.</p>
+        <h3>Which devices I already own are Thread border routers?</h3>
+        <p>Apple devices include HomePod, HomePod mini, and Apple TV 4K models with Wi-Fi and Ethernet or Wi-Fi only (2nd and 3rd generation). Google devices include Nest Hub 2nd generation, Nest Hub Max, Nest Wifi, Nest Wifi Pro, and the Google TV Streamer. Nanoleaf and Amazon also sell border-router-capable devices, per Home Assistant's list.</p>
+        <h3>How do I share Thread credentials with my Android phone or iPhone?</h3>
+        <p>In Home Assistant, send credentials to a phone so it can commission Thread devices. On iPhone, go to Settings, Connectivity, Thread, then Send credentials to phone. On Android, in the Companion app go to Settings, Companion app, Troubleshooting, then Sync Thread credentials. Your phone needs the credentials before adding Matter-on-Thread devices.</p>
+        <h3>Can I have more than one Thread border router, and what happens then?</h3>
+        <p>Yes, and many homes end up with several. Home Assistant's Thread integration tracks the Thread networks in your home and stores their credentials, so you can see which networks exist and which one is preferred. The border routers merge Thread partitions over your IP infrastructure, so multiple routers make the Thread network more resilient, but you should decide which network Home Assistant treats as preferred.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/integrations/thread/">Home Assistant Thread integration</a>; <a href="https://openthread.io/guides/border-router">OpenThread border router guide</a>; <a href="https://www.threadgroup.org/WhatIsThread/AboutThread/BordersRouters">Thread Group on border routers</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
