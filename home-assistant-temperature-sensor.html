@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best temperature sensor for Home Assistant (2026) — HA News</title>
+  <meta name="description" content="The best temperature sensor for Home Assistant: SONOFF SNZB-02D accuracy and specs, setup via Zigbee2MQTT or ZHA, Aqara and Xiaomi alternatives, and the gotchas to know before you buy.">
+  <link rel="canonical" href="https://hanews.org/home-assistant-temperature-sensor">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best temperature sensor for Home Assistant (2026)", "image": "https://hanews.org/images/sonoff-snzb-02d.jpg", "datePublished": "2026-11-10", "dateModified": "2026-11-10", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-assistant-temperature-sensor"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which temperature sensor works best with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "The SONOFF SNZB-02D is the top pick: it is a Zigbee 3.0 temperature and humidity sensor with a built-in 2.8-inch LCD, rated at ±0.2 °C accuracy with updates every 5 seconds, and it pairs to Home Assistant through Zigbee2MQTT or ZHA."}}, {"@type": "Question", "name": "How do I add a SONOFF SNZB-02D to Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Plug a Zigbee coordinator dongle such as the SONOFF ZBDongle-E into your Home Assistant machine, run Zigbee2MQTT or ZHA, then long-press the pairing button for 5 seconds until the display indicator blinks and let it join."}}, {"@type": "Question", "name": "How accurate is the SNZB-02D?", "acceptedAnswer": {"@type": "Answer", "text": "Per the official spec sheet it is rated at ±0.2 °C and ±2% relative humidity, updates every 5 seconds, and measures from -9.9 °C to 60 °C at 5–95% RH non-condensing."}}, {"@type": "Question", "name": "Does the SNZB-02D work without a hub?", "acceptedAnswer": {"@type": "Answer", "text": "No. It is a Zigbee 3.0 end device, so it needs a Zigbee 3.0 coordinator or hub — for Home Assistant that means a USB coordinator dongle running Zigbee2MQTT or ZHA."}}, {"@type": "Question", "name": "Why does my Zigbee temperature sensor stop reporting?", "acceptedAnswer": {"@type": "Answer", "text": "If a sensor gets stuck, Zigbee2MQTT's recovery is to force-remove the device, restart Zigbee2MQTT, and re-pair it; if pairing fails, pull the battery for 10 seconds. Low battery voltage can also cause disconnects on some Xiaomi sensors even when the battery reads full."}}, {"@type": "Question", "name": "Can I get temperature, humidity and pressure in one sensor?", "acceptedAnswer": {"@type": "Answer", "text": "The Aqara T2 (WSDCGQ12LM) adds barometric pressure alongside temperature, humidity and battery, which the Sonoff SNZB-02D and SNZB-02 do not expose."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 10 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Picks · Sensors</p>
+        <h1>The best temperature sensor for Home Assistant (2026)</h1>
+        <p class="byline">HA News · 10 Nov 2026</p>
+        <p class="disclosure">Disclosure: HA News earns a commission from qualifying purchases made through the Amazon links on this page. Prices and stock are on Amazon; we don't quote them here.</p>
+
+        <p>Temperature sensors are the cheapest useful hardware in a smart home and the ones that quietly power the most automations: thermostat trims, fan triggers, frost alerts, the garage door complaint from a spouse. Almost none of them talk to Home Assistant directly — they need a radio and a local integration. <strong>For most houses the best temperature sensor for Home Assistant is the SONOFF SNZB-02D</strong>, a Zigbee 3.0 temperature and humidity sensor with a built-in 2.8-inch LCD and honest spec-sheet accuracy of ±0.2 °C. It costs little, runs on a coin cell for a long time, and pairs to Home Assistant through Zigbee2MQTT or ZHA without any cloud account.</p>
+
+        <p>This guide walks through the pairing path, the spec details from the manufacturer pages, the alternatives worth considering, and the gotchas that show up on forums — stuck sensors, unit quirks, Xiaomi pairing oddities.</p>
+
+        <figure class="figure">
+          <img src="images/sonoff-snzb-02d.jpg" alt="SONOFF SNZB-02D Zigbee temperature and humidity sensor with built-in LCD display showing temperature and humidity readings" width="1600" height="1600" loading="lazy">
+          <figcaption>SONOFF SNZB-02D. Source: <a href="https://sonoff.tech/products/sonoff-snzb-02d-zigbee-lcd-smart-temperature-humidity-sensor">SONOFF product page</a> (image © SONOFF)</figcaption>
+        </figure>
+
+        <h2>How temperature sensors reach Home Assistant</h2>
+        <p>Home Assistant doesn't have a native radio. Whatever protocol a sensor speaks, it reaches Home Assistant through an integration: Zigbee devices via a coordinator dongle (ZHA, the built-in integration, or Zigbee2MQTT, the add-on), Bluetooth devices via HA's Bluetooth stack or an ESPHome Bluetooth proxy, Wi-Fi devices rarely (unless they run ESPHome or use local APIs). The <a href="zigbee-hub">Zigbee coordinator</a> is the backbone for sensors, and Zigbee temperature sensors are the largest category — cheap, battery-friendly, mesh-native.</p>
+        <p>Per <a href="https://www.zigbee2mqtt.io/devices/SNZB-02D.html">Zigbee2MQTT's device page</a>, Zigbee temperature/humidity sensors pair to Home Assistant via Zigbee2MQTT or ZHA — with a coordinator such as the SONOFF ZBDongle-E — and expose temperature, humidity and battery entities once joined. That means one coordinator can host sensors from Sonoff, Aqara, Xiaomi and dozens of other marques side by side, which is a real argument against buying into any single vendor's bridge. If you're deciding between the two Zigbee stacks, our <a href="zha-vs-zigbee2mqtt">ZHA vs Zigbee2MQTT</a> comparison covers the trade-offs.</p>
+
+        <h2>Our pick: SONOFF SNZB-02D</h2>
+        <table>
+          <thead><tr><th>Spec</th><th>SONOFF SNZB-02D</th></tr></thead>
+          <tbody>
+            <tr><td>Protocol</td><td>Zigbee 3.0 (IEEE 802.15.4), end device</td></tr>
+            <tr><td>Display</td><td>Built-in 2.8-inch LCD</td></tr>
+            <tr><td>Accuracy</td><td>±0.2 °C, ±2% RH (per <a href="https://help.sonoff.tech/docs/snzb-02d">manufacturer spec page</a>)</td></tr>
+            <tr><td>Update interval</td><td>Every 5 s</td></tr>
+            <tr><td>Measuring range</td><td>-9.9 °C to 60 °C, 5–95% RH non-condensing, indoor use</td></tr>
+            <tr><td>Battery</td><td>CR2450 (3 V)</td></tr>
+            <tr><td>Radio chip</td><td>EFR32MG22 (per <a href="https://help.sonoff.tech/docs/snzb-02d">spec page</a>)</td></tr>
+            <tr><td>Dimensions</td><td>59.5 × 62.5 × 18.5 mm, indoor use</td></tr>
+            <tr><td>Mounting</td><td>Tabletop stand, magnetic back, or 3M adhesive</td></tr>
+          </tbody>
+        </table>
+        <p>All spec figures are from <a href="https://help.sonoff.tech/docs/snzb-02d">Sonoff's official spec page</a> and its <a href="https://sonoff.tech/products/sonoff-snzb-02d-zigbee-lcd-smart-temperature-humidity-sensor">product page</a>. What you get for that: a display that reads out conditions at a glance without opening a dashboard, ±0.2 °C accuracy that is genuinely good at this category's price point, and 5-second updates that are fast enough to drive automations directly rather than just charting.</p>
+        <p>Zigbee2MQTT exposes the entities HA cares about: temperature, humidity, and battery, plus configuration options for comfort min/max thresholds, <code>temperature_units</code>, and temperature and humidity calibration offsets. The device supports OTA firmware updates — Z2M's page notes firmware v2.3.0 improved reporting and updates via a short press of the pairing button plus a click in the web UI. Check <a href="https://www.amazon.com/s?k=SONOFF+SNZB-02D&amp;tag=hanews01-20" rel="sponsored nofollow">SONOFF SNZB-02D on Amazon</a> for current price and stock.</p>
+
+        <h2>Setting it up with Home Assistant</h2>
+        <ol>
+          <li>Plug a Zigbee coordinator into the Home Assistant machine — the SONOFF ZBDongle-E is the common pairing with Sonoff sensors. Sonoff's own docs for the 02D list ZBBridge, NSPanel Pro, iHost and the ZBDongle-P/E dongles as supported gateways, per the <a href="https://support.sonoff.tech/snzb-02d-usermanual">official user manual</a>; with Home Assistant, the dongles are the direct path.</li>
+          <li>Run Zigbee2MQTT or ZHA against that coordinator. Our <a href="zigbee2mqtt-home-assistant">Zigbee2MQTT + Home Assistant setup guide</a> covers the add-on install if you're starting from zero.</li>
+          <li>Long-press the 02D's pairing button for 5 seconds until the display indicator blinks, per <a href="https://www.zigbee2mqtt.io/devices/SNZB-02D.html">Z2M's device page</a>. It should join and expose its entities.</li>
+          <li>Place it. The stand, magnet and adhesive give you three mounting options; keep it off exterior walls and out of direct sun for honest readings.</li>
+        </ol>
+        <p>Note on eWeLink: Sonoff's marketing page says the SNZB-02D can be added to Home Assistant via the eWeLink add-on, but the direct local path — no cloud account, no vendor bridge — is a Zigbee coordinator with Zigbee2MQTT or ZHA, per <a href="https://www.zigbee2mqtt.io/devices/SNZB-02D.html">Zigbee2MQTT's page</a>. HA News prefers the local path; cloud integrations break in ways local ones don't.</p>
+
+        <h2>Alternatives worth knowing</h2>
+        <ul>
+          <li><strong>SONOFF SNZB-02</strong> (older sibling, no display). Same CR2450 battery, no screen, and Z2M exposes battery, temperature, humidity and voltage with calibration and precision options, per its <a href="https://www.zigbee2mqtt.io/devices/SNZB-02.html">Z2M page</a>. It's still in Sonoff's current sensor lineup alongside the SNZB-02LD (external probe) and SNZB-02WD (IP65 outdoor), per <a href="https://sonoff.tech/product/gateway-and-sensors/snzb-02d/">Sonoff's category page</a>. Pairing: press the reset button 5 s until the LED flashes three times.</li>
+          <li><strong>Aqara T1 (WSDCGQ11LM)</strong>, a round puck on a CR2032. Z2M exposes temperature, humidity, pressure, battery and voltage. Known Xiaomi-family quirks per the <a href="https://www.zigbee2mqtt.io/devices/WSDCGQ11LM.html">Z2M page</a>: pair it near a router device if joining fails, treat a link quality below 20 as weak, and note that low battery voltage can cause disconnects even when the battery still reads full.</li>
+          <li><strong>Aqara T2 (WSDCGQ12LM)</strong>. The one to pick when you want barometric pressure too: it adds pressure and <code>device_temperature</code> and <code>power_outage_count</code> to temperature, humidity and battery, per its <a href="https://www.zigbee2mqtt.io/devices/WSDCGQ12LM.html">Z2M page</a>. Gotcha: it likely needs a coordinator firmware newer than 2021. Pair by holding reset about 5 s until the blue LED blinks.</li>
+          <li><strong>Xiaomi LYWSD03MMC</strong>, the famous cheap hygro-thermometer. Ships Bluetooth-only, but a community custom firmware flashes it to Zigbee for Zigbee2MQTT with full entity support and OTA, per the <a href="https://www.zigbee2mqtt.io/devices/LYWSD03MMC.html">Z2M page</a>. Or skip the flash: it works over plain Bluetooth in HA, including via an ESPHome Bluetooth proxy.</li>
+        </ul>
+
+        <h2>Gotchas to know before you buy</h2>
+        <p><strong>The °C/°F button is display-only.</strong> A double-press of the pairing button toggles the LCD between Celsius and Fahrenheit, but per Z2M's page the unit the sensor reports to Home Assistant doesn't change — fix the reported unit through the <code>temperature_units</code> option in Zigbee2MQTT instead, not the button.</p>
+        <p><strong>Stuck sensors have a known recovery.</strong> If a sensor stops reporting: force-remove it from Zigbee2MQTT, restart Z2M, and re-pair. If pairing itself fails, pull the battery for 10 seconds. This is documented on the Z2M device page and applies to both the 02D and the 02 (per its page), so it's better understood upfront than at 11 pm.</p>
+        <p><strong>Indoor range limits.</strong> The 02D is rated -9.9 °C to 60 °C, indoor use, per the <a href="https://help.sonoff.tech/docs/snzb-02d">spec sheet</a>. For a freezer, a crawlspace, or outdoor monitoring, that's not the tool — the SNZB-02WD is Sonoff's IP65 outdoor variant, and a probe-type sensor (SNZB-02LD) suits a freezer's coil.</p>
+        <p><strong>Calibration beats replacement.</strong> If a reading seems off versus a reference thermometer, both Sonoff and Aqara devices expose calibration offsets in Zigbee2MQTT. Setting a one-degree offset is cheaper and quieter than buying another sensor.</p>
+        <p><strong>Pick the radio after the rooms.</strong> Before buying a fleet, confirm you have (or will buy) a coordinator. The sensor decision and the <a href="zigbee-hub">coordinator decision</a> are really one decision — a shelf full of Zigbee sensors and no dongle is a common expensive mistake. And once the network exists, water detection is usually the next sensor purchase; our <a href="best-water-leak-sensor">water leak sensor roundup</a> covers that, and for occupancy the <a href="aqara-presence-sensor-home-assistant">Aqara presence sensor guide</a> covers indoors detection.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Which temperature sensor works best with Home Assistant?</h3>
+        <p>The SONOFF SNZB-02D is the top pick: a Zigbee 3.0 temperature and humidity sensor with a built-in 2.8-inch LCD, ±0.2 °C accuracy, 5-second updates, and pairing to Home Assistant through Zigbee2MQTT or ZHA.</p>
+        <h3>How do I add a SONOFF SNZB-02D to Home Assistant?</h3>
+        <p>Plug a Zigbee coordinator dongle such as the SONOFF ZBDongle-E into your Home Assistant machine, run Zigbee2MQTT or ZHA, then long-press the pairing button for 5 seconds until the display indicator blinks and let it join.</p>
+        <h3>How accurate is the SNZB-02D?</h3>
+        <p>Per the official spec sheet it is rated at ±0.2 °C and ±2% relative humidity, updates every 5 seconds, and measures from -9.9 °C to 60 °C at 5–95% RH non-condensing.</p>
+        <h3>Does the SNZB-02D work without a hub?</h3>
+        <p>No. It is a Zigbee 3.0 end device, so it needs a Zigbee 3.0 coordinator or hub — for Home Assistant that means a USB coordinator dongle running Zigbee2MQTT or ZHA.</p>
+        <h3>Why does my Zigbee temperature sensor stop reporting?</h3>
+        <p>If a sensor gets stuck, Zigbee2MQTT's recovery is to force-remove the device, restart Zigbee2MQTT, and re-pair it; if pairing fails, pull the battery for 10 seconds. Low battery voltage can also cause disconnects on some Xiaomi sensors even when the battery reads full.</p>
+        <h3>Can I get temperature, humidity and pressure in one sensor?</h3>
+        <p>The Aqara T2 (WSDCGQ12LM) adds barometric pressure alongside temperature, humidity and battery, which the Sonoff SNZB-02D and SNZB-02 do not expose.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://help.sonoff.tech/docs/snzb-02d">SONOFF SNZB-02D spec page</a>; <a href="https://sonoff.tech/products/sonoff-snzb-02d-zigbee-lcd-smart-temperature-humidity-sensor">SONOFF product page</a>; <a href="https://support.sonoff.tech/snzb-02d-usermanual">SONOFF user manual</a>; <a href="https://www.zigbee2mqtt.io/devices/SNZB-02D.html">Zigbee2MQTT SNZB-02D</a>; <a href="https://www.zigbee2mqtt.io/devices/SNZB-02.html">Zigbee2MQTT SNZB-02</a>; <a href="https://www.zigbee2mqtt.io/devices/WSDCGQ11LM.html">Zigbee2MQTT Aqara T1</a>; <a href="https://www.zigbee2mqtt.io/devices/WSDCGQ12LM.html">Zigbee2MQTT Aqara T2</a>; <a href="https://www.zigbee2mqtt.io/devices/LYWSD03MMC.html">Zigbee2MQTT LYWSD03MMC</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
