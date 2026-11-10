@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What is a Matter controller? Home Assistant, Apple, Google, Alexa and SmartThings explained — HA News</title>
+  <meta name="description" content="A Matter controller is the app or device that controls Matter devices. How it differs from a hub and a Thread border router, which controllers work, and how multi-admin lets one device serve several ecosystems.">
+  <link rel="canonical" href="https://hanews.org/matter-controller">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "What is a Matter controller? Home Assistant, Apple, Google, Alexa and SmartThings explained", "datePublished": "2026-11-10", "dateModified": "2026-11-10", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/matter-controller"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is a Matter controller and is Home Assistant one?", "acceptedAnswer": {"@type": "Answer", "text": "A Matter controller is the app or device in an ecosystem that controls Matter devices. Home Assistant is one: it runs the Matter Server app, its own Matter controller, which joins devices to the Matter fabric and connects it to Home Assistant over WebSocket."}}, {"@type": "Question", "name": "What is the difference between a Matter controller, a hub and a Thread border router?", "acceptedAnswer": {"@type": "Answer", "text": "The controller holds the device list and controls devices at the application layer. A Thread border router routes packets between the Thread mesh and other IP networks and does not control devices. A hub can be either or both, depending on the vendor."}}, {"@type": "Question", "name": "Does a Thread device automatically work with Matter?", "acceptedAnswer": {"@type": "Answer", "text": "No. Thread is only the network. Some Thread devices support HomeKit or another vendor protocol instead of Matter, and some need a firmware update. Look for the Matter logo, not the Thread logo."}}, {"@type": "Question", "name": "Which controllers work: Apple Home, Google Home, Alexa, SmartThings, Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Per Home Assistant's Matter documentation, controllers include Google Nest products, Apple HomePod speakers, Samsung SmartThings Station, some newer Amazon Echo devices, and Home Assistant running the Matter Server app."}}, {"@type": "Question", "name": "Can one Matter device be controlled by two ecosystems (multi-admin)?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Multi-admin lets a Matter device join multiple controllers on separate fabrics. In Home Assistant you add an already-commissioned device via Settings, Connectivity, Matter, Add device, then choose \"Yes. It's already in use.\""}}, {"@type": "Question", "name": "Can I share a device from Apple Home or Google Home to Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, via multi-admin. In the Home Assistant Companion app, add the device as already in use and pick the existing controller, such as Google Home. The device stays paired to the original ecosystem too."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 10 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Explainer · Matter &amp; Thread</p>
+        <h1>What is a Matter controller? Home Assistant, Apple, Google, Alexa and SmartThings explained</h1>
+        <p class="byline">HA News · 10 Nov 2026</p>
+
+        <p>You will see the word "controller" all over Matter packaging and documentation, and it is easy to confuse with a hub or a border router. A <strong>Matter controller</strong> is the app or device in an ecosystem that actually controls Matter devices: it holds the device list, commissions new devices onto the network, and sends them commands. Apple Home, Google Home, Amazon Alexa, Samsung SmartThings and Home Assistant can all act as controllers. Home Assistant runs its own Matter controller as the <a href="https://www.home-assistant.io/integrations/matter/">Matter Server app</a>, which runs as a separate process and connects the Matter network — the fabric — to Home Assistant over WebSocket.</p>
+
+        <p>The short answer to "should I buy a Matter controller?" is usually no: you probably already own one. A HomePod, a Nest device, an Echo or a SmartThings Station is already a controller. What you may need to add is a Thread border router or a radio for Home Assistant, which is a different job.</p>
+
+        <h2>Controller, hub, border router: three different jobs</h2>
+        <p>Matter stacks several roles on top of ordinary networking hardware, which is why the naming gets confusing.</p>
+        <p><strong>The controller</strong> works at the application layer. It knows which devices exist on your Matter fabric, commissions them, and issues the commands that turn lights on or lock doors. Every ecosystem you join a device to runs one controller of its own.</p>
+        <p><strong>A Thread border router</strong> is infrastructure, not software. Per the <a href="https://www.home-assistant.io/integrations/thread/">Home Assistant Thread documentation</a>, a border router routes packets between the Thread mesh and other IP networks, and does not control devices. Device control is application-layer work — Matter or HomeKit — and a border router can serve a network without ever sending a single command. A Thread network supports several border routers at once for coverage and redundancy.</p>
+        <p><strong>A hub</strong> is whatever the vendor says it is. Some hubs are controllers, some are border routers, some are both, and some are Matter bridges. The word on the box tells you nothing about the role; check the spec sheet.</p>
+        <p>It helps to remember what sits underneath. Matter is an application-layer service-control protocol running over IPv6 on your existing LAN — Wi-Fi or Ethernet — or over Thread. It has no radio of its own. Thread is a low-power mesh networking protocol on IEEE 802.15.4 RF, the same radio as Zigbee, that is IP-addressable. Thread alone does not control devices; a higher-layer protocol such as Matter or HomeKit is required. Details in our <a href="matter">Matter primer</a> and <a href="thread-border-router">Thread border router guide</a>.</p>
+
+        <h2>Which devices are Matter controllers</h2>
+        <p>Home Assistant's Matter integration documentation lists the controllers you are likely to already own:</p>
+        <ul>
+          <li><strong>Home Assistant</strong>, running the Matter Server app (formerly the Matter add-on). It runs as a separate process and connects the Matter fabric to Home Assistant over WebSocket.</li>
+          <li><strong>Google Nest products</strong>, such as Nest Hub and Nest speakers.</li>
+          <li><strong>Apple HomePod speakers</strong>, which control Matter devices for the Apple Home ecosystem.</li>
+          <li><strong>Samsung SmartThings Station</strong>.</li>
+          <li><strong>Some newer Amazon Echo devices</strong> for Alexa.</li>
+        </ul>
+
+        <h2>Home Assistant as a Matter controller</h2>
+        <p>Setup is straightforward on HA OS. Add the Matter integration; on a regular Home Assistant OS install, submit to install the official Matter Server app. It is not supported on 32-bit platforms. Commissioning — the pairing step that adds a device to your fabric — needs Bluetooth: Android 8.1 or later (12+ recommended), iOS 16 or later, and the latest Home Assistant Companion app.</p>
+        <p>Once a device is commissioned, it talks to Home Assistant locally. Matter always allows local control and needs no internet connection for device control; the cloud never sits between your switch and your light. Some vendors, though, require an account on their own hub before they will enable Matter support on that hub — worth checking before you buy, if cloud accounts bother you.</p>
+        <p>A practical tip the documentation repeats: keep the QR code or numeric setup code from the packaging. You need it to re-commission a device after a reset, so photograph the code and store it somewhere you can find it again.</p>
+
+        <h2>Multi-admin: one device, several controllers</h2>
+        <p>Matter's most useful property is that a device can be joined to multiple controllers — the multi-admin, or multi-fabric, feature documented in the <a href="https://www.home-assistant.io/integrations/matter/">Home Assistant Matter integration</a>. A lock commissioned to Apple Home can also be shared to Home Assistant, and it keeps working in both.</p>
+        <p>In Home Assistant the path is Settings, then Connectivity, then Matter, then Add device, then answer "Yes. It's already in use." and choose the existing controller — for example Google Home. The device stays paired to the original ecosystem; Home Assistant simply joins its fabric alongside.</p>
+        <p>One caution worth knowing: Google's Matter documentation states that, starting in 2026, Matter integration and testing require the CSA Alliance Interop Test. If you build or flash Matter devices yourself, budget for certification, not just testing.</p>
+
+        <h2>A familiar trap: Thread does not mean Matter</h2>
+        <p>The most common buying mistake is assuming a "Thread device" is a Matter device. It is not. Some Thread devices support only HomeKit or another vendor protocol, and some need beta firmware before they can speak Matter at all. The Home Assistant docs are blunt about it: look for the Matter logo, not the Thread logo.</p>
+        <p>Read the packaging the same way. "Built on Thread: requires border router" means Thread is the only network protocol on board — no Wi-Fi — so you need a border router somewhere in the house. The Matter or HomeKit logo on the same box names the control protocol.</p>
+
+        <h2>Matter bridges: when your existing hub joins the fabric</h2>
+        <p>You do not have to abandon old hardware. Matter bridges expose a hub's non-Matter devices as Matter devices, while the vendor's native app keeps working at the same time. Documented examples include the SwitchBot Hub 2, Aqara Hub M2, Ikea DIRIGERA and the Philips Hue Bridge. If you own a house full of Zigbee devices, a bridge is often the cheapest route into a Matter fabric without re-pairing anything.</p>
+        <p>Home Assistant itself is not a bridge: it cannot turn your existing Home Assistant devices into Matter devices for other ecosystems to control. And bridging is not a full translation — feature coverage varies. The SwitchBot Hub 2 at firmware V1.5 exposes curtains, locks and blinds via Matter but not lights, so check the bridge's coverage list before assuming everything will appear.</p>
+
+        <h2>Controllers you may already own</h2>
+        <p>If your controller situation is thin, these are the usual starting points; check compatibility with your ecosystem before buying.</p>
+        <ul>
+          <li><strong>Apple HomePod mini</strong> — controller and Thread border router for Apple Home: <a href="https://www.amazon.com/s?k=Apple+HomePod+mini&amp;tag=hanews01-20" rel="sponsored nofollow">HomePod mini on Amazon</a></li>
+          <li><strong>Google Nest Hub (2nd gen)</strong> — controller and border router for Google Home: <a href="https://www.amazon.com/s?k=Google+Nest+Hub+2nd+gen&amp;tag=hanews01-20" rel="sponsored nofollow">Google Nest Hub on Amazon</a></li>
+          <li><strong>Samsung SmartThings Station</strong> — controller with a built-in radio: <a href="https://www.amazon.com/s?k=Samsung+SmartThings+Station&amp;tag=hanews01-20" rel="sponsored nofollow">SmartThings Station on Amazon</a></li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>What is a Matter controller and is Home Assistant one?</h3>
+        <p>A Matter controller is the app or device in an ecosystem that controls Matter devices. Home Assistant is one: it runs the Matter Server app, its own Matter controller, which joins devices to the Matter fabric and connects it to Home Assistant over WebSocket.</p>
+        <h3>What is the difference between a Matter controller, a hub and a Thread border router?</h3>
+        <p>The controller holds the device list and controls devices at the application layer. A Thread border router routes packets between the Thread mesh and other IP networks and does not control devices. A hub can be either or both, depending on the vendor.</p>
+        <h3>Does a Thread device automatically work with Matter?</h3>
+        <p>No. Thread is only the network. Some Thread devices support HomeKit or another vendor protocol instead of Matter, and some need a firmware update. Look for the Matter logo, not the Thread logo.</p>
+        <h3>Which controllers work: Apple Home, Google Home, Alexa, SmartThings, Home Assistant?</h3>
+        <p>Per Home Assistant's Matter documentation, controllers include Google Nest products, Apple HomePod speakers, Samsung SmartThings Station, some newer Amazon Echo devices, and Home Assistant running the Matter Server app.</p>
+        <h3>Can one Matter device be controlled by two ecosystems (multi-admin)?</h3>
+        <p>Yes. Multi-admin lets a Matter device join multiple controllers on separate fabrics. In Home Assistant you add an already-commissioned device via Settings, Connectivity, Matter, Add device, then choose "Yes. It's already in use."</p>
+        <h3>Can I share a device from Apple Home or Google Home to Home Assistant?</h3>
+        <p>Yes, via multi-admin. In the Home Assistant Companion app, add the device as already in use and pick the existing controller, such as Google Home. The device stays paired to the original ecosystem too.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/integrations/matter/">Home Assistant Matter integration</a>; <a href="https://www.home-assistant.io/integrations/thread/">Home Assistant Thread integration</a>; <a href="https://openthread.io/guides/border-router">OpenThread Border Router guide</a>; <a href="https://developers.home.google.com/matter">Google Home Matter developer docs</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
