@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ecobee Home Assistant integration: setup, models, and gotchas — HA News</title>
+  <meta name="description" content="How to add ecobee to Home Assistant: no API key needed since HA 2026.3, setup steps, which ecobee thermostat to buy, entities, and why control is cloud-based.">
+  <link rel="canonical" href="https://hanews.org/ecobee-home-assistant">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "ecobee Home Assistant integration: setup, models, and gotchas", "datePublished": "2026-11-10", "dateModified": "2026-11-10", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/ecobee-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does ecobee work with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. All three current Wi-Fi models work through the official ecobee integration, which gives you a climate entity per thermostat plus sensors, notifications and accessory controls."}}, {"@type": "Question", "name": "Do I need an ecobee API key for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "No. Since Home Assistant 2026.3 you can sign in with your ecobee.com username and password and leave the API key field blank. Existing API keys keep working."}}, {"@type": "Question", "name": "How do I add ecobee to Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Settings, then Devices & services, then Add integration, then choose ecobee. Leave the API key blank, enter your ecobee.com username and password, and complete the MFA step. Auto-discovered thermostats appear as Discovered."}}, {"@type": "Question", "name": "Does Home Assistant control ecobee locally?", "acceptedAnswer": {"@type": "Answer", "text": "No. Control and sensor data go through the ecobee.com cloud API. There is no local radio integration, so internet access is required."}}, {"@type": "Question", "name": "Which ecobee model should I get with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "The Smart Thermostat Premium if you want the built-in air quality monitor and included SmartSensor; the Enhanced for the same sensing at a lower price; the Essential for a straightforward schedule-based thermostat. All three work with Home Assistant."}}, {"@type": "Question", "name": "Why does Home Assistant keep asking me to re-authenticate ecobee?", "acceptedAnswer": {"@type": "Answer", "text": "Usually because your ecobee.com password changed or an API key was revoked. ecobee only supports authenticator-app TOTP or SMS codes for MFA, not push or email codes."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Tuesday, 10 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Climate · Home Assistant</p>
+        <h1>ecobee and Home Assistant: setup, model picks, and gotchas</h1>
+        <p class="byline">HA News · 10 Nov 2026</p>
+
+        <p>Yes, ecobee works with Home Assistant. The official ecobee integration gives each thermostat a climate entity, plus room sensors, notifications, and controls for accessories like ventilators and humidifiers. Since Home Assistant 2026.3 you don't need a developer API key at all — you sign in with your ecobee.com username and password. All three current ecobee Wi-Fi thermostats work: the Smart Thermostat Premium, the Smart Thermostat Enhanced, and the Smart Thermostat Essential.</p>
+        <p>One thing to know up front: this is a cloud integration. Home Assistant talks to ecobee's servers, not to the thermostat itself, so remote-control commands need an internet connection, and an ecobee outage is a Home Assistant outage. If local control is non-negotiable for your heating system, see our guide on <a href="zigbee-hub.html">building a local Zigbee network</a> or our roundup of <a href="home-assistant-temperature-sensor.html">Home Assistant temperature sensors</a>. If you already own an ecobee or like its hardware, the integration is mature and well documented — here's how to set it up and what you actually get.</p>
+
+        <figure class="figure">
+          <img src="https://images.ctfassets.net/a3qyhfznts9y/5QkQfzEzbF0FiB01z3RyCR/805757d9a01d50059bb898a507b7ce45/Ares_PDP_Hero_Mobile_US_v2.jpg" alt="ecobee smart thermostat with larger touchscreen mounted on a wall" loading="lazy">
+          <figcaption>Image: ecobee</figcaption>
+        </figure>
+
+        <h2>How to add ecobee to Home Assistant</h2>
+        <p>The setup path changed in 2026.3, and it's simpler now.</p>
+        <ol>
+          <li>Open Home Assistant and go to <strong>Settings &gt; Devices &amp; services &gt; Add integration</strong>, then choose <strong>ecobee</strong>. If Home Assistant has already discovered thermostats on your network, they show up as "Discovered" and you can configure them from there.</li>
+          <li>Leave the <strong>API key</strong> field blank and enter your ecobee.com username and password. The developer API key is now optional: blank means password login, and an existing key is entered in place of the username and password.</li>
+          <li>Complete the multi-factor prompt if you have MFA enabled. The integration supports authenticator-app TOTP codes and SMS codes. Push or email codes are not supported, so set up an authenticator app or SMS before you start.</li>
+          <li>Each thermostat appears as its own climate entity, with sensors and controls grouped under the ecobee device.</li>
+        </ol>
+        <p>Home Assistant stores a refresh token, and routine token refreshes don't re-ask for MFA. You'll be asked to sign in again if your ecobee.com password changes, or if you revoke an API key in the ecobee developer portal — a revoked key breaks the integration until you run setup again. Per the <a href="https://www.home-assistant.io/integrations/ecobee/">Home Assistant ecobee integration documentation</a>, that's the full list of triggers for surprise re-authentication.</p>
+
+        <h2>What you get in Home Assistant</h2>
+        <p>Beyond the basic thermostat dial, the integration exposes more than most people expect:</p>
+        <ul>
+          <li><strong>Climate entity per thermostat</strong> with HVAC modes heat, cool, auto and off. ecobee's "comfort settings" (Home, Away, Sleep, plus any you define) appear as presets, including away presets that emulate vacation behavior.</li>
+          <li><strong>Holds, handled correctly</strong>. Temperature and climate holds are temporary and expire at the next scheduled climate change. A vacation hold runs for the vacation period you set — useful for automations that manage a house you're away from.</li>
+          <li><strong>Aux heat control</strong>. On thermostats with auxiliary heat, an <code>aux_heat_only</code> switch appears. Turning it on sets the HVAC mode to "Aux", which Home Assistant displays as "heat".</li>
+          <li><strong>Attribute sensors</strong> for fan (on/off), climate mode, what equipment is running, and fan minimum-on time. Handy for automations like "warn me if the outdoor unit runs during a cool call."</li>
+          <li><strong>Humidity and ventilation</strong>. Where a humidifier or ventilator accessory is attached, you get target-humidity numbers and a ventilator entity.</li>
+          <li><strong>Notifications from ecobee</strong>. A notify platform per thermostat lets automations send messages to the thermostat's own screen.</li>
+        </ul>
+
+        <h2>Which ecobee model to buy for Home Assistant</h2>
+        <p>ecobee's current lineup is three thermostats, all of which work with Home Assistant through the integration. Specs here are per the product pages on ecobee.com.</p>
+
+        <h3>ecobee Smart Thermostat Premium — the flagship</h3>
+        <p>The Premium is the one to pick if you want the full feature set: a built-in air quality monitor, radar-based occupancy sensing, Alexa built in (and Siri when paired with a HomePod), Spotify Connect and Amazon Music, and a metal-bodied, 50%-larger touchscreen. It includes a SmartSensor in the box and ships with the Power Extender Kit for homes without a C wire — the thermostat is powered over the 24 VAC common wire and has no batteries. It supports humidifier, dehumidifier, HRV and ERV accessories, can act as an ecobee Smart Security hub, and integrates with Generac PWRcell 2 and generator setups. ecobee backs it with a 3-year warranty. <a href="https://www.amazon.com/s?k=ecobee+Smart+Thermostat+Premium&amp;tag=hanews01-20" rel="sponsored nofollow">ecobee Smart Thermostat Premium on Amazon</a>.</p>
+
+        <h3>ecobee Smart Thermostat Enhanced — the sensible default</h3>
+        <p>The Enhanced keeps the radar occupancy sensing and the larger touchscreen, is ENERGY STAR rated, and works with SmartSensors (sold separately) plus the eco+ scheduling features. It's listed at $199.99 on ecobee's product page. If you don't need air quality monitoring or the Premium's speaker features, this is the model most homes will be happy with. <a href="https://www.amazon.com/s?k=ecobee+Smart+Thermostat+Enhanced&amp;tag=hanews01-20" rel="sponsored nofollow">ecobee Smart Thermostat Enhanced on Amazon</a>.</p>
+
+        <h3>ecobee Smart Thermostat Essential — the budget option</h3>
+        <p>The Essential is the straightforward schedule-based model: full-color touchscreen, ENERGY STAR, and ecobee's "up to 23% savings" claim on the product page. It works with Apple HomeKit, Google Assistant and Alexa, and is listed at $139.99. You give up occupancy sensing and accessory integrations, but it still shows up a plain climate entity in Home Assistant, so automations work the same. <a href="https://www.amazon.com/s?k=ecobee+Smart+Thermostat+Essential&amp;tag=hanews01-20" rel="sponsored nofollow">ecobee Smart Thermostat Essential on Amazon</a>.</p>
+
+        <p>Also worth knowing: the older ecobee3 lite is discontinued at retail but sold as certified refurbished through ecobee's own sales page. Accessories in the current line include SmartSensor for rooms, SmartSensor for doors and windows, the wired Smart Doorbell Camera (which live-streams to the Premium's display), the Power Extender Kit, and an Essential Trim Kit. If you're weighing ecobee against other protocols, our <a href="best-water-leak-sensor.html">sensor roundups</a> cover the wider Home Assistant device ecosystem, and <a href="shelly-home-assistant.html">Shelly's Home Assistant integration</a> is a good example of what local control looks like by comparison.</p>
+
+        <h2>Gotchas</h2>
+        <p><strong>It's cloud, full stop.</strong> The integration is built on the ecobee.com HTTP/JSON developer API — read, update, and poll thermostats. There's no local Zigbee or Wi-Fi path Home Assistant can use, so no internet means no control, and polling adds some latency versus a local protocol. This is the single biggest reason people leave ecobee for locally controlled hardware.</p>
+        <p><strong>MFA is limited.</strong> Only TOTP authenticator apps and SMS codes work. If you rely on email or push verification codes on your ecobee account, switch to an authenticator app before configuring the integration, or setup will fail at the MFA step.</p>
+        <p><strong>Don't revoke the API key.</strong> If you originally set the integration up with a developer key and later revoke that key in the ecobee portal, the integration stops working and has to be re-setup — either with a new key or with the password flow.</p>
+        <p><strong>Holds expire.</strong> Automations that "set" a temperature create a temporary hold that ends at the next scheduled climate change. If you want a temperature to stick, use a permanent hold or restructure the schedule; a vacation hold is the right tool for a set it and travel case.</p>
+
+        <h2>Should you buy an ecobee for Home Assistant?</h2>
+        <p>If you value ecobee's room sensors, air quality monitoring, and polished scheduling, the integration is complete enough to run your heating and cooling from Home Assistant, and since 2026.3 setup takes minutes rather than a developer-portal detour. If your priority is a fully local stack where the thermostat responds even when the internet is down, pick hardware that Home Assistant drives over Zigbee, Z-Wave, or Wi-Fi locally instead. Climate control is the one category where many people accept the cloud trade-off for the comfort features — now you know exactly what you're accepting.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Does ecobee work with Home Assistant?</h3>
+        <p>Yes. All three current Wi-Fi models work through the official ecobee integration, which gives you a climate entity per thermostat plus sensors, notifications and accessory controls.</p>
+        <h3>Do I need an ecobee API key for Home Assistant?</h3>
+        <p>No. Since Home Assistant 2026.3 you can sign in with your ecobee.com username and password and leave the API key field blank. Existing API keys keep working.</p>
+        <h3>How do I add ecobee to Home Assistant?</h3>
+        <p>Settings, then Devices &amp; services, then Add integration, then choose ecobee. Leave the API key blank, enter your ecobee.com username and password, and complete the MFA step. Auto-discovered thermostats appear as "Discovered".</p>
+        <h3>Does Home Assistant control ecobee locally?</h3>
+        <p>No. Control and sensor data go through the ecobee.com cloud API. There is no local radio integration, so internet access is required.</p>
+        <h3>Which ecobee model should I get with Home Assistant?</h3>
+        <p>The Smart Thermostat Premium if you want the built-in air quality monitor and included SmartSensor; the Enhanced for the same sensing at a lower price; the Essential for a straightforward schedule-based thermostat. All three work with Home Assistant.</p>
+        <h3>Why does Home Assistant keep asking me to re-authenticate ecobee?</h3>
+        <p>Usually because your ecobee.com password changed or an API key was revoked. ecobee only supports authenticator-app TOTP or SMS codes for MFA, not push or email codes.</p>
+        <p>We publish a daily brief on Home Assistant, Zigbee, Z-Wave and Matter releases. <a href="brief-2026-11-02.html">Read the latest</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/integrations/ecobee/">Home Assistant ecobee integration</a>; <a href="https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-premium/">ecobee Smart Thermostat Premium product page</a>; <a href="https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-enhanced/">ecobee Smart Thermostat Enhanced product page</a>; <a href="https://www.ecobee.com/en-us/smart-thermostats/smart-thermostat-essential/">ecobee Smart Thermostat Essential product page</a>; <a href="https://www.ecobee.com/home/developer/api/introduction/index.shtml">ecobee developer API</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
