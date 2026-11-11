@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meshtastic vs MeshCore: which LoRa mesh for off-grid texting (2026) — HA News</title>
+  <meta name="description" content="Meshtastic vs MeshCore compared: routing and node roles, phone apps, supported hardware, firmware flashing, and which project fits an off-grid home mesh in 2026.
+">
+  <link rel="canonical" href="https://hanews.org/meshtastic-vs-meshcore">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Meshtastic vs MeshCore: which LoRa mesh for off-grid texting (2026)", "datePublished": "2026-11-11", "dateModified": "2026-11-11", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/meshtastic-vs-meshcore"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "MeshCore vs Meshtastic: which is better for off-grid text messaging?", "acceptedAnswer": {"@type": "Answer", "text": "Both send long-range text over unlicensed LoRa radio with no cell coverage. Meshtastic is the older, larger project with mature phone apps and automatic rebroadcast routing. MeshCore is a newer, lighter-weight project with fixed node roles and dedicated repeater and room-server node types. Pick Meshtastic for community mesh and app polish; pick MeshCore if you want simple, role-based control of what repeats."}}, {"@type": "Question", "name": "Can a Meshtastic node also run MeshCore firmware, or do I need separate radios?", "acceptedAnswer": {"@type": "Answer", "text": "The same LoRa board can usually run either firmware, because both projects support popular boards such as the Heltec V3 and RAK4631, but it runs one at a time and you reflash to switch. Check each board against both projects' firmware pages before buying: Meshtastic support does not guarantee MeshCore support and vice versa."}}, {"@type": "Question", "name": "Which has better range, Meshtastic or MeshCore?", "acceptedAnswer": {"@type": "Answer", "text": "Range depends on the radio hardware, antenna and terrain, not the firmware. Meshtastic documents a 331 km long-distance record. MeshCore supports the same class of LoRa hardware, including 1-watt trackers. Neither project changes the physics of LoRa at the legal power limits."}}, {"@type": "Question", "name": "How many nodes do I need to start a MeshCore mesh?", "acceptedAnswer": {"@type": "Answer", "text": "At minimum, one Companion radio paired with your phone's client app. Text only reaches phones and room servers other nodes hop to, so a useful mesh also has at least one Repeater, usually placed high, and optionally a Room Server for stored messages. Companion nodes themselves never repeat messages."}}, {"@type": "Question", "name": "Do Meshtastic and MeshCore interoperate on the same frequency?", "acceptedAnswer": {"@type": "Answer", "text": "No. They use different packet formats and routing, so a node running Meshtastic cannot decode or repeat MeshCore traffic, or the reverse. Nodes in one mesh must all run firmware from the same project."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Wednesday, 11 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · LoRa mesh</p>
+        <h1>Meshtastic vs MeshCore: which LoRa mesh for off-grid texting (2026)</h1>
+        <p class="byline">HA News · 11 Nov 2026</p>
+
+        <p>Both projects answer the same question: how do you send text messages where there is no cell service — a ranch gate, a boat, a mountain cabin, a hurricane-hit neighborhood — without paying for satellite messaging. The answer each gives is a mesh of cheap LoRa radios. Each radio rebroadcasts what it hears, so messages hop node to node over miles of open terrain using unlicensed spectrum that needs no ham radio license. The difference is in how each project builds that mesh. <strong>Meshtastic is the larger, more mature project with polished phone apps and automatic rebroadcast routing; MeshCore is a newer, deliberately lighter-weight alternative with fixed node roles and dedicated repeater hardware.</strong> This page compares routing, apps, hardware and flashing, then helps you pick.</p>
+
+        <h2>What Meshtastic is</h2>
+        <p>Meshtastic is an open-source project built around one idea: a radio receives a message and rebroadcasts it, and every router-capable node in range does the same, so the text propagates across the mesh without any central server. The project documents a 331 km long-distance record for a LoRa hop. A phone connects to a node over Bluetooth or USB to compose and read messages; each device supports connection from only one phone or user at a time, which is worth knowing if a household shares one node. Nodes can carry optional GPS so positions appear alongside chat. Because Meshtastic runs on unlicensed LoRa spectrum, no license is required — unlike ham-radio digital networks. The project is community-driven, and the docs point out that no dedicated router node is required to make a mesh work: ordinary nodes carry traffic. The project's <a href="https://meshtastic.org/docs/introduction">introduction page</a> lays this out in full.</p>
+        <p>Meshtastic ships frequent firmware releases. The latest release at the time of writing, <a href="https://api.github.com/repos/meshtastic/firmware/releases/latest">v2.7.26.54e0d8d (Beta), published 24 June 2026</a>, was mostly bug fixes plus new board configurations — RAK 6421/13300/13302 variants, Zebra/Nebra hats, the B&amp;Q Station G3, T-Deck touch calibration, and continued work on meshtasticd, the Linux-native build for boards that run Linux rather than an RTOS. That pace is typical: board support arrives as vendors ship new trackers and hats.</p>
+
+        <h2>What MeshCore is</h2>
+        <p>MeshCore is a newer project from the same hobby. It is a lightweight C++ library for multi-hop packet routing on LoRa packet radios, under the MIT license, hosted at <a href="https://github.com/meshcore-dev/MeshCore">meshcore-dev/MeshCore</a> (roughly 4,000 stars and 1,600 forks). The README positions it explicitly: designed to balance simplicity against Reticulum's advanced networking, and lighter-weight than both Meshtastic and Reticulum. Where Meshtastic treats almost every mains-powered node as a potential router, MeshCore gives every node a fixed role, and the role is baked into the firmware you flash.</p>
+        <ul>
+          <li><strong>Companion</strong> — the radio paired with your phone's client app. Companion nodes never repeat messages. That single rule is MeshCore's biggest design difference.</li>
+          <li><strong>Repeater</strong> — a headless node that does the hopping. Administered by serial console or password. A "hidden" mode keeps a repeater out of node lists when its adverts are off (undiscoverable as of v1.18.0).</li>
+          <li><strong>Room Server</strong> — a headless node that stores and serves channel messages, like a bulletin board on the mesh. Access is password-controlled.</li>
+        </ul>
+        <p>Hop limit is configurable, and the project's <a href="https://raw.githubusercontent.com/meshcore-dev/MeshCore/main/docs/faq.md">FAQ documents</a> the mesh behaviors you will actually tune: adverts, path hashes, repeater deafness. The <a href="https://docs.meshcore.io/">MeshCore docs</a> cover the CLI commands, the Companion Protocol, the packet and payload format, radio presets, QR-code provisioning and the Terminal Chat CLI.</p>
+
+        <h2>Routing compared: automatic mesh vs fixed roles</h2>
+        <p>This is the heart of the meshtastic-vs-meshcore question. In Meshtastic, you deploy nodes and the mesh largely organizes itself: messages rebroadcast through router-capable roles, no dedicated router is required, and adding a node generally extends coverage without configuration. The trade-off is that every participating node carries traffic, so airtime is shared among everything in range — on a crowded channel, rebroadcasts from devices you never intended to be infrastructure consume the channel.</p>
+        <p>In MeshCore, you decide explicitly where the mesh is. Companion nodes — everything a person carries or keeps on a desk — never repeat, so your pocket radio stays quiet and saves battery. Only the Repeaters you deliberately placed, typically mounted high with good antennas, forward traffic. For a planned installation — a farm with two towers, a camp with a mast on the ridge — that control is the appeal: you know exactly which radio is doing what, and you can set the hop limit per design rather than watch it converge. The cost is that MeshCore won't build a mesh by accident out of whatever nodes happen to be switched on; if no Repeater is placed between two Companions, they don't talk beyond direct radio range.</p>
+
+        <h2>Apps and clients</h2>
+        <p>Meshtastic's phone apps are the most mature part of the project. You pair a phone to a node, chat, see node lists and positions, and administer settings from the app. The constraint to plan around is the one-phone-per-device rule documented by the project.</p>
+        <p>MeshCore's model separates the radio from the client. The Companion radio pairs with phone client apps; the <a href="https://docs.meshcore.io/">docs</a> also include a Terminal Chat CLI for keyboard-driven use over serial, which suits a headless laptop or a fixed terminal at a base camp. Repeaters and Room Servers are administered by serial console or password, not by the chat app — infrastructure and conversation are deliberately kept apart. In the most recent release, <a href="https://blog.meshcore.io/2026/10/15/release-1-18-0">Companion Firmware v1.18.0 (15 October 2026)</a>, the project added a Companion CLI with commands like tz.offset get/set, wifi configuration, and reboot/poweroff; sensor telemetry push/subscribe; RAK12500/12501 GPS support on the RAK3401; thermal fan control on the T-Beam-1W; a repeater loop-detection default; and new device support for the Thinknode M8/M6/M4, WIO Tracker L1 1W, Muzi Base boards, and the Waveshare ESP32-S3 LR1121.</p>
+
+        <h2>Hardware, and the one check that matters before buying</h2>
+        <p>Both projects run on widely available LoRa boards, and both support the Heltec V3, the RAK4631, the LilyGo T-Deck and T-Beam family, and assorted outdoor trackers. Meshtastic additionally documents long lists of supported hardware and frequent new-board configs in its release notes, including Linux-native boards via meshtasticd. MeshCore's support list skews to the same popular ESP32 and nRF52 boards, with new trackers added release by release (the Thinknode and WIO Tracker L1 above, for example), and the docs cover nRF52 power management, which matters for battery-powered repeaters.</p>
+        <p>Before you buy, cross-check the exact board you are looking at against both projects' device pages. <strong>Meshtastic support does not guarantee MeshCore support and vice versa.</strong> A board that is first-class in one project may be missing, experimental, or absent in the other. This is the single most common way to end up with a radio you cannot flash for the network you joined.</p>
+
+        <h2>Flashing: both are point-and-click</h2>
+        <p>Neither project requires you to compile firmware. Meshtastic provides a web flasher at <a href="https://flash.meshtastic.org">flash.meshtastic.org</a>; MeshCore provides pre-built binaries flashable through Adafruit ESPTool at its own flasher, and lists board-specific flashing instructions in the docs. The general procedure for either: plug the board in over USB, pick your board and firmware variant in the web flasher, flash, then configure region and role. Switching a board from one project to the other is the same operation — flash the other firmware — losing whatever configuration and node database the previous firmware held, not the hardware.</p>
+
+        <h2>Building a first mesh with MeshCore</h2>
+        <p>Because roles are flashed rather than assigned, plan the roles before you buy or flash. Three deployments cover most cases:</p>
+        <ul>
+          <li>a radio for the gate or the dock: one Companion radio and your phone;</li>
+          <li>coverage across a property: two or three Repeaters, one at the house, one at the far end;</li>
+          <li>a channel your group can read later, or an off-grid "inbox": a Room Server.</li>
+        </ul>
+        <p>Because companions never repeat, a single-node Meshtastic-style setup (one node, one phone, direct range only) works fine in MeshCore too — you just have no mesh. Where the projects differ is what happens as you grow.</p>
+
+        <h2>Which to pick</h2>
+        <p><strong>Pick Meshtastic if</strong> you want the larger community, the most mature phone apps, and a mesh that forms itself as friends and neighbors add nodes. It suits ad-hoc groups, event networks, and a community channel where you can't control which hardware joins. If your goal is a neighborhood resilience network you don't administer centrally, Meshtastic's rebroadcast-everything design is a feature, not a bug.</p>
+        <p><strong>Pick MeshCore if</strong> you are planning a fixed network — a property, a farm, a valley with two good tower sites — and you want to decide exactly which radios spend airtime repeating. Companion nodes staying out of the mesh keeps personal radios quiet and saves battery; the Repeater and Room Server roles give you infrastructure you can administer deliberately. It is also the lighter codebase, if simplicity is the priority.</p>
+        <p>Both are open source, both run on the same class of cheap LoRa hardware, and both use unlicensed spectrum with no license required. The mesh you can maintain is worth more than any feature list: if your fellow node operators already run one project, stay with it.</p>
+        <p>If your property networking extends to Wi-Fi and the routers behind these radios, our guides on <a href="openwrt">OpenWrt for the smart home</a> and <a href="openwrt-iot-vlan">putting IoT devices on their own VLAN</a> cover the wired half of the same problem. For the wide-area counterpart — sensor networks that report over LoRaWAN rather than mesh — see <a href="lorawan-gateway">running a LoRaWAN gateway</a>.</p>
+        <p>Popular boards people flash with either firmware:</p>
+        <ul>
+          <li><a href="https://www.amazon.com/s?k=Heltec+V3+LoRa&amp;tag=hanews01-20" rel="sponsored nofollow">Heltec V3 on Amazon</a></li>
+          <li><a href="https://www.amazon.com/s?k=RAK4631+LoRa&amp;tag=hanews01-20" rel="sponsored nofollow">RAK WisBlock RAK4631 on Amazon</a></li>
+          <li><a href="https://www.amazon.com/s?k=LilyGO+T-Deck+LoRa&amp;tag=hanews01-20" rel="sponsored nofollow">LilyGO T-Deck on Amazon</a></li>
+          <li><a href="https://www.amazon.com/s?k=LilyGO+T-Beam+LoRa&amp;tag=hanews01-20" rel="sponsored nofollow">LilyGO T-Beam on Amazon</a></li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, ESPHome and the radio layers underneath, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>MeshCore vs Meshtastic: which is better for off-grid text messaging?</h3>
+        <p>Both send long-range text over unlicensed LoRa radio with no cell coverage. Meshtastic is the older, larger project with mature phone apps and automatic rebroadcast routing. MeshCore is a newer, lighter-weight project with fixed node roles and dedicated repeater and room-server node types. Pick Meshtastic for community mesh and app polish; pick MeshCore if you want simple, role-based control of what repeats.</p>
+        <h3>Can a Meshtastic node also run MeshCore firmware, or do I need separate radios?</h3>
+        <p>The same LoRa board can usually run either firmware, because both projects support popular boards such as the Heltec V3 and RAK4631, but it runs one at a time and you reflash to switch. Check each board against both projects' firmware pages before buying: Meshtastic support does not guarantee MeshCore support and vice versa.</p>
+        <h3>Which has better range, Meshtastic or MeshCore?</h3>
+        <p>Range depends on the radio hardware, antenna and terrain, not the firmware. Meshtastic documents a 331 km long-distance record. MeshCore supports the same class of LoRa hardware, including 1-watt trackers. Neither project changes the physics of LoRa at the legal power limits.</p>
+        <h3>How many nodes do I need to start a MeshCore mesh?</h3>
+        <p>At minimum, one Companion radio paired with your phone's client app. Text only reaches phones and room servers other nodes hop to, so a useful mesh also has at least one Repeater, usually placed high, and optionally a Room Server for stored messages. Companion nodes themselves never repeat messages.</p>
+        <h3>Do Meshtastic and MeshCore interoperate on the same frequency?</h3>
+        <p>No. They use different packet formats and routing, so a node running Meshtastic cannot decode or repeat MeshCore traffic, or the reverse. Nodes in one mesh must all run firmware from the same project.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://meshtastic.org/docs/introduction">Meshtastic documentation: introduction</a>; <a href="https://github.com/meshcore-dev/MeshCore">MeshCore GitHub repository (README)</a>; <a href="https://raw.githubusercontent.com/meshcore-dev/MeshCore/main/docs/faq.md">MeshCore docs FAQ</a>; <a href="https://docs.meshcore.io/">MeshCore documentation</a>; <a href="https://api.github.com/repos/meshtastic/firmware/releases/latest">Meshtastic firmware releases</a>; <a href="https://api.github.com/repos/meshcore-dev/MeshCore/releases/latest">MeshCore releases</a>; <a href="https://blog.meshcore.io/2026/10/15/release-1-18-0">MeshCore release 1.18.0 announcement</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
