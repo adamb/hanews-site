@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP32 projects worth building for Home Assistant (2026) — HA News</title>
+  <meta name="description" content="Seven useful ESP32 projects for Home Assistant with ESPHome: CO2 monitor, mmWave presence, garage door, LED strip, e-paper dashboard, Bluetooth proxy and weather sensor — with difficulty for each.">
+  <link rel="canonical" href="https://hanews.org/esp32-projects">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "ESP32 projects worth building for Home Assistant (2026)", "datePublished": "2026-11-11", "dateModified": "2026-11-11", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/esp32-projects"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do ESP32 projects work with Home Assistant without a cloud account?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. ESPHome nodes talk to Home Assistant over the local ESPHome API, so sensors and controls work entirely on your network with no vendor cloud account."}}, {"@type": "Question", "name": "How hard is each ESP32 project for a beginner?", "acceptedAnswer": {"@type": "Answer", "text": "Easiest to hardest: Bluetooth proxy, CO2 monitor, weather sensor, LED strip, e-paper dashboard, mmWave presence, and garage door last because a misconfigured cover controls something heavy and safety-critical."}}, {"@type": "Question", "name": "Can an ESP32 run the Home Assistant Bluetooth proxy?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. ESPHome's bluetooth_proxy component turns an ESP32 into a Bluetooth extension for Home Assistant. It handles BLE only, with 3 active GATT connection slots by default on ESP32, up to 9 (5 recommended)."}}, {"@type": "Question", "name": "Which CO2 sensor should I use with ESPHome?", "acceptedAnswer": {"@type": "Answer", "text": "The Sensirion SCD30 is the well-documented default: an I2C NDIR module at address 0x61 that also reports temperature and humidity, with automatic self-calibration on by default in ESPHome."}}, {"@type": "Question", "name": "Do mmWave presence sensors replace PIR in Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "The Hi-Link LD2410 detects still and moving targets and reports distance over UART, so it can detect a person sitting still where a PIR would time out. ESPHome exposes it as binary sensors and sensors."}}, {"@type": "Question", "name": "Can ESPHome drive multi-color e-paper displays?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The waveshare_epaper display platform supports many Waveshare and Good Display panels over SPI, including 7-color ACeP models."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Wednesday, 11 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · ESPHome</p>
+        <h1>ESP32 projects worth building for Home Assistant (2026)</h1>
+        <p class="byline">HA News · 11 Nov 2026</p>
+
+        <p>An ESP32 dev board plus <a href="esphome.html">ESPHome</a> is the cheapest way to add a genuinely useful sensor or control to Home Assistant. Nothing here needs a vendor cloud account: ESPHome nodes speak to Home Assistant over the local ESPHome API, and everything you build stays on your network. The projects below are ordered roughly from easiest to hardest, with the hardware each one needs and the gotchas the ESPHome documentation itself flags.</p>
+
+        <p>If Home Assistant runs on a <a href="home-assistant-docker.html">Docker install</a> or a small server you already own, you have everything required: flash the board once from a browser or the ESPHome add-on, and the node shows up in Home Assistant as entities. Reconfigure later by editing the YAML and re-flashing over Wi-Fi.</p>
+
+        <h2>How we ranked difficulty</h2>
+        <p>Difficulty here means how much can go wrong, not how clever the YAML is. A Bluetooth proxy is a one-component config and fails harmlessly. A garage door controller moves something heavy, so it sits last and deserves the most care. Cost is deliberately left out: boards and sensor module prices move around too much to quote, and every build here is the price of dinner for two or less.</p>
+
+        <h2>1. Bluetooth proxy — easiest, most leverage</h2>
+        <p><strong>Difficulty: beginner · Hardware: any ESP32 board · Docs:</strong> <a href="https://esphome.io/components/bluetooth_proxy/">ESPHome bluetooth_proxy</a></p>
+        <p>Home Assistant's Bluetooth integrations — including <a href="best-water-leak-sensor.html">BTHome sensors</a> and many plant and temperature sensors — only hear what their adapter can reach. The bluetooth_proxy component turns an ESP32 into a remote ear on your Wi-Fi, and Home Assistant aggregates proxies automatically alongside any USB adapter.</p>
+        <p>The limits are in the docs, not marketing: proxies handle BLE only, and each active GATT connection slot costs about 1&nbsp;KB of RAM. An ESP32 defaults to 3 slots, allows up to 9 with 5 recommended, and Ethernet-based proxies handle 4 slots well. RP2040 and RP2350 boards default to and max out at 3. The proxy requires the platform's BLE tracker to be enabled in the config. If your use is "more plant sensors in the far rooms," this is the build — no soldering, no external sensors, two lines of YAML.</p>
+        <p><a href="https://www.amazon.com/s?k=ESP32+dev+board&amp;tag=hanews01-20" rel="sponsored nofollow">ESP32 dev boards on Amazon</a></p>
+
+        <h2>2. CO2 and air-quality monitor</h2>
+        <p><strong>Difficulty: beginner-plus · Hardware: Sensirion SCD30 module · Docs:</strong> <a href="https://esphome.io/components/sensor/scd30/">ESPHome SCD30</a></p>
+        <p>The SCD30 is the well-documented default for CO2: an NDIR sensor on I2C at address 0x61 that reports CO2 from 0–4,000&nbsp;ppm plus temperature and humidity in the same package. In ESPHome the <code>sensor: platform: scd30</code> block gives you co2, temperature and humidity entities, with options for <code>temperature_offset</code>, <code>automatic_self_calibration</code> (on by default), <code>ambient_pressure_compensation</code>, <code>altitude_compensation</code>, and an update interval from 2 to 1,800 seconds (default 60).</p>
+        <p>Two details worth wiring up from the start. First, the sensor's manual recalibration is exposed to Home Assistant through the <code>scd30.force_recalibration_with_reference</code> action — pair it with a template button and a number helper between 350 and 4,500&nbsp;ppm and you can recalibrate from the dashboard against fresh outdoor air. Second, the docs note self-calibration assumes the room sees fresh air periodically; in a permanently sealed office, disable it and recalibrate manually instead.</p>
+        <p><a href="https://www.amazon.com/s?k=Sensirion+SCD30+CO2+sensor+module&amp;tag=hanews01-20" rel="sponsored nofollow">Sensirion SCD30 modules on Amazon</a></p>
+
+        <h2>3. Temperature, pressure and humidity — the BME280 fallback</h2>
+        <p><strong>Difficulty: beginner · Hardware: Bosch BME280 module · Docs:</strong> <a href="https://esphome.io/components/sensor/bme280/">ESPHome BME280</a></p>
+        <p>If CO2 is a nice-to-have, the BME280 is the build every house eventually gets several of. One module does temperature, pressure and humidity over I2C (address 0x77 or 0x76) or SPI, and GY-BME280 boards are common and cheap. ESPHome's platform runs measurements in forced mode with 16× oversampling by default and a 60-second interval, which is plenty for a room sensor.</p>
+        <p>This is the ideal first flashing project: wires, an I2C address, three sensors, done. Put one in every room before you attempt anything with relays or radios.</p>
+        <p><a href="https://www.amazon.com/s?k=BME280+sensor+module&amp;tag=hanews01-20" rel="sponsored nofollow">BME280 modules on Amazon</a></p>
+
+        <h2>4. Addressable LED strip</h2>
+        <p><strong>Difficulty: beginner-plus · Hardware: WS2812-type addressable strip · Docs:</strong> <a href="https://esphome.io/components/light/index/">ESPHome light core</a></p>
+        <p>ESPHome's addressable light platform drives WS2812-type strips directly from the ESP32, with the full light-effects library and brightness, color and effect controls showing up in Home Assistant as a light entity. The light core docs are the reference for strip setup and effects.</p>
+        <p>If you are reusing older YAML, note that ESPHome 2026.10.0 replaced the light <code>restore_mode</code> option with <code>restore_state</code>, a breaking change, so check the <a href="https://esphome.io/changelog/2026.10.0/">release notes</a> before you update. Power injection is the classic hardware gotcha on long runs — plan for it before you staple the strip up.</p>
+        <p><a href="https://www.amazon.com/s?k=WS2812B+addressable+LED+strip&amp;tag=hanews01-20" rel="sponsored nofollow">WS2812B LED strips on Amazon</a></p>
+
+        <h2>5. E-paper dashboard</h2>
+        <p><strong>Difficulty: intermediate · Hardware: Waveshare or Good Display e-paper panel · Docs:</strong> <a href="https://esphome.io/components/display/waveshare_epaper/">ESPHome waveshare_epaper</a></p>
+        <p>An e-paper panel on the wall is the closest thing Home Assistant has to a printed status page: sensor values, calendar, laundry state, rendered by the ESP32 itself and refreshed only when something changes. The <code>waveshare_epaper</code> display platform supports a long list of panels over 4-wire SPI — the 2.90&nbsp;in, 2.13&nbsp;in TTGO variants including the -b73/-b1, the 1.54&nbsp;in Good Display gdew0154m09 used in the M5Stack Core Ink, the 4.2&nbsp;in GDEY042T81, and others, up to 7-color ACeP displays.</p>
+        <p>Pinning is the part people stumble on: CLK and DIN go on the SPI clk_pin and mosi_pin, plus CS, DC, and optionally BUSY and RESET. The <code>full_update_every: 30</code> option controls partial refresh — 30 partial refreshes between full ones, which keeps ghosting manageable. Because the panel only draws when told, the whole thing can run on attention-sipping power budgets no LCD would survive.</p>
+        <p><a href="https://www.amazon.com/s?k=Waveshare+e-paper+display&amp;tag=hanews01-20" rel="sponsored nofollow">Waveshare e-paper displays on Amazon</a></p>
+
+        <h2>6. mmWave presence detection</h2>
+        <p><strong>Difficulty: intermediate · Hardware: Hi-Link LD2410/LD2410B/LD2410C · Docs:</strong> <a href="https://esphome.io/components/sensor/ld2410/">ESPHome LD2410</a></p>
+        <p>A 24&nbsp;GHz mmWave sensor solves the problem PIR never will: detecting a person who is sitting still. The Hi-Link LD2410 family reads out over UART (parity NONE, 1 stop bit; the sensor defaults to 256,000 baud, and ESPHome recommends hardware UART pins), and reports three binary sensors — has_target, has_moving_target, has_still_target — plus light level, moving and still distances, per-target energy, detection distance and per-gate energies.</p>
+        <p>One config line is essential: the platform sets a default <code>settle: 1000ms</code> filter on the binary sensors to avoid flooding Home Assistant with rapid on/off flapping. Leave it, though you can tune it. Placement matters more than configuration with mmWave — the sensor sees through drywall only weakly, but it does see fans, curtains and pets, so expect some tuning of gates before it behaves.</p>
+        <p><a href="https://www.amazon.com/s?k=LD2410+mmWave+presence+sensor&amp;tag=hanews01-20" rel="sponsored nofollow">Hi-Link LD2410 sensors on Amazon</a></p>
+
+        <h2>7. Garage or roller door controller — do it last</h2>
+        <p><strong>Difficulty: advanced · Hardware: dry-contact door sensor(s) plus a relay board · Docs:</strong> <a href="https://esphome.io/components/cover/template/">ESPHome template cover</a></p>
+        <p>ESPHome needs no special controller for a garage door: a dry-contact sensor to read the door's state and a relay board to press the wall-button circuit. The template cover platform ties them together — open_action and close_action fire your relay switches, an optional stop_action for motors that support it, and a lambda reporting state via COVER_OPEN/COVER_CLOSED. With <code>has_position</code> and <code>tilt_lambda</code> you can even expose partial-open positions. The result appears in Home Assistant as a cover entity automatically.</p>
+        <p>This build ranks last on purpose. A misconfigured cover is the one ESP32 project that can trap a car — or a person. Use opto-isolated relay boards, verify the door state sensor reads correctly before wiring the relay, and keep the physical wall button as the fallback. If the door matters to your day, test every failure mode with the door in view.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>Wi-Fi config every ESP32 build shares</h2>
+        <p>Whatever the sensor, the <a href="https://esphome.io/components/wifi/">wifi</a> component config is the same. The docs recommend a static IP for fast reconnection — worth doing in a house with dozens of nodes. The fallback AP mode kicks in after <code>ap_timeout</code> (default 90 seconds) if the board can't reach your network, giving you a direct Wi-Fi hotspot to fix things from. Credentials go in a <code>secrets.yaml</code> referenced with <code>!secret</code>, so the same YAML can be shared or committed without leaking passwords. On ESP32 you can even combine Ethernet and Wi-Fi via the network priority list, which matters for proxies and controllers that must never drop off.</p>
+
+        <h2>Where to start</h2>
+        <p>The honest recommendation: flash a Bluetooth proxy and a BME280 room sensor first, because both are forgiving and immediately useful. Add the SCD30 where people actually sit. Leave mmWave and e-paper for a weekend with a breadboard. The garage door is worth doing, but do it when you can watch the door while you test — and check the <a href="esphome.html">ESPHome guide</a> for the flashing basics before you start.</p>
+
+        <h2>FAQ</h2>
+        <h3 id="garage-gate-projects">Do ESP32 projects work with Home Assistant without a cloud account?</h3>
+        <p>Yes. ESPHome nodes talk to Home Assistant over the local ESPHome API, so sensors and controls work entirely on your network with no vendor cloud account.</p>
+        <h3>How hard is each ESP32 project for a beginner?</h3>
+        <p>Easiest to hardest: Bluetooth proxy, CO2 monitor, weather sensor, LED strip, e-paper dashboard, mmWave presence, and garage door last because a misconfigured cover controls something heavy and safety-critical.</p>
+        <h3>Can an ESP32 run the Home Assistant Bluetooth proxy?</h3>
+        <p>Yes. ESPHome's bluetooth_proxy component turns an ESP32 into a Bluetooth extension for Home Assistant. It handles BLE only, with 3 active GATT connection slots by default on ESP32, up to 9 (5 recommended).</p>
+        <h3>Which CO2 sensor should I use with ESPHome?</h3>
+        <p>The Sensirion SCD30 is the well-documented default: an I2C NDIR module at address 0x61 that also reports temperature and humidity, with automatic self-calibration on by default in ESPHome.</p>
+        <h3>Do mmWave presence sensors replace PIR in Home Assistant?</h3>
+        <p>The Hi-Link LD2410 detects still and moving targets and reports distance over UART, so it can detect a person sitting still where a PIR would time out. ESPHome exposes it as binary sensors and sensors.</p>
+        <h3>Can ESPHome drive multi-color e-paper displays?</h3>
+        <p>Yes. The waveshare_epaper display platform supports many Waveshare and Good Display panels over SPI, including 7-color ACeP models.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://esphome.io/components/bluetooth_proxy/">ESPHome bluetooth_proxy</a>; <a href="https://esphome.io/components/sensor/scd30/">ESPHome SCD30</a>; <a href="https://esphome.io/components/sensor/bme280/">ESPHome BME280</a>; <a href="https://esphome.io/components/sensor/ld2410/">ESPHome LD2410</a>; <a href="https://esphome.io/components/display/waveshare_epaper/">ESPHome waveshare_epaper</a>; <a href="https://esphome.io/components/cover/template/">ESPHome template cover</a>; <a href="https://esphome.io/components/light/index/">ESPHome light core</a>; <a href="https://esphome.io/components/wifi/">ESPHome Wi-Fi</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

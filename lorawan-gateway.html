@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LoRaWAN gateway: what it does and how to set one up at home (2026) — HA News</title>
+  <meta name="description" content="A LoRaWAN gateway explained: what the gateway does, indoor vs outdoor units for a house or farm, and whether to use The Things Network or self-host ChirpStack.">
+  <link rel="canonical" href="https://hanews.org/lorawan-gateway">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "LoRaWAN gateway: what it does and how to set one up at home", "datePublished": "2026-11-11", "dateModified": "2026-11-11", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/lorawan-gateway"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What does a LoRaWAN gateway actually do?", "acceptedAnswer": {"@type": "Answer", "text": "It is a bridge. Devices connect to it over low-power LoRa radio, and the gateway forwards those packets over Wi-Fi, Ethernet or cellular to the network server. The network server deduplicates messages received by several gateways and routes downlinks back through the best one."}}, {"@type": "Question", "name": "Do I need a license to run a LoRaWAN gateway?", "acceptedAnswer": {"@type": "Answer", "text": "Running your own gateway is legal in most countries because LoRaWAN uses unlicensed radio bands. There can be country-specific restrictions, such as rules about antenna placement."}}, {"@type": "Question", "name": "Should I pick an indoor or outdoor gateway for my house or farm?", "acceptedAnswer": {"@type": "Answer", "text": "Indoor gateways are simpler to power and house and fine when your sensors are within radio range of the building. Outdoor gateways cost more to mount and protect but can see further, because an antenna outside on a roof or pole avoids walls that block LoRa signals."}}, {"@type": "Question", "name": "Should I use The Things Network or self-host a ChirpStack network server?", "acceptedAnswer": {"@type": "Answer", "text": "The Things Network hosts the network server for you, which is the fastest route for a household. ChirpStack is open-source software you run yourself for a private network, with a web interface, integrations and a gRPC API. It pairs with any gateway that uses a Semtech concentrator and speaks a packet-forwarder protocol."}}, {"@type": "Question", "name": "How many devices can one LoRaWAN gateway handle?", "acceptedAnswer": {"@type": "Answer", "text": "Per The Things Network gateway documentation, one gateway can serve thousands of devices, because LoRa sensors send small packets infrequently."}}, {"@type": "Question", "name": "Which bands and regions do LoRaWAN gateways and network servers support?", "acceptedAnswer": {"@type": "Answer", "text": "LoRaWAN has regional bands such as US915, EU868, AU915, AS923, IN865, KR920 and RU864, plus 2.4 GHz ISM2400 in newer revisions. Gateway and network server must match your region; ChirpStack lists all of these as supported regions."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Wednesday, 11 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · LoRaWAN</p>
+        <h1>LoRaWAN gateway: what it does and how to set one up at home</h1>
+        <p class="byline">HA News · 11 Nov 2026</p>
+
+        <p>A LoRaWAN gateway is the piece of hardware that lets long-range, battery-powered sensors — a water-tank level probe at the far end of a property, a soil-moisture sensor in a field, a freezer alarm in a shed — report into your home network from places Wi-Fi can't reach. This guide covers what a gateway actually does, which kind to buy or build for a house or a farm, and how to connect it to a LoRaWAN network server, using The Things Network or your own ChirpStack install.</p>
+
+        <h2>What a LoRaWAN gateway actually does</h2>
+        <p>A gateway is a bridge between two worlds. On one side, sensors and trackers talk to it over LoRa, a low-power long-range radio link. On the other side, the gateway forwards those packets over Wi-Fi, Ethernet or cellular to the network server, which is where devices are actually managed and where data is routed onward to your applications or home automation setup.</p>
+        <p>Three properties of this design matter for anyone running a real property:</p>
+        <ul>
+          <li><strong>Every gateway that hears a message forwards it.</strong> If a sensor is in range of two gateways, both receive the transmission, and the network server deduplicates the copies and picks the best gateway for any reply. A second gateway adds redundancy rather than a second network.</li>
+          <li><strong>One gateway serves many devices.</strong> Per <a href="https://www.thethingsnetwork.org/docs/gateways/">The Things Network's gateway documentation</a>, a single gateway can serve thousands of devices, because LoRaWAN sensors send small packets infrequently.</li>
+          <li><strong>The gateway is roughly interchangeable.</strong> Devices are registered on the network server, not on the gateway. Swap gateways and your sensors keep working as long as the new one covers the same area.</li>
+        </ul>
+
+        <h2>Two kinds of gateway hardware</h2>
+        <p>The TTN documentation splits gateway hardware into two families, and the distinction decides how much you can tinker:</p>
+        <ul>
+          <li><strong>Minimal-firmware gateways</strong> run only packet-forwarding software and nothing else. They are the low-cost option — you get radio reception and forwarding, and little more.</li>
+          <li><strong>OS-based gateways</strong> run a full operating system. The packet forwarder runs as a background program, and you can install your own software alongside it — a local data log, a small integration script, or monitoring tools.</li>
+        </ul>
+        <p>Both approaches use the same internal component: a LoRa concentrator, the multi-channel radio chip that lets one gateway listen on many frequency channels at once. For a household with a handful of sensors, a minimal gateway is usually enough. For a farm or a larger property where you want local logging and integrations without round-tripping through the cloud, an OS-based unit earns its keep.</p>
+        <p>Shopping for hardware? <a href="https://www.amazon.com/s?k=LoRaWAN+gateway&amp;tag=hanews01-20" rel="sponsored nofollow">LoRaWAN gateways on Amazon</a>, <a href="https://www.amazon.com/s?k=LoRaWAN+gateway+outdoor&amp;tag=hanews01-20" rel="sponsored nofollow">outdoor models</a> and <a href="https://www.amazon.com/s?k=LoRaWAN+gateway+indoor&amp;tag=hanews01-20" rel="sponsored nofollow">indoor models</a> give a sense of the landscape.</p>
+
+        <h2>Indoor vs outdoor for a house or farm</h2>
+        <p>The honest answer is that placement matters more than the badge on the box. LoRa is long-range, but a wall is still a wall.</p>
+        <p><strong>Indoor gateway:</strong> plugs into mains power near your router, no weatherproofing to worry about, no ladder required. Sensible when your sensors are close by — around the house, in the yard, in a barn within a few hundred meters. Expect range to shrink substantially through walls and roofs; LoRa signals weaken going through building structure, so an indoor antenna at one end of the house may not hear a tank sensor at the other end of the property.</p>
+        <p><strong>Outdoor gateway:</strong> an antenna on a roof or pole sees the whole property with nothing in the way. This is the right call for acreage, remote gates, or sensors at the far edge of the land. The trade-offs are weatherproofing, mounting, power (often Power over Ethernet, or a solar-plus-battery arrangement on a distant pole), and in lightning-prone areas, lightning protection — The Things Stack's current documentation includes pages on troubleshooting and lightning protection precisely because people mount these things high. Check TTN's docs for their guidance on gateway registration and outdoor placement before you drill anything.</p>
+        <p>A middle path: put an indoor gateway first, place your sensors, and check received signal quality at each one. If distant sensors report weak signal but nearby ones are fine, a second gateway — or moving the first one outdoors — solves it. Because the network deduplicates, gateways overlap happily.</p>
+
+        <h2>The network server: The Things Network vs ChirpStack</h2>
+        <p>The gateway is the dumb radio half; the network server is the brain. You have two main routes, and the split is simple:</p>
+        <ul>
+          <li><strong>The Things Network (TTN)</strong> hosts the network server for you. You register your gateway in their console, register your sensors, and your device data arrives at an integration endpoint. Free for community use, backed by The Things Industries for commercial deployments. This is the fastest route for a household: no servers to maintain, and a global community already running gateways you can piggyback on. One caution: TTN's original V2 documentation is outdated and no longer maintained — the current platform is The Things Stack (V3), so read its docs for gateway registration, packet forwarder configuration and troubleshooting. If you follow an old tutorial that mentions the V2 stack, expect the steps to be different.</li>
+          <li><strong>ChirpStack</strong> is open-source network-server software you run yourself. It is built for private or public networks, with a web interface for managing gateways, devices and tenants, data integrations with major cloud providers and databases, and a gRPC API for extension and self-hosting. Per the ChirpStack documentation, it pairs with any gateway that uses a Semtech concentrator and speaks a packet-forwarder protocol, so your gateway choice and your server choice are independent decisions.</li>
+        </ul>
+        <p>Rule of thumb: if you want the simplest path and don't mind community hosting, use TTN. If you want everything local-first — the data staying on hardware you own, on a network only your sensors join — run ChirpStack on a small server. People who care about local control tend to end up there, and it fits homes that already run their automation stack locally.</p>
+
+        <h2>Regions and bands: get this right before you buy</h2>
+        <p>LoRaWAN is regional. Sensors and gateways must operate in the band allocated for your country, and the network server must have the matching region plan configured.</p>
+        <p>The common ones are <strong>US915</strong> (North America), <strong>EU868</strong> (Europe), <strong>AU915</strong> (Australia), <strong>AS923</strong> variants (parts of Asia), <strong>IN865</strong> (India), <strong>KR920</strong> (South Korea) and <strong>RU864</strong> (Russia), plus older and niche plans like CN470, CN779 and EU433, and the 2.4 GHz ISM2400 band from newer LoRaWAN revisions. ChirpStack documents all of these as supported regions, along with device Class A, Class B (unicast and multicast) and Class C operation and LoRaWAN versions from 1.0.0 through 1.1.0 with RP002 revisions up to RP002-1.0.4.</p>
+        <p>The practical check: gateway lists its supported region on the datasheet, sensors list theirs, and the network server gets set to match. A US915 sensor will not talk to an EU868 gateway. Buy for your region, and if you import hardware from abroad, check the band before pairing anything.</p>
+
+        <h2>Setting one up, step by step</h2>
+        <p>The exact screens differ by hardware and by server, but the sequence is the same for The Things Stack or a self-hosted ChirpStack:</p>
+        <ol>
+          <li><strong>Place the gateway.</strong> Indoors for a start; higher and closer to your sensors is better. If it's an outdoor unit, follow the vendor's mounting guidance and TTN's lightning-protection notes.</li>
+          <li><strong>Connect it.</strong> Ethernet or Wi-Fi for buildings, cellular for the far end of a property. Confirm the gateway shows as connected in the network server's console.</li>
+          <li><strong>Register the gateway.</strong> On TTN this means registering it in the console with its ID and a key from the label or app. On ChirpStack, add the gateway in the web interface with its ID.</li>
+          <li><strong>Register the sensors.</strong> Each device gets a device EUI and an application key or session keys, from the vendor's datasheet or printed on the device.</li>
+          <li><strong>Check uplink and downlink.</strong> Watch packets arrive in the console. A downlink (server-to-device message) succeeding confirms the gateway's radio path works both ways — some gateways only do downlinks well with good signal, so test from your most distant sensor.</li>
+          <li><strong>Wire the data into your home.</strong> TTN and ChirpStack both offer integrations: webhooks, MQTT, and cloud/database connectors. From MQTT or a webhook into Home Assistant or your broker, sensor values join the rest of your local stack.</li>
+        </ol>
+        <p>Legal note: running your own gateway is legal in most countries because LoRaWAN uses unlicensed bands. There can be country-specific restrictions, in particular around antenna placement, so check your local rules if you plan a tall pole on the roof.</p>
+
+        <p>Inside a single building, Thread usually covers short-range sensors; see <a href="thread-border-router.html">Thread border routers</a> and <a href="article-thread-network.html">building a Thread network</a>. For sensors that report into Home Assistant over shorter range, our <a href="best-water-leak-sensor.html">water leak sensor guide</a> covers the mainstream options. And if the LoRaWAN gateway ends up on its own network segment, a VLAN for IoT traffic on an <a href="openwrt-iot-vlan.html">OpenWrt router</a> keeps it quarantined.</p>
+
+        <h2>Gotchas worth knowing</h2>
+        <ul>
+          <li><strong>Old TTN tutorials.</strong> Much of the internet's LoRaWAN advice predates The Things Stack V3. The V2 docs are deprecated; anything that walks you through the old console won't match what you see.</li>
+          <li><strong>Region mismatch.</strong> The most common "nothing works" cause. Sensor band, gateway band and server region plan must all agree.</li>
+          <li><strong>Downlink range.</strong> Uplink from a sensor can work fine while scheduled downlinks struggle, especially at the edges of coverage. Battery-powered sensors on Class A only receive when they transmit, so they're forgiving — but keep it in mind.</li>
+          <li><strong>Power at the far end.</strong> An outdoor gateway needs power wherever it is. Plan the cable run, PoE, or solar before deciding the antenna spot.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, Zigbee and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>What does a LoRaWAN gateway actually do?</h3>
+        <p>It is a bridge. Devices connect to it over low-power LoRa radio, and the gateway forwards those packets over Wi-Fi, Ethernet or cellular to the network server. The network server deduplicates messages received by several gateways and routes downlinks back through the best one.</p>
+        <h3>Do I need a license to run a LoRaWAN gateway?</h3>
+        <p>Running your own gateway is legal in most countries because LoRaWAN uses unlicensed radio bands. There can be country-specific restrictions, such as rules about antenna placement.</p>
+        <h3>Should I pick an indoor or outdoor gateway for my house or farm?</h3>
+        <p>Indoor gateways are simpler to power and house and fine when your sensors are within radio range of the building. Outdoor gateways cost more to mount and protect but can see further, because an antenna outside on a roof or pole avoids walls that block LoRa signals.</p>
+        <h3>Should I use The Things Network or self-host a ChirpStack network server?</h3>
+        <p>The Things Network hosts the network server for you, which is the fastest route for a household. ChirpStack is open-source software you run yourself for a private network, with a web interface, integrations and a gRPC API. It pairs with any gateway that uses a Semtech concentrator and speaks a packet-forwarder protocol.</p>
+        <h3>How many devices can one LoRaWAN gateway handle?</h3>
+        <p>Per The Things Network gateway documentation, one gateway can serve thousands of devices, because LoRa sensors send small packets infrequently.</p>
+        <h3>Which bands and regions do LoRaWAN gateways and network servers support?</h3>
+        <p>LoRaWAN has regional bands such as US915, EU868, AU915, AS923, IN865, KR920 and RU864, plus 2.4 GHz ISM2400 in newer revisions. Gateway and network server must match your region; ChirpStack lists all of these as supported regions.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.thethingsnetwork.org/docs/gateways/">The Things Network gateway documentation</a>; <a href="https://www.chirpstack.io/docs/">ChirpStack documentation</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

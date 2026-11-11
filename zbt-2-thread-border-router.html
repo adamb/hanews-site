@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Assistant Connect ZBT-2 as a Thread border router: setup, limits and the reset trap — HA News</title>
+  <meta name="description" content="How to use the Home Assistant Connect ZBT-2 as a Thread border router: what it can and can't do, the OpenThread Border Router add-on setup, channel planning, and the reset that can wipe your Thread devices.
+">
+  <link rel="canonical" href="https://hanews.org/zbt-2-thread-border-router">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Home Assistant Connect ZBT-2 as a Thread border router: setup, limits and the reset trap", "image": "https://hanews.org/images/zbt-2-product-og.jpg", "datePublished": "2026-11-11", "dateModified": "2026-11-11", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/zbt-2-thread-border-router"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can the Connect ZBT-2 run Zigbee and Thread at the same time?", "acceptedAnswer": {"@type": "Answer", "text": "No. The ZBT-2 runs Zigbee 3.0 or Thread, but not both at once. Nabu Casa tested multiprotocol operation on the earlier ZBT-1, found it inconsistent, and does not plan to implement it. Dedicate one adapter to each protocol."}}, {"@type": "Question", "name": "Can the ZBT-2 act as a Thread border router on its own, without Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "No. Nabu Casa states that this capability is not built into Connect ZBT-2. The ZBT-2 is a radio; the border router is Home Assistant's OpenThread Border Router add-on running on the Home Assistant host, which uses the ZBT-2 as its radio."}}, {"@type": "Question", "name": "How do I enable Thread on the ZBT-2 in Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Install the OpenThread Border Router app on your Home Assistant instance and follow the Enable Thread on Home Assistant Connect ZBT-2 procedure. Then confirm in Settings > Connectivity > Thread that the Home Assistant network is listed as the preferred network."}}, {"@type": "Question", "name": "How do I add Matter-over-Thread devices?", "acceptedAnswer": {"@type": "Answer", "text": "First share Thread credentials from your Thread-border-router phone app to the Home Assistant Companion app, then scan the device's Matter QR code with the Companion app. The phone commissions over Bluetooth and the device joins over Thread."}}, {"@type": "Question", "name": "Can I migrate my existing Zigbee or Thread network to the ZBT-2?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Home Assistant has migration wizards for both Zigbee and Thread networks, and Zigbee2MQTT documents migrating to the ZBT-2. Some third-party adapters, such as ConBee sticks, need extra steps."}}, {"@type": "Question", "name": "Why did resetting my ZBT-2 wipe my Thread devices?", "acceptedAnswer": {"@type": "Answer", "text": "Resetting the ZBT-2 from Home Assistant's Thread Border Router panel can force every Thread device to be re-added. One HA News editor learned this the hard way at roughly 30 Thread devices. Reset only when nothing else works."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Wednesday, 11 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Matter &amp; Thread</p>
+        <h1>Home Assistant Connect ZBT-2 as a Thread border router</h1>
+        <p class="byline">HA News · 11 Nov 2026</p>
+
+        <p>The Home Assistant Connect ZBT-2 is the official USB radio from Nabu Casa, and it is the easiest supported way to turn a Home Assistant box into a Thread border router. Plug it in, install the OpenThread Border Router add-on, and your Matter-over-Thread devices pair locally, with the credentials they need stored where you can see them. It is officially a Zigbee or Thread adapter — one protocol at a time — so if you already run a Zigbee network on a different stick, the ZBT-2 can sit beside it and do Thread duty only.</p>
+
+        <p>One thing to get out of the way first: the ZBT-2 is not a border router on its own. Per the <a href="https://www.home-assistant.io/connect/zbt-2/">Home Assistant Connect ZBT-2 product page</a>, using it as a Thread border router separately from Home Assistant is not a built-in capability. It is a radio. The border router itself is software — Home Assistant's OpenThread Border Router (OTBR) add-on — which runs on your Home Assistant host and uses the ZBT-2 as its Thread radio. If you have been looking for a standalone Thread border router box or a drop-in replacement for a HomePod mini or Nest Hub that runs headless, this is not it. If you already run Home Assistant, it is a strong fit.</p>
+
+        <figure class="figure">
+          <img src="images/zbt-2-product-og.jpg" alt="Home Assistant Connect ZBT-2 adapter with its external antenna on a round base" width="1200" height="630" loading="lazy">
+          <figcaption>Home Assistant Connect ZBT-2. Source: <a href="https://www.home-assistant.io/connect/zbt-2/">Nabu Casa</a>, home-assistant.io/connect/zbt-2</figcaption>
+        </figure>
+
+        <h2>What the ZBT-2 is (and what changed from ZBT-1)</h2>
+        <p>The ZBT-2 is the second generation of the Connect platform. It succeeds the Connect ZBT-1, the adapter formerly sold as SkyConnect, which is now discontinued. According to the <a href="https://www.home-assistant.io/connect/zbt-2/">product page</a>, the hardware pairs a Silicon Labs MG24 main radio with an ESP32-S3 that serves as the USB-serial bridge. That chip upgrade from the ZBT-1's MG21 matters for two reasons: faster operation and better weak-signal sensitivity, which helps at the edges of a house where Thread networks tend to struggle.</p>
+
+        <p>The other spec jump is the serial link speed. The ZBT-2 talks over USB at 460,800 baud, four times the ZBT-1's 115,200. Home Assistant's claim is a fourfold improvement in adapter speed and device responsiveness — meaningful once you have a couple of dozen devices checking in. Power and data are a single USB-C connection at 5 V DC, 500 mA, and a 1.5 m cable comes in the box.</p>
+
+        <p>Physically, this is an antenna-and-base design rather than a bare dongle: an omnidirectional 24 mm antenna, 164 mm tall, with a peak gain of 4.16 dBi, on a polycarbonate base. Transmit power is rated at 10 dBm in Europe and 8 dBm elsewhere, indoor use only, 0–65 °C. All per the <a href="https://www.home-assistant.io/connect/zbt-2/">spec sheet</a>.</p>
+
+        <h2>Why a border router at all</h2>
+        <p>Thread is the mesh protocol under Matter. Most battery-powered Matter devices — door and window sensors, motion sensors, remotes — are Thread devices, and Thread devices need at least one <a href="thread-border-router.html">Thread border router</a> on the network to connect Thread to the rest of your LAN. You may already own one without knowing: a HomePod mini, a Nest Hub, or a 4th-generation Echo all act as border routers. Those work, but they route your Thread network through a vendor's devices and vendor's app. Owning the border router in Home Assistant keeps the network local and under your control.</p>
+
+        <p>If you are still deciding whether Thread is worth the move, our walkthrough of <a href="article-thread-network.html">building a Thread network with Home Assistant</a> covers the whole journey, and the general <a href="thread-border-router.html">Thread border router explainer</a> lists every border router you may already own.</p>
+
+        <h2>Setup: turning Home Assistant into the border router</h2>
+        <ol>
+          <li><strong>Flash and configure the ZBT-2 for Thread.</strong> The adapter supports Zigbee 3.0 or Thread — choose one. If this adapter is your Zigbee coordinator today, leave it as Zigbee and buy a second one for Thread.</li>
+          <li><strong>Install the OpenThread Border Router app</strong> on Home Assistant. The procedure is documented as "Enable Thread on Home Assistant Connect ZBT-2" in the <a href="https://www.home-assistant.io/integrations/thread/">Thread integration docs</a>. Nabu Casa also runs a support section for ZBT-2 OTBR setup at <a href="https://support.nabucasa.com/hc/sections/31260019451421">support.nabucasa.com</a>.</li>
+          <li><strong>Verify the network.</strong> Go to Settings, then Connectivity, then Thread. The Home Assistant network should appear under Preferred network. On a first setup, Home Assistant auto-creates a Thread network named something like <em>ha-thread-xxxx</em>.</li>
+          <li><strong>Onboard into an existing Thread network, if you have one.</strong> If your home already runs a Google or Apple Thread network, you can import its credentials instead of making a new one: use the Home Assistant Companion app to send credentials to Home Assistant, then make that network the preferred one.</li>
+        </ol>
+
+        <h2>Sharing Thread credentials before pairing devices</h2>
+        <p>This is the step people skip, then wonder why Matter pairing fails. Before you add a Matter-over-Thread device, the Home Assistant Companion app on your phone needs your Thread credentials. Per the <a href="https://www.home-assistant.io/integrations/thread/">Thread integration docs</a>: on Android, go to Settings, then Companion app, then Troubleshooting, and tap Sync Thread credentials. On iPhone, go to Settings, then Connectivity, then Thread, and send credentials to the phone.</p>
+
+        <p>After that, pairing a device is the standard Matter flow: scan the device's Matter QR code with the Home Assistant Companion app. The phone commissions the device over Bluetooth, and the device's working connection then rides over the Thread network. The ZBT-2 just stays plugged in, doing radio duty.</p>
+
+        <p>One compatibility note from the <a href="https://www.home-assistant.io/connect/zbt-2/">product page</a>: Matter devices that connect over Wi-Fi do not need the ZBT-2 at all — they join your LAN and Home Assistant talks to them over Matter directly. Thread matters mainly for battery-powered Matter devices that use Thread instead.</p>
+
+        <h2>The mesh rule: routers carry the network, batteries ride it</h2>
+        <p>When <a href="https://blog.beguelin.com">Adam Beguelin</a> moved his concrete-walled house from Wi-Fi and Alexa to Thread running on Home Assistant Green plus a ZBT-2, the biggest lesson was mesh structure. Battery-powered Thread devices are endpoints, not repeaters — they do not extend coverage. The mesh is built by mains-powered Thread Routers. In his build, written up at <a href="https://blog.beguelin.com/2026/07/building-thread-network-home-assistant/">blog.beguelin.com</a>, Inovelli White Series switches were the backbone, Eve switches also proved solid, and Onvis Thread smart plugs served as movable mesh extenders between rooms. Battery devices — IKEA MYGGBETT door and window sensors, MYGGSPRAY motion sensors, BILRESA remotes — were added last, once the router layer was in place. The network ended up at roughly 30 Thread devices.</p>
+
+        <h2>Channel planning: Thread lives in Wi-Fi's leftovers</h2>
+        <p>Thread and Wi-Fi share the 2.4 GHz band, and interference follows. Wi-Fi 2.4 GHz has only three non-overlapping 20 MHz channels (1, 6 and 11). Thread splits the same band into sixteen 2 MHz 802.15.4 channels, numbered 11 through 26. The practical move, per <a href="https://blog.beguelin.com/2026/07/building-thread-network-home-assistant/">Adam's write-up</a>: put Wi-Fi on 1, 6 and 11, and choose a Thread channel that sits in one of the gaps — Thread channel 15 or 20 are common choices. Two mitigating facts keep this from being as painful as it sounds: Thread can scan for a quiet channel at boot, and it can migrate channels later without breaking device associations. Concrete walls with rebar still block both technologies, so treat Thread coverage the way you treat Wi-Fi coverage: add routers, test, repeat.</p>
+
+        <h2>The reset trap</h2>
+        <p>The one genuinely painful gotcha in Adam's build: resetting the ZBT-2 from the Thread Border Router panel in Home Assistant can force re-adding <em>all</em> of your Thread devices. He did it early on, at around 30 devices, and had to redo every one. Avoid resets unless nothing else works, and if you must reset, do it before the network has grown. This is the failure mode that hurts most exactly when the network is done and happy.</p>
+
+        <h2>Zigbee, migration, and what the ZBT-2 won't do</h2>
+        <p>Three limitations worth knowing before buying, per the <a href="https://www.home-assistant.io/connect/zbt-2/">product page</a>. First, no multiprotocol: the ZBT-2 cannot run Zigbee and Thread simultaneously, and Nabu Casa, having tested MultiPAN on the ZBT-1 and found it inconsistent, does not plan to implement it. Dedicate one adapter per protocol. Second, no standalone border router operation — the OTBR add-on on your Home Assistant host is the router. Third, no PoE version is planned (the experimental PoE firmware exists only for the ZWA-2, a different Connect product). On the upside: Zigbee 4.0 support is under review and believed possible via firmware update, and experimental repeater firmware exists — but a ZBT-2 flashed as a repeater cannot coordinate again until reflashed with stock firmware from the Open Home Foundation toolbox website.</p>
+
+        <p>Migration is the good news for anyone replacing an older stick. Home Assistant ships migration wizards for both Zigbee and Thread networks, and per <a href="https://www.home-assistant.io/connect/zbt-2/">Nabu Casa</a>, the ZBT-2 works with Zigbee2MQTT, which has its own migration docs. Some adapter families — ConBee among them — need extra steps, so check the migration docs for your specific stick before starting.</p>
+
+        <p>Thinking of buying one as your Thread radio? <a href="https://www.amazon.com/s?k=Home+Assistant+Connect+ZBT-2&amp;tag=hanews01-20" rel="sponsored nofollow">Home Assistant Connect ZBT-2 on Amazon</a> has current price and stock, and if you are building it around official hardware, our review of the <a href="home-assistant-green.html">Home Assistant Green</a> covers the box it typically plugs into.</p>
+
+        <aside class="rail-sub article-cta" aria-label="Newsletter">
+          <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, Zigbee and ESPHome releases, sourced from the projects themselves.</p>
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </aside>
+
+        <h2>FAQ</h2>
+        <h3>Can the Connect ZBT-2 run Zigbee and Thread at the same time?</h3>
+        <p>No. The ZBT-2 runs Zigbee 3.0 or Thread, but not both at once. Nabu Casa tested multiprotocol operation on the earlier ZBT-1, found it inconsistent, and does not plan to implement it. Dedicate one adapter to each protocol.</p>
+        <h3>Can the ZBT-2 act as a Thread border router on its own, without Home Assistant?</h3>
+        <p>No. Nabu Casa states that this capability is not built into Connect ZBT-2. The ZBT-2 is a radio; the border router is Home Assistant's OpenThread Border Router add-on running on the Home Assistant host, which uses the ZBT-2 as its radio.</p>
+        <h3>How do I enable Thread on the ZBT-2 in Home Assistant?</h3>
+        <p>Install the OpenThread Border Router app on your Home Assistant instance and follow the Enable Thread on Home Assistant Connect ZBT-2 procedure. Then confirm in Settings > Connectivity > Thread that the Home Assistant network is listed as the preferred network.</p>
+        <h3>How do I add Matter-over-Thread devices?</h3>
+        <p>First share Thread credentials from your Thread-border-router phone app to the Home Assistant Companion app (Sync Thread credentials on Android; send credentials to phone on iPhone), then scan the device's Matter QR code with the Companion app. The phone commissions over Bluetooth and the device joins over Thread.</p>
+        <h3>Can I migrate my existing Zigbee or Thread network to the ZBT-2?</h3>
+        <p>Yes. Home Assistant has migration wizards for both Zigbee and Thread networks, and Zigbee2MQTT documents migrating to the ZBT-2. Some third-party adapters, such as ConBee sticks, need extra steps.</p>
+        <h3>Why did resetting my ZBT-2 wipe my Thread devices?</h3>
+        <p>Resetting the ZBT-2 from Home Assistant's Thread Border Router panel can force every Thread device to be re-added. Reset only when nothing else works, and know the cost before you press it.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/connect/zbt-2/">Home Assistant Connect ZBT-2 product page</a>; <a href="https://www.home-assistant.io/integrations/thread/">Home Assistant Thread integration</a>; <a href="https://blog.beguelin.com/2026/07/building-thread-network-home-assistant/">Building a Thread network with Home Assistant (blog.beguelin.com)</a>; <a href="https://support.nabucasa.com/hc/sections/31260019451421">Nabu Casa support: ZBT-2 OTBR</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
