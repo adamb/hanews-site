@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wi-Fi 6 vs Wi-Fi 7 for a smart home: does your house need the upgrade? — HA News</title>
+  <meta name="description" content="Wi-Fi 6 vs Wi-Fi 7 for a smart home: what changed (320 MHz channels, MLO, 4K-QAM, 6 GHz), why ESPHome and IoT devices stay on 2.4 GHz, and which routers to pick.
+">
+  <link rel="canonical" href="https://hanews.org/wifi-6-vs-wifi-7">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Wi-Fi 6 vs Wi-Fi 7 for a smart home: does your house need the upgrade?", "datePublished": "2026-11-12", "dateModified": "2026-11-12", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/wifi-6-vs-wifi-7"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does a smart home need Wi-Fi 7?", "acceptedAnswer": {"@type": "Answer", "text": "Mostly no. Most smart home devices use 2.4 GHz Wi-Fi or another radio entirely (Zigbee, Z-Wave, Thread), so Wi-Fi 7's headline gains — 320 MHz channels, MLO, 4K-QAM on 5/6 GHz streams — never reach them."}}, {"@type": "Question", "name": "What is MLO (multi-link operation) and which devices use it?", "acceptedAnswer": {"@type": "Answer", "text": "MLO is a Wi-Fi 7 feature that lets one device send traffic over two Wi-Fi links at once, for higher throughput and lower latency. Both ends must support it: a Wi-Fi 6 phone connected to a Wi-Fi 7 router gets no MLO benefit."}}, {"@type": "Question", "name": "Is Wi-Fi 7's 6 GHz band useful for Home Assistant gear?", "acceptedAnswer": {"@type": "Answer", "text": "Not today. Home Assistant server hardware, ESPHome nodes and most sensors sit on 2.4 GHz Wi-Fi or non-Wi-Fi radios. 6 GHz matters for fast client devices like laptops and phones, and for cleaning up congestion on 2.4 GHz indirectly."}}, {"@type": "Question", "name": "Should I wait for Wi-Fi 7 routers that run OpenWrt?", "acceptedAnswer": {"@type": "Answer", "text": "Official OpenWrt support for Wi-Fi 7 (BE-class) hardware now exists, such as the Acer Predator Connect W6x and Arcadyan Mozart on OpenWrt 25.12.6, but the list of picks is still thin compared with the long list of well-supported Wi-Fi 6 routers."}}, {"@type": "Question", "name": "Is Wi-Fi 6 enough for 4K streaming and video calls in 2026?", "acceptedAnswer": {"@type": "Answer", "text": "Per the Wi-Fi Alliance spec, Wi-Fi 6 supports up to 160 MHz channels, OFDMA and 1024-QAM. For typical household streaming and calls, a healthy Wi-Fi 6 network is generally sufficient; bottlenecks usually come from placement and interference rather than the standard."}}, {"@type": "Question", "name": "Do ESPHome and ESP32 devices support 5 GHz or 6 GHz Wi-Fi?", "acceptedAnswer": {"@type": "Answer", "text": "Almost all do not. The ESPHome wifi component offers a band_mode option (AUTO / 2.4GHZ / 5GHZ) only on the ESP32-C5; the ESP8266 and mainstream ESP32-family radios are 2.4 GHz only. Your IoT fleet stays on 2.4 GHz regardless of router generation."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 12 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Explainer · Networking</p>
+        <h1>Wi-Fi 6 vs Wi-Fi 7 for a smart home: does your house need the upgrade?</h1>
+        <p class="byline">HA News · 12 Nov 2026</p>
+
+        <p>Wi-Fi 7 has been on store shelves since 2024, and router marketing says you are falling behind without it. For a smart home the honest answer is closer: <strong>Wi-Fi 7 is a nice upgrade for the people and laptops in your house, and nearly irrelevant to the devices your smart home actually runs on</strong>. Most IoT gear sits on 2.4 GHz Wi-Fi or skips Wi-Fi entirely — Zigbee, Z-Wave, Thread. This page compares what Wi-Fi 6 and Wi-Fi 7 actually changed, per the Wi-Fi Alliance and the ESPHome and OpenWrt docs, and says where the money is best spent.</p>
+
+        <h2>What Wi-Fi 6 brought (2019)</h2>
+        <p>Wi-Fi 6 (Wi-Fi CERTIFIED 6, introduced in 2019 per the Wi-Fi Alliance) is the standard most "AX" routers sold today use. Its key features, all aimed at homes full of many chatty devices rather than one blazing-fast one:</p>
+        <ul>
+          <li><strong>OFDMA</strong> — the access point splits a channel into small resource units so several devices share one channel efficiently instead of taking turns on the whole channel.</li>
+          <li><strong>Multi-user MIMO</strong> — the router can transmit to several devices at once on the downlink.</li>
+          <li><strong>Up to 160 MHz channels</strong> and <strong>1024-QAM</strong> for faster per-device rates on good links.</li>
+          <li><strong>Target wake time (TWT)</strong> — devices negotiate sleep schedules, saving battery on sensors and remotes.</li>
+          <li>Transmit beamforming, and the <strong>6 GHz band</strong>, which arrived with Wi-Fi 6E devices.</li>
+        </ul>
+        <p>That list already reads like a smart-home wish list: OFDMA and TWT exist mostly to serve the dozens-of-small-devices case.</p>
+
+        <h2>What Wi-Fi 7 adds (2024)</h2>
+        <p>Wi-Fi CERTIFIED 7 arrived in 2024 and operates across the 2.4, 5 and 6 GHz bands. Per the Wi-Fi Alliance's Wi-Fi 7 page, the main additions:</p>
+        <ul>
+          <li><strong>320 MHz channels in 6 GHz</strong> — twice the width of Wi-Fi 6's widest channel, which the Alliance summarizes as roughly twice the throughput.</li>
+          <li><strong>Multi-Link Operation (MLO)</strong> — a device can use two Wi-Fi links at once, with the router load-balancing traffic across them for speed and resilience.</li>
+          <li><strong>4K-QAM</strong> — about 20% higher peak rates than Wi-Fi 6's 1024-QAM, on short, clean links.</li>
+          <li> refinements for dense networks: 512 compressed block ack and multiple resource units to a single station.</li>
+        </ul>
+        <p>Every one of those gains lives on the wide, fast streams in the 5 and 6 GHz bands. That is precisely where your plug sensors, thermostats and ESP32 nodes do not live.</p>
+
+        <h2>Where your IoT fleet actually sits</h2>
+        <p>The radios your smart home runs on are mostly unchanged by Wi-Fi 7:</p>
+        <ul>
+          <li><strong>Zigbee, Z-Wave and Thread devices aren't Wi-Fi at all.</strong> They run on their own 2.4 GHz (or sub-GHz) radios connected to a coordinator or border router. A Wi-Fi 7 router neither helps nor hurts them — except by adding another network to plan channels around. See our OpenWrt IoT VLAN <a href="openwrt-iot-vlan.html">guide</a> for keeping that traffic segmented.</li>
+          <li><strong>ESPHome devices are 2.4 GHz.</strong> The ESPHome Wi-Fi component documentation is blunt about it: a <code>band_mode</code> option (AUTO / 2.4GHZ / 5GHZ) exists only on the ESP32-C5, and the ESP8266's <code>phy_mode</code> supports only 11B/11G/11N — all 2.4 GHz modes. The mainstream ESP32, ESP32-S3 and ESP32-C3 radios have no 5 GHz support. Your ESPHome fleet stays on 2.4 GHz no matter how fast the router is, so Wi-Fi 7's 320 MHz, MLO and 4K-QAM gains land on streams these devices never touch. ESPHome's default guidance is WPA2-or-newer security, with WPA3 examples ESP32-only.</li>
+          <li><strong>Cloud-dependent hubs</strong> (vendor bridges, cameras that must call home) care about internet bandwidth, not the protocol generation between them and the router.</li>
+        </ul>
+
+        <h2>Wi-Fi 6 vs Wi-Fi 7 at a glance</h2>
+        <table>
+          <thead><tr><th>Feature</th><th>Wi-Fi 6 (2019)</th><th>Wi-Fi 7 (2024)</th></tr></thead>
+          <tbody>
+            <tr><td>Bands</td><td>2.4 / 5 GHz (6 GHz with 6E)</td><td>2.4 / 5 / 6 GHz</td></tr>
+            <tr><td>Max channel width</td><td>160 MHz</td><td>320 MHz (6 GHz)</td></tr>
+            <tr><td>Modulation</td><td>1024-QAM</td><td>4K-QAM (~20% higher rates)</td></tr>
+            <tr><td>Multi-link operation</td><td>No</td><td>Yes — traffic balanced across two links</td></tr>
+            <tr><td>Channel sharing</td><td>OFDMA</td><td>OFDMA plus multi-RU to one device</td></tr>
+            <tr><td>Power saving</td><td>Target wake time</td><td>TWT, retained</td></tr>
+            <tr><td>Relevance to IoT on 2.4 GHz</td><td>Good</td><td>Effectively none for those devices</td></tr>
+          </tbody>
+        </table>
+
+        <h2>What is actually worth buying</h2>
+        <p>If clients in your house — laptops, phones, TVs, desktop links — are the bottleneck, Wi-Fi 7 buys you headroom: big 6 GHz channels and MLO for compliant devices. If the smart home is the workload, spend the money on <a href="openwrt.html">a router that runs OpenWrt</a>, good coverage and clean channels; that matters more to a house full of 2.4 GHz sensors than protocol generation.</p>
+        <p>Wi-Fi 7 picks with official OpenWrt support are still a short list. Per the OpenWrt firmware selector and device database (devices recorded for stable 25.12.6 or oldstable 24.10.8):</p>
+        <ul>
+          <li><strong>Acer Predator Connect W6x</strong> (MediaTek Filogic, Wi-Fi 7) — official OpenWrt builds for 25.12.6, including U-Boot and stock-layout variants; device page at <a href="https://openwrt.org/toh/acer/predator-w6x">openwrt.org/toh/acer/predator-w6x</a>. <a href="https://www.amazon.com/s?k=Acer+Predator+Connect+W6x&amp;tag=hanews01-20" rel="sponsored nofollow">Acer Predator Connect W6x on Amazon</a></li>
+          <li><strong>Arcadyan Mozart</strong> (Filogic, Wi-Fi 7) — official builds for both 24.10.8 and 25.12.6: <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=arcadyan_mozart">firmware selector entry</a>.</li>
+          <li><strong>Routerich BE7200</strong> (Wi-Fi 7) — official 25.12.6 build: <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=routerich_be7200">firmware selector entry</a>.</li>
+          <li><strong>MediaTek MT7988A reference board</strong> (Wi-Fi 7) — developer-oriented, both 24.10.8 and 25.12.6.</li>
+          <li><strong>TP-Link Archer BE550</strong> — a BE9300 tri-band Wi-Fi 7 router (2.4 + 5 + 6 GHz) per TP-Link's product page. It is <em>not</em> in the OpenWrt device database, so it has no official OpenWrt build; buy it only if you intend to run stock firmware. <a href="https://www.amazon.com/s?k=TP-Link+Archer+BE550&amp;tag=hanews01-20" rel="sponsored nofollow">TP-Link Archer BE550 on Amazon</a></li>
+        </ul>
+        <p>Well-supported Wi-Fi 6 gear remains the safer local-first pick, with mature builds for both OpenWrt releases. Examples with official builds per the firmware selector: <strong>ASUS TUF-AX6000</strong> (Filogic; device page <a href="https://openwrt.org/toh/asus/tuf-ax6000">openwrt.org/toh/asus/tuf-ax6000</a>) and <strong>Dynalink DL-WRX36</strong> (Qualcomm IPQ807x; device page <a href="https://openwrt.org/toh/dynalink/dl-wrx36">openwrt.org/toh/dynalink/dl-wrx36</a>) — both covered for 24.10.8 and 25.12.6. Others long-supported on OpenWrt include the ASUS RT-AX89X and the GL.iNet GL-AXT1800.</p>
+
+        <h2>Should you wait?</h2>
+        <p>The Wi-Fi Alliance already lists Wi-Fi 8 as the next generation, pitched at reliable, deterministic low latency through access-point coordination rather than raw speed — and it is not a certification to shop for in a home yet. That shapes the timing question: Wi-Fi 7 is now the sensible top end to buy, but nothing about it rescues a 2.4 GHz IoT fleet. If your current router is healthy, upgrade your network (coverage, VLANs, wired backhaul, <a href="openwrt-wireguard.html">WireGuard remote access</a>) before you chase the badge on the box.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Does a smart home need Wi-Fi 7?</h3>
+        <p>Mostly no. Most smart home devices use 2.4 GHz Wi-Fi or another radio entirely (Zigbee, Z-Wave, Thread), so Wi-Fi 7's headline gains — 320 MHz channels, MLO, 4K-QAM on 5/6 GHz streams — never reach them.</p>
+        <h3>What is MLO (multi-link operation) and which devices use it?</h3>
+        <p>MLO is a Wi-Fi 7 feature that lets one device send traffic over two Wi-Fi links at once, for higher throughput and lower latency. Both ends must support it: a Wi-Fi 6 phone connected to a Wi-Fi 7 router gets no MLO benefit.</p>
+        <h3>Is Wi-Fi 7's 6 GHz band useful for Home Assistant gear?</h3>
+        <p>Not today. Home Assistant server hardware, ESPHome nodes and most sensors sit on 2.4 GHz Wi-Fi or non-Wi-Fi radios. 6 GHz matters for fast client devices like laptops and phones, and for cleaning up congestion on 2.4 GHz indirectly.</p>
+        <h3>Should I wait for Wi-Fi 7 routers that run OpenWrt?</h3>
+        <p>Official OpenWrt support for Wi-Fi 7 (BE-class) hardware now exists, such as the Acer Predator Connect W6x and Arcadyan Mozart on OpenWrt 25.12.6, but the list of picks is still thin compared with the long list of well-supported Wi-Fi 6 routers.</p>
+        <h3>Is Wi-Fi 6 enough for 4K streaming and video calls in 2026?</h3>
+        <p>Per the Wi-Fi Alliance spec, Wi-Fi 6 supports up to 160 MHz channels, OFDMA and 1024-QAM. For typical household streaming and calls, a healthy Wi-Fi 6 network is generally sufficient; bottlenecks usually come from placement and interference rather than the standard.</p>
+        <h3>Do ESPHome and ESP32 devices support 5 GHz or 6 GHz Wi-Fi?</h3>
+        <p>Almost all do not. The ESPHome wifi component offers a band_mode option (AUTO / 2.4GHZ / 5GHZ) only on the ESP32-C5; the ESP8266 and mainstream ESP32-family radios are 2.4 GHz only. Your IoT fleet stays on 2.4 GHz regardless of router generation.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.wi-fi.org/discover-wi-fi/wi-fi-7">Wi-Fi Alliance: Wi-Fi CERTIFIED 7</a>; <a href="https://esphome.io/components/wifi.html">ESPHome Wi-Fi component docs</a>; <a href="https://openwrt.org/toh/start">OpenWrt Table of Hardware</a> and <a href="https://firmware-selector.openwrt.org/">OpenWrt Firmware Selector</a>; <a href="https://www.tp-link.com/us/home-networking/wifi-router/archer-be550/">TP-Link Archer BE550 product page</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
