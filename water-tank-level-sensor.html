@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Water tank level sensor for Home Assistant: DIY and LoRaWAN options — HA News</title>
+  <meta name="description" content="How to measure water tank level for Home Assistant: a failed mechanical gauge replaced by an ultrasonic probe, HC-SR04 with ESPHome, Mopeka Bluetooth sensors and Dragino LoRaWAN for remote cisterns.">
+  <link rel="canonical" href="https://hanews.org/water-tank-level-sensor">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Water tank level sensor for Home Assistant: DIY and LoRaWAN options", "image": "https://hanews.org/images/water-tank/ldds20.jpg", "datePublished": "2026-11-12", "dateModified": "2026-11-12", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/water-tank-level-sensor"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the best water tank level sensor for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "For a tank within Wi-Fi range, an HC-SR04 ultrasonic sensor on an ESPHome board is the cheapest reliable option. For tanks out of Wi-Fi range, a LoRaWAN ultrasonic sensor such as the Dragino LDDS20 is the way to go. Mopeka Bluetooth sensors pair natively with Home Assistant."}}, {"@type": "Question", "name": "Can I measure tank level without drilling (non-contact ultrasonic)?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The Dragino LDDS20 is a non-contact LoRaWAN ultrasonic liquid-level sensor that mounts directly below the container and measures through the container wall, with no hole and no contact with the liquid. The manufacturer says it works for acids and alkalis and for airtight tanks."}}, {"@type": "Question", "name": "How do I measure water tank level with an HC-SR04 and ESPHome?", "acceptedAnswer": {"@type": "Answer", "text": "Use the ESPHome ultrasonic sensor platform with a trigger_pin and echo_pin on the HC-SR04. The sensor returns a distance; convert it to a fill level by subtracting the measured wall distance from the tank height using a filter or template in the ESPHome config."}}, {"@type": "Question", "name": "How do I set up a low water level alert with the numeric state crossed threshold trigger?", "acceptedAnswer": {"@type": "Answer", "text": "Create a Home Assistant automation using the numeric state crossed threshold trigger on your tank level sensor, then notify yourself through your preferred service. Note that a trigger fires on the crossing, not while the level stays low, so pair it with conditions if you want repeat alerts."}}, {"@type": "Question", "name": "What LoRaWAN sensors work for remote cistens and rainwater tanks?", "acceptedAnswer": {"@type": "Answer", "text": "The Dragino LDDS20 ultrasonic liquid level sensor runs on LoRaWAN 1.0.3 Class A, supports EU868, US915 and other regional bands, and runs up to 10 years on an 8500 mAh Li-SOCl2 battery. It needs a LoRaWAN gateway within range."}}, {"@type": "Question", "name": "Does the Mopeka Pro H2O work with Home Assistant for water tanks?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The Mopeka integration, added in Home Assistant 2023.2, auto-discovers Mopeka sensors over Bluetooth with local push. Supported devices include the Pro H2O; you set the medium per device so the ultrasonic coefficients match the substance."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 12 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">How-to · Sensors</p>
+        <h1>Water tank level sensor for Home Assistant: DIY and LoRaWAN options</h1>
+        <p class="byline">HA News · 12 Nov 2026</p>
+
+        <p>A water tank level sensor has one job: tell you how full the tank is, without a ladder and a flashlight. If the tank sits within Wi-Fi range of your house, the cheapest reliable route is an ultrasonic sensor on an ESPHome board feeding Home Assistant directly. If the tank is a cistern or rainwater tank out in the field, LoRaWAN is the honest answer. This page walks through both, plus the Bluetooth option that pairs with Home Assistant without any DIY at all.</p>
+
+        <p>Some of this comes from <a href="https://blog.beguelin.com/">Adam Beguelin</a>'s own water tanks, written up on his blog. The details are his; the general guidance is HA News. Nothing here was bench-tested by us — every spec below links to the manufacturer or project documentation it came from.</p>
+
+        <h2>The problem with mechanical gauges</h2>
+        <p>Adam's tanks originally had mechanical float gauges. They failed "pretty quickly," as he <a href="https://blog.beguelin.com/2025/09/adding-alerts-to-spiderplant-sensors/">wrote on his blog</a> — the usual story with anything mechanical that sits in water and sun for a year. The fix that lasted: replace the gauge with an ultrasonic probe that fits inside the old gauge fitting. The tank's existing opening becomes the sensor's mounting point, and a small board reads the distance from the sensor down to the water surface.</p>
+
+        <p>That is the core trick of nearly every electronic tank level sensor: it is a distance sensor pointed at water. The fill level is tank height minus the measured distance. Everything else — percentage, gallons, low-level alerts — is arithmetic done later, either in the sensor firmware or in Home Assistant.</p>
+
+        <h2>What happens when the level runs low</h2>
+        <p>A level number is only useful if something happens when it goes wrong. On Adam's build, thresholds live in Cloudflare KV (a simple key-value store) and alerts arrive as <a href="https://pushover.net/">Pushover</a> notifications. You do not have to copy that architecture. Home Assistant has a first-class way to do the same thing locally: the <a href="https://www.home-assistant.io/docs/automation/trigger/">numeric state crossed threshold trigger</a>, documented on the Home Assistant automation triggers page.</p>
+
+        <p>One behavior from that documentation is worth knowing before you write your first alert. Triggers react at a moment, not while a condition stays true. A level trigger fires when the reading <em>crosses</em> the threshold — once. If you want the automation to keep nagging while the tank stays low, use conditions in the action, not the trigger alone. This one distinction prevents most "why did it only alert once?" confusion.</p>
+
+        <h2>Option 1: HC-SR04 and ESPHome, the DIY route</h2>
+        <p>Adam's build uses an HC-SR04 ultrasonic depth sensor driven by an ESP8266 board (an Adafruit Huzzah, per his blog post), in a Spiderplant sensor built by his friend Bob. The same design maps directly onto Home Assistant if you prefer to keep the logic at home rather than in outside services.</p>
+
+        <p>In ESPHome, the <a href="https://esphome.io/components/sensor/ultrasonic.html">ultrasonic sensor platform</a> (documented for ESPHome 2026.10.2) needs two pins from the HC-SR04: a <code>trigger_pin</code> and an <code>echo_pin</code>. A few settings matter for a tank, and the docs are explicit about them:</p>
+        <ul>
+          <li><strong>update_interval</strong> defaults to 60 seconds. Water level moves slowly; this is fine, and you can slow it further to save power.</li>
+          <li><strong>timeout</strong> is in meters, defaulting to 2 m. Most hobby sensors only sense up to 2 m anyway. The docs warn that if you set the timeout too long, a no-echo read — a burst, foam, or a sensor facing open air — can look like a valid measurement instead of an error. For a deep tank, that is a real gotcha: a "very full" reading may actually be a failed reading. Set the timeout to match your tank, not more.</li>
+          <li><strong>pulse_time</strong> defaults to 10 µs. Leave it unless the manufacturer of your specific module says otherwise.</li>
+        </ul>
+        <p>The platform returns a distance. To turn it into a tank level, the docs' own pattern applies: subtract the measured distance from the known tank height using a filter or a template sensor in the ESPHome config. Calibrate against reality by checking the reading at a known fill point — one known depth is enough to catch an upside-down or misplaced constant.</p>
+
+        <figure class="figure">
+          <img src="images/water-tank/esphome-ultrasonic-full.webp" alt="HC-SR04 ultrasonic sensor wired to an ESP board, with its readings visible on the ESPHome dashboard" width="1800" height="1040" loading="lazy">
+          <figcaption>HC-SR04 wiring and live readings on the ESPHome dashboard. Source: <a href="https://esphome.io/components/sensor/ultrasonic.html">esphome.io documentation</a> (Open Home Foundation)</figcaption>
+        </figure>
+
+        <p>Once the level entity exists in Home Assistant, the crossed-threshold trigger above takes care of alerts, and a history graph takes care of the leak-you-didn't-know-you-had. If you are new to the board side, our <a href="esp32-projects">ESP32 projects</a> guide covers the wider family, and our <a href="best-water-leak-sensor">water leak sensor</a> guide covers the other liquid problem worth sensing. Ready-made boards for this kind of build appear under an <a href="https://www.amazon.com/s?k=ESP8266+NodeMCU&amp;tag=hanews01-20" rel="sponsored nofollow">ESP8266 search on Amazon</a> and an <a href="https://www.amazon.com/s?k=HC-SR04+ultrasonic+sensor&amp;tag=hanews01-20" rel="sponsored nofollow">HC-SR04 search on Amazon</a>; pick board variants with good community support.</p>
+
+        <h2>Option 2: Mopeka Bluetooth sensors, the no-solder route</h2>
+        <p>If soldering is not on the table, Mopeka's Bluetooth tank sensors pair natively with Home Assistant. Per the <a href="https://www.home-assistant.io/integrations/mopeka/">Home Assistant Mopeka integration</a>, the integration auto-discovers the devices over Bluetooth and uses local push — the readings arrive without a cloud account. (The integration was added in Home Assistant 2023.2, per the same page.)</p>
+        <p>Two details from the documentation to get right: you pick a "medium" for each device so the ultrasonic coefficients match the substance it is measuring, and for water tanks specifically the docs point to the "Air" medium for unpressurized top-down sensors and "Fresh Water" for bottom-up ones. Supported devices listed on that page include the Pro Plus (M1015), Pro Check (M1017), Pro-200, Pro H2O, Lippert BottleCheck, TD40, TD200 and Pro Check Universal. Model variants show up under a <a href="https://www.amazon.com/s?k=Mopeka+Pro+H2O+tank+sensor&amp;tag=hanews01-20" rel="sponsored nofollow">Mopeka Pro H2O search on Amazon</a>. The catch is range: Bluetooth needs the Home Assistant machine — or a <a href="esp32-projects">Bluetooth proxy</a> — within earshot of the tank.</p>
+
+        <h2>Option 3: LoRaWAN for cisterns and rainwater tanks</h2>
+        <p>For a tank beyond Wi-Fi range, the answer is low-power long-range radio. The <a href="https://www.dragino.com/products/distance-level-sensor/item/164-ldds20.html">Dragino LDDS20</a> is a LoRaWAN ultrasonic liquid level sensor with a genuinely practical mounting trick: it is non-contact. Per Dragino's product page, it mounts directly below the container and measures through the container wall — no hole to drill, no sensor in the liquid. The manufacturer says it works for acids and alkalis and for airtight tanks, which makes it one of the few options for tanks you cannot open or penetrate.</p>
+
+        <figure class="figure">
+          <img src="images/water-tank/ldds20.jpg" alt="Dragino LDDS20 LoRaWAN ultrasonic liquid level sensor, a short cylinder with a flat sensing face" width="756" height="756" loading="lazy">
+          <figcaption>Dragino LDDS20. Source: <a href="https://www.dragino.com/products/distance-level-sensor/item/164-ldds20.html">Dragino</a></figcaption>
+        </figure>
+
+        <p>Specs from Dragino's page and the <a href="http://wiki.dragino.com/xwiki/bin/view/Main/User%20Manual%20for%20LoRaWAN%20End%20Nodes/DDS20-LB_LoRaWAN_Ultrasonic_Liquid_Level_Sensor_User_Manual">DDS20-LB user manual</a>:</p>
+        <table>
+          <thead><tr><th>Spec</th><th>Dragino LDDS20</th></tr></thead>
+          <tbody>
+            <tr><td>Method</td><td>Ultrasonic, non-contact, through the container wall (mounts below the tank)</td></tr>
+            <tr><td>LoRaWAN</td><td>1.0.3 Class A</td></tr>
+            <tr><td>Bands</td><td>EU868, US915, CN470, KR920, AS923, AU915, IN865, EU433</td></tr>
+            <tr><td>Battery</td><td>8500 mAh Li-SOCl2, rated up to 10 years</td></tr>
+            <tr><td>Provisioning</td><td>Pre-loaded OTAA keys</td></tr>
+            <tr><td>Install notes</td><td>Coupling paste and epoxy required for mounting; often not included in the box</td></tr>
+            <tr><td>Variants</td><td>Newer DDS20-LB/LS models, default uplink every 20 minutes with ACK and store-and-forward</td></tr>
+          </tbody>
+        </table>
+        <p>Two practical notes from the manufacturer documentation. First, the mounting is not peel-and-stick: you need coupling paste for the acoustic bond to the tank wall and epoxy to hold the unit, and both are commonly omitted from the box — order them with the sensor. Second, a LoRaWAN sensor needs a gateway within radio range; if you are setting one up for a property with a single remote tank, our <a href="lorawan-gateway">LoRaWAN gateway</a> guide covers the gateway side, including public network options. Retail listings appear under a <a href="https://www.amazon.com/s?k=Dragino+LDDS20+ultrasonic+liquid+level+sensor&amp;tag=hanews01-20" rel="sponsored nofollow">Dragino LDDS20 search on Amazon</a>.</p>
+        <p>How did the DIY probe compare in the field? Adam's post describes the mechanical gauges failing quickly and the ultrasonic replacement holding up — one data point, from one property, but it matches what the sensor physics suggest: fewer moving parts in the water means less to fail.</p>
+
+        <h2>Which one should you build or buy?</h2>
+        <ul>
+          <li><strong>Tank in Wi-Fi range, comfortable with small DIY:</strong> HC-SR04 on an ESPHome board. Cheapest hardware, fully local, and the level lives as an ordinary Home Assistant entity. Mind the <code>timeout</code> setting so failed reads don't masquerade as full tanks.</li>
+          <li><strong>Tank in Wi-Fi range, no soldering:</strong> a Mopeka sensor on the Bluetooth integration. Auto-discovery, local push, no cloud account, per the HA docs.</li>
+          <li><strong>Remote cistern, rainwater tank, or airtight tank you can't drill:</strong> the Dragino LDDS20 over LoRaWAN, plus a gateway. Non-contact mounting, multi-year battery life per the manufacturer.</li>
+        </ul>
+        <p>Whatever you pick, the alert design is the same: measure, convert distance to level, and alert on the crossing of a threshold — in Home Assistant with the numeric state crossed trigger, or through whatever notification channel your build already trusts. Water you can measure is water you can schedule: pumps, refills and leak detection all fall out of the same one number.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, ESPHome and OpenWrt releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>What is the best water tank level sensor for Home Assistant?</h3>
+        <p>For a tank within Wi-Fi range, an HC-SR04 ultrasonic sensor on an ESPHome board is the cheapest reliable option. For tanks out of Wi-Fi range, a LoRaWAN ultrasonic sensor such as the Dragino LDDS20 is the way to go. Mopeka Bluetooth sensors pair natively with Home Assistant.</p>
+        <h3>Can I measure tank level without drilling (non-contact ultrasonic)?</h3>
+        <p>Yes. The Dragino LDDS20 is a non-contact LoRaWAN ultrasonic liquid-level sensor that mounts directly below the container and measures through the container wall, with no hole and no contact with the liquid. The manufacturer says it works for acids and alkalis and for airtight tanks.</p>
+        <h3>How do I measure water tank level with an HC-SR04 and ESPHome?</h3>
+        <p>Use the ESPHome ultrasonic sensor platform with a trigger_pin and echo_pin on the HC-SR04. The sensor returns a distance; convert it to a fill level by subtracting the measured wall distance from the tank height using a filter or template in the ESPHome config.</p>
+        <h3>How do I set up a low water level alert with the numeric state crossed threshold trigger?</h3>
+        <p>Create a Home Assistant automation using the numeric state crossed threshold trigger on your tank level sensor, then notify yourself through your preferred service. Note that a trigger fires on the crossing, not while the level stays low, so pair it with conditions if you want repeat alerts.</p>
+        <h3>What LoRaWAN sensors work for remote cisterns and rainwater tanks?</h3>
+        <p>The Dragino LDDS20 ultrasonic liquid level sensor runs on LoRaWAN 1.0.3 Class A, supports EU868, US915 and other regional bands, and runs up to 10 years on an 8500 mAh Li-SOCl2 battery. It needs a LoRaWAN gateway within range.</p>
+        <h3>Does the Mopeka Pro H2O work with Home Assistant for water tanks?</h3>
+        <p>Yes. The Mopeka integration, added in Home Assistant 2023.2, auto-discovers Mopeka sensors over Bluetooth with local push. Supported devices include the Pro H2O; you set the medium per device so the ultrasonic coefficients match the substance.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://blog.beguelin.com/2025/09/adding-alerts-to-spiderplant-sensors/">Adam Beguelin's blog: adding alerts to Spiderplant sensors</a>; <a href="https://esphome.io/components/sensor/ultrasonic.html">ESPHome ultrasonic sensor platform</a>; <a href="https://www.home-assistant.io/docs/automation/trigger/">Home Assistant automation triggers</a>; <a href="https://www.dragino.com/products/distance-level-sensor/item/164-ldds20.html">Dragino LDDS20 product page</a>; <a href="http://wiki.dragino.com/xwiki/bin/view/Main/User%20Manual%20for%20LoRaWAN%20End%20Nodes/DDS20-LB_LoRaWAN_Ultrasonic_Liquid_Level_Sensor_User_Manual">Dragino DDS20-LB user manual</a>; <a href="https://www.home-assistant.io/integrations/mopeka/">Home Assistant Mopeka integration</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

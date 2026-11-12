@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Best GL.iNet travel router with OpenWrt (2026) — HA News</title>
+  <meta name="description" content="Which GL.iNet travel router to buy: Beryl AX, Slate AX, Spitz AX and more, with official vanilla OpenWrt support from the OpenWrt device table, WireGuard and Tailscale on hotel Wi-Fi.">
+  <link rel="canonical" href="https://hanews.org/travel-router-openwrt">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Best GL.iNet travel router with OpenWrt (2026)", "image": "https://hanews.org/images/travel-router-mt3000.png", "datePublished": "2026-11-12", "dateModified": "2026-11-12", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/travel-router-openwrt"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Are GL.iNet travel routers actually OpenWrt?", "acceptedAnswer": {"@type": "Answer", "text": "GL.iNet stock firmware is built on OpenWrt, so you get a Linux router with a custom GL.iNet admin panel on top. For full vanilla OpenWrt with only official packages, you can flash an official OpenWrt build on the models listed in the OpenWrt table of hardware."}}, {"@type": "Question", "name": "Can I flash vanilla OpenWrt on a GL.iNet travel router, and which models are supported?", "acceptedAnswer": {"@type": "Answer", "text": "Yes on supported models. The OpenWrt table of hardware lists official builds for the GL-MT3000 (Beryl AX), GL-MT6000 (Flint 2), GL-MT300N-V2 (Mango), GL-AR750S (Slate), GL-X3000 (Spitz AX), GL-XE3000 (Cheetah AX), GL-MT1300 (Beryl), GL-AR750 (Cretan), GL-A1300 (Slate Plus), GL-MT3600BE (Beryl 7), GL-E750 (Mudi) and others. The GL-AXT1800 (Slate AX) has an official build for OpenWrt 25.12.6 only. Models such as the GL-SFT1200 (Opal), GL-MG1300 (Mango 2), GL-E5800 (Mudi 7) and GL-BE3600 (Slate 7) have no official vanilla build in the current table, so they stay on stock GL.iNet firmware."}}, {"@type": "Question", "name": "Which GL.iNet travel router is best for WireGuard or Tailscale on hotel Wi-Fi?", "acceptedAnswer": {"@type": "Answer", "text": "For most trips the GL-MT3000 (Beryl AX), a pocket-sized Wi-Fi 6 AX3000 travel router that GL.iNet ships with WireGuard and OpenVPN clients and encrypted DNS. GL.iNet's official documentation also covers WireGuard server and client setups and Tailscale tutorials. If you want Wi-Fi 7, the GL-MT3600BE (Beryl 7) has an official OpenWrt 25.12.6 build."}}, {"@type": "Question", "name": "Do I need a travel router with cellular (5G) or is public-Wi-Fi mode enough?", "acceptedAnswer": {"@type": "Answer", "text": "If you stay in hotels and apartments with usable Wi-Fi, a Wi-Fi-only travel router that bridges the hotel network over your own encrypted link is enough. The GL-X3000 (Spitz AX) adds dual-SIM 5G NR cellular, which matters where public Wi-Fi is unreliable or you want redundancy."}}, {"@type": "Question", "name": "What is the difference between GL.iNet stock firmware and vanilla OpenWrt?", "acceptedAnswer": {"@type": "Answer", "text": "GL.iNet stock firmware runs OpenWrt underneath with a custom Luci-style admin panel aimed at non-experts, plus GL.iNet's own apps and updates. Vanilla OpenWrt is the official build from openwrt.org: stock packages only, the standard LuCI interface, and updates that follow OpenWrt's own release schedule. Flashing vanilla is optional, not required."}}, {"@type": "Question", "name": "Can a travel router connect or mesh alongside a Home Assistant or Thread setup?", "acceptedAnswer": {"@type": "Answer", "text": "A travel router is a standalone router for trips, not part of a Thread network. At home you can use one as an extra OpenWrt node or lab router on your LAN; for mesh networking at home, OpenWrt supports mesh approaches such as batman-adv, which we cover in our OpenWrt mesh guide."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 12 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt</p>
+        <h1>Best GL.iNet travel router with OpenWrt (2026)</h1>
+        <p class="byline">HA News · 12 Nov 2026</p>
+
+        <p>GL.iNet makes more travel routers than anyone else, and every one of them runs OpenWrt underneath. That matters if your home network is open source: the same router you pack for a trip can run WireGuard, Tailscale, ad blocking and the rest of the packages you already know. The question is which model, and whether to keep GL.iNet's stock firmware or flash vanilla OpenWrt from openwrt.org. <strong>For most trips the GL-MT3000 (Beryl AX) is the best pick: a pocket-sized Wi-Fi 6 AX3000 travel router, with official vanilla OpenWrt builds for both current releases and VPN support out of the box.</strong> We checked every candidate against the OpenWrt table of hardware, so the support claims below come from OpenWrt's own device database, refreshed November 2026, not from marketing pages.</p>
+
+        <p>If you are new to OpenWrt itself, start with our <a href="openwrt.html">what is OpenWrt guide</a>, and for how a multi-router open-source network fits together at home, Adam's <a href="openwrt-mesh-network.html">OpenWrt mesh network story</a> is the pillar for this cluster.</p>
+
+        <h2>Stock GL.iNet firmware vs vanilla OpenWrt</h2>
+        <p>Every GL.iNet router ships with firmware built on OpenWrt, plus a custom GL.iNet admin panel on top. That panel is aimed at ordinary users: a guided interface for connecting to hotel Wi-Fi, toggling a VPN client, and setting up WireGuard or OpenVPN. Behind it is still a Linux router, and the GL.iNet documentation covers WireGuard server and client modes and even <a href="https://docs.gl-inet.com/router/en/4/tutorials/openwrt/">Tailscale tutorials in the 4.x docs</a>.</p>
+        <p>Vanilla OpenWrt is the other road. You flash an official build from openwrt.org, and the router behaves like any other OpenWrt device: standard LuCI interface, official packages only, and upgrades that follow OpenWrt's release calendar — currently 24.10.8 as the old stable line and 25.12.6 as the current stable snapshot. Vanilla support is per-model and per-release, so we took it directly from the OpenWrt table of hardware rather than from GL.iNet. For each model below we link the OpenWrt device page in the format openwrt.org uses, e.g. <a href="https://openwrt.org/toh/gl.inet/gl_mt3000">https://openwrt.org/toh/gl.inet/gl_mt3000</a>, and the firmware selector there lists the exact image for your release.</p>
+        <p>One gotcha worth stating plainly: the newest GL.iNet models are not all in the official vanilla table yet. The GL-MG1300 (Mango 2), GL-E5800 (Mudi 7) and GL-BE3600 (Slate 7) appear in GL.iNet's own OpenWrt-tutorial device list but have no official vanilla OpenWrt build in the current table snapshot, and neither does the GL-SFT1200 (Opal). Buy those knowing you are staying on stock firmware.</p>
+
+        <h2>Picks by trip type</h2>
+        <h3>Best overall: GL-MT3000 (Beryl AX)</h3>
+        <figure class="figure">
+          <img src="images/travel-router-mt3000.png" alt="GL.iNet GL-MT3000 Beryl AX travel router" width="1200" height="1200" loading="lazy">
+          <figcaption>GL-MT3000 Beryl AX. Source: <a href="https://www.gl-inet.com/products/gl-mt3000/">GL.iNet product page</a></figcaption>
+        </figure>
+        <p>GL.iNet describes the Beryl AX as a "pocket-sized AX3000 Wi-Fi 6 Travel Router" with Wi-Fi 6, WireGuard, OpenVPN and encrypted DNS — its product page is the source for those specs. It is the sweet spot for hotel and conference use: small, fast enough to carry a laptop plus phones and a tablet, and it has official vanilla OpenWrt builds for both 24.10.8 and 25.12.6, listed as mediatek/filogic in the table of hardware. <a href="https://www.amazon.com/s?k=GL.iNet+GL-MT3000+Beryl+AX&amp;tag=hanews01-20" rel="sponsored nofollow">GL-MT3000 Beryl AX on Amazon</a>.</p>
+
+        <h3>Best if you want Wi-Fi 7: GL-MT3600BE (Beryl 7)</h3>
+        <p>The Beryl 7 is a dual-band Wi-Fi 7 travel router in GL.iNet's lineup. In the official OpenWrt table it has a 25.12.6 build (mediatek/filogic) and no 24.10.8 build in the current snapshot, so on vanilla OpenWrt it is current-stable only. If you will not leave stock firmware, that constraint does not apply. Source: <a href="https://www.gl-inet.com/products/gl-mt3600be/">GL.iNet Beryl 7 product page</a> and the OpenWrt table of hardware. <a href="https://www.amazon.com/s?k=GL.iNet+GL-MT3600BE+Beryl+7&amp;tag=hanews01-20" rel="sponsored nofollow">GL-MT3600BE Beryl 7 on Amazon</a>.</p>
+
+        <h3>Best if you need Wi-Fi 6 more than Wi-Fi 7 but want an extra-compact box: GL-AXT1800 (Slate AX)</h3>
+        <figure class="figure">
+          <img src="images/travel-router-axt1800.png" alt="GL.iNet GL-AXT1800 Slate AX travel router" width="1200" height="1200" loading="lazy">
+          <figcaption>GL-AXT1800 Slate AX. Source: <a href="https://www.gl-inet.com/products/gl-axt1800/">GL.iNet product page</a></figcaption>
+        </figure>
+        <p>The Slate AX is a Wi-Fi 6 dual-band travel router with VPN support and MU-MIMO, per GL.iNet's page. The vanilla-OpenWrt caveat is unusual: in the current table it shows an official build for 25.12.6 only, with no 24.10.8 entry. If you flash vanilla, you are on the current stable release; on stock GL.iNet firmware it is an ordinary supported device. <a href="https://openwrt.org/toh/gl.inet/gl_axt1800">OpenWrt device page</a>. <a href="https://www.amazon.com/s?k=GL.iNet+GL-AXT1800+Slate+AX&amp;tag=hanews01-20" rel="sponsored nofollow">GL-AXT1800 Slate AX on Amazon</a>.</p>
+
+        <h3>Best with cellular: GL-X3000 (Spitz AX)</h3>
+        <figure class="figure">
+          <img src="images/travel-router-x3000.png" alt="GL.iNet GL-X3000 Spitz AX cellular travel router" width="1200" height="1200" loading="lazy">
+          <figcaption>GL-X3000 Spitz AX. Source: <a href="https://www.gl-inet.com/products/gl-x3000/">GL.iNet product page</a></figcaption>
+        </figure>
+        <p>The Spitz AX is a Wi-Fi 6 AX3000 dual-SIM 5G NR cellular router with OpenWrt and VPN support. Cellular is the travel angle: it covers places with bad or captive-portal Wi-Fi — road trips, a van, a job site, or a rental where the router password never works. The dual-SIM setup lets you carry two carriers and fail over. It has official vanilla builds for both current releases. <a href="https://openwrt.org/toh/gl.inet/gl_x3000">OpenWrt device page</a>. <a href="https://www.amazon.com/s?k=GL.iNet+GL-X3000+Spitz+AX&amp;tag=hanews01-20" rel="sponsored nofollow">GL-X3000 Spitz AX on Amazon</a>.</p>
+
+        <h3>Budget picks: GL-MT300N-V2 (Mango) and GL-AR750S (Slate)</h3>
+        <figure class="figure">
+          <img src="images/travel-router-mt300nv2.png" alt="GL.iNet GL-MT300N-V2 Mango mini travel router" width="1200" height="1200" loading="lazy">
+          <figcaption>GL-MT300N-V2 Mango. Source: <a href="https://www.gl-inet.com/products/gl-mt300n-v2/">GL.iNet product page</a></figcaption>
+        </figure>
+        <p>The Mango is a portable mini travel router with OpenWrt and VPN support — the pick for the single job of securing public Wi-Fi from a laptop and a phone. It has official builds for both current releases. The older <strong>GL-AR750S (Slate)</strong> is a dual-band 802.11ac-era portable router that is still officially supported in vanilla OpenWrt (both releases), which makes it a common secondhand or desk-drawer pick for a dedicated VPN endpoint; its specs come from <a href="https://www.gl-inet.com/products/gl-ar750s/">GL.iNet's Slate page</a>. Neither matches the Beryl AX's speed; both are smaller and cheaper. <a href="https://www.amazon.com/s?k=GL.iNet+GL-MT300N-V2+Mango&amp;tag=hanews01-20" rel="sponsored nofollow">GL-MT300N-V2 Mango on Amazon</a> · <a href="https://www.amazon.com/s?k=GL.iNet+GL-AR750S+Slate&amp;tag=hanews01-20" rel="sponsored nofollow">GL-AR750S Slate on Amazon</a>.</p>
+
+        <h2>The full supported list, from the OpenWrt table of hardware</h2>
+        <p>These GL.iNet models have official vanilla OpenWrt builds in the current table snapshot (releases 24.10.8 and 25.12.6, refreshed 2026-11-09):</p>
+        <ul>
+          <li>GL-MT3000 (Beryl AX) — both releases — <a href="https://openwrt.org/toh/gl.inet/gl_mt3000">OpenWrt device page</a></li>
+          <li>GL-MT6000 (Flint 2) — both releases — <a href="https://openwrt.org/toh/gl.inet/gl_mt6000">OpenWrt device page</a></li>
+          <li>GL-AXT1800 (Slate AX) — 25.12.6 only</li>
+          <li>GL-X3000 (Spitz AX) — both releases</li>
+          <li>GL-XE3000 (Cheetah AX) — both releases</li>
+          <li>GL-MT3600BE (Beryl 7) — 25.12.6 only</li>
+          <li>GL-MT300N-V2 (Mango) — both releases</li>
+          <li>GL-MT1300 (Beryl) — both releases</li>
+          <li>GL-AR750S (Slate) — both releases</li>
+          <li>GL-AR750 (Cretan) — both releases</li>
+          <li>GL-A1300 (Slate Plus) — both releases</li>
+          <li>GL-E750 (Mudi) — both releases</li>
+        </ul>
+        <p>The Flint 2 (GL-MT6000) is worth a note even though it is a home router, not a travel one: it is the common "GL.iNet box at home" pick, and travelers who like the interface often want the same OS on both ends of a trip — a paired Beryl AX traveling to a Flint 2 running WireGuard at home. For the home side of that pairing, see our <a href="openwrt-wireguard.html">OpenWrt WireGuard guide</a>, which covers the server setup the traveler connects back to.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, ESPHome and OpenWrt releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>Setting up WireGuard or Tailscale on a travel router</h2>
+        <p>The usual travel pattern: the router connects upstream to hotel Wi-Fi as a client (often called repeater or WISP mode in the GL.iNet panel), and your devices attach to the router's own network. With a VPN client running, all of that traffic exits through your home connection or a commercial VPN, which defeats captive-portal snooping and gives you a consistent IP. On stock GL.iNet firmware, the admin panel handles WireGuard and OpenVPN clients directly; WireGuard server and client guides live in the official GL.iNet docs, and the 4.x docs also include Tailscale tutorials.</p>
+        <p>Under vanilla OpenWrt, install the WireGuard packages and configure a tunnel, or add Tailscale from the package feed; our <a href="openwrt-wireguard.html">WireGuard on OpenWrt walkthrough</a> shows the config. The advantage of vanilla when traveling is predictability: the menus are the same as the OpenWrt router you run at home, so there is only one interface to remember.</p>
+        <ol>
+          <li>Plug in the router and connect its upstream to the hotel Wi-Fi (client or repeater mode) or, for cellular models, insert the SIM.</li>
+          <li>Bring up the VPN client — WireGuard tunnel on stock or vanilla alike — and confirm traffic flows through it before attaching devices.</li>
+          <li>Connect your laptop and phone to the router's own SSID. Anything that must stay local (for example a Home Assistant box on the same LAN) is unaffected.</li>
+          <li>On checkout day, wipe or export the config so the next hotel Wi-Fi name and credentials do not linger on the device.</li>
+        </ol>
+        <p>A caution for repeater mode on hotel networks where the portal itself is a problem: connect a laptop first, finish any captive-portal login on the router's upstream network, then start the VPN. That order avoids chasing portal timeouts through a tunnel that cannot reach the login page.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd>GL.iNet product pages for the <a href="https://www.gl-inet.com/products/gl-mt3000/">GL-MT3000</a>, <a href="https://www.gl-inet.com/products/gl-axt1800/">GL-AXT1800</a>, <a href="https://www.gl-inet.com/products/gl-x3000/">GL-X3000</a>, <a href="https://www.gl-inet.com/products/gl-mt300n-v2/">GL-MT300N-V2</a>, <a href="https://www.gl-inet.com/products/gl-ar750s/">GL-AR750S</a>, <a href="https://www.gl-inet.com/products/gl-mt3600be/">GL-MT3600BE</a>; <a href="https://docs.gl-inet.com/router/en/4/tutorials/openwrt/">GL.iNet OpenWrt and VPN docs</a>; official vanilla OpenWrt support per the OpenWrt table of hardware (device pages linked above). Prices and stock are on Amazon; we don't quote them.</dd>
+        </dl>
+
+        <h2>FAQ</h2>
+        <h3>Are GL.iNet travel routers actually OpenWrt?</h3>
+        <p>GL.iNet stock firmware is built on OpenWrt, so you get a Linux router with a custom GL.iNet admin panel on top. For full vanilla OpenWrt with only official packages, you can flash an official OpenWrt build on the models listed in the OpenWrt table of hardware.</p>
+        <h3>Can I flash vanilla OpenWrt on a GL.iNet travel router, and which models are supported?</h3>
+        <p>Yes on supported models. The OpenWrt table of hardware lists official builds for the GL-MT3000 (Beryl AX), GL-MT6000 (Flint 2), GL-MT300N-V2 (Mango), GL-AR750S (Slate), GL-X3000 (Spitz AX), GL-XE3000 (Cheetah AX), GL-MT1300 (Beryl), GL-AR750 (Cretan), GL-A1300 (Slate Plus), GL-MT3600BE (Beryl 7), GL-E750 (Mudi) and others. The GL-AXT1800 (Slate AX) has an official build for OpenWrt 25.12.6 only. Models such as the GL-SFT1200 (Opal), GL-MG1300 (Mango 2), GL-E5800 (Mudi 7) and GL-BE3600 (Slate 7) have no official vanilla build in the current table, so they stay on stock GL.iNet firmware.</p>
+        <h3>Which GL.iNet travel router is best for WireGuard or Tailscale on hotel Wi-Fi?</h3>
+        <p>For most trips the GL-MT3000 (Beryl AX), a pocket-sized Wi-Fi 6 AX3000 travel router that GL.iNet ships with WireGuard and OpenVPN clients and encrypted DNS. GL.iNet's official documentation also covers WireGuard server and client setups and Tailscale tutorials. If you want Wi-Fi 7, the GL-MT3600BE (Beryl 7) has an official OpenWrt 25.12.6 build.</p>
+        <h3>Do I need a travel router with cellular (5G) or is public-Wi-Fi mode enough?</h3>
+        <p>If you stay in hotels and apartments with usable Wi-Fi, a Wi-Fi-only travel router that bridges the hotel network over your own encrypted link is enough. The GL-X3000 (Spitz AX) adds dual-SIM 5G NR cellular, which matters where public Wi-Fi is unreliable or you want redundancy.</p>
+        <h3>What is the difference between GL.iNet stock firmware and vanilla OpenWrt?</h3>
+        <p>GL.iNet stock firmware runs OpenWrt underneath with a custom admin panel aimed at non-experts, plus GL.iNet's own apps and updates. Vanilla OpenWrt is the official build from openwrt.org: stock packages only, the standard LuCI interface, and updates that follow OpenWrt's own release schedule. Flashing vanilla is optional, not required.</p>
+        <h3>Can a travel router connect or mesh alongside a Home Assistant or Thread setup?</h3>
+        <p>A travel router is a standalone router for trips, not part of a Thread network. At home you can use one as an extra OpenWrt node or lab router on your LAN; for mesh networking at home, OpenWrt supports mesh approaches such as batman-adv, which we cover in our <a href="openwrt-mesh-network.html">OpenWrt mesh network guide</a>.</p>
+        <p>More from this cluster: <a href="openwrt.html">what is OpenWrt</a> and <a href="openwrt-wireguard.html">WireGuard on OpenWrt</a>.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Assistant MCP: connect Claude and ChatGPT to your home — HA News</title>
+  <meta name="description" content="How to use MCP with Home Assistant: the two MCP integrations, which AI agents connect, tool sets, OAuth setup, what the AI can see and control, and real debugging wins.">
+  <link rel="canonical" href="https://hanews.org/home-assistant-mcp">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Home Assistant MCP: connect Claude and ChatGPT to your home", "datePublished": "2026-11-12", "dateModified": "2026-11-12", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-assistant-mcp"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I connect Claude to Home Assistant via MCP?", "acceptedAnswer": {"@type": "Answer", "text": "Copy the MCP server URL from Settings > System > AI in Home Assistant, then in Claude Code run `claude mcp add --transport http home-assistant <url>` and `claude mcp login home-assistant`. HTTPS is required for the Claude Code connection."}}, {"@type": "Question", "name": "Which entities can an AI agent see and control through the Home Assistant MCP server?", "acceptedAnswer": {"@type": "Answer", "text": "With the Device control tool set, the agent can only control or see entities exposed on the exposed entities page. With the Home Assistant tool set, it can read all entities, logs and history and perform any action."}}, {"@type": "Question", "name": "Does the Home Assistant MCP integration expose my whole instance or only exposed devices?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on the tool set you allow. The default Device control set is limited to exposed entities; granting the Home Assistant set hands the agent access to everything, including logs and history."}}, {"@type": "Question", "name": "How do I fix repeated OAuth failures when connecting ChatGPT or Claude to Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Set the Client ID to the base URL of the AI client app, such as https://claude.ai or https://chatgpt.com, never your Home Assistant URL. IndieAuth requires the redirect URI to be on the same scheme and domain as the client ID."}}, {"@type": "Question", "name": "What is the difference between Home Assistant's two MCP integrations?", "acceptedAnswer": {"@type": "Answer", "text": "The Model Context Protocol integration (mcp_server) makes Home Assistant an MCP server so an outside AI app can control it. The Model Context Protocol Client integration (mcp) does the reverse: your HA conversation agent gains tools from an external MCP server."}}, {"@type": "Question", "name": "Can Home Assistant's Assist use tools from external MCP servers?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, through the Model Context Protocol Client integration. You need an AI conversation agent that can use tools, such as Anthropic, Google Gemini, Ollama or OpenAI, and a network-reachable MCP server URL."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Thursday, 12 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html" aria-current="page">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Home Assistant + AI</p>
+        <h1>Home Assistant MCP: connect Claude and ChatGPT to your home</h1>
+        <p class="byline">HA News · 12 Nov 2026</p>
+
+        <p>MCP, the Model Context Protocol, is the common standard that lets AI applications call tools. Home Assistant speaks it in both directions, which is why "Home Assistant MCP" is suddenly a search term. Two integrations look similar and do opposite things. The <strong>Model Context Protocol</strong> integration (<code>mcp_server</code>) makes Home Assistant an MCP server: an outside AI application such as Claude or ChatGPT connects in and controls your home. The <strong>Model Context Protocol Client</strong> integration (<code>mcp</code>) does the reverse: your Home Assistant conversation agent picks up tools from an external MCP server. Both are built in; neither needs a custom add-on. This guide covers what each one does, how to set up the server side, which agents connect and how, what the AI can actually see and touch, and the gotchas that trip people up — per the Home Assistant documentation, not guesswork.</p>
+
+        <h2>The two integrations, in one table</h2>
+        <table>
+          <thead><tr><th>Integration</th><th>Direction</th><th>What it gives you</th></tr></thead>
+          <tbody>
+            <tr><td>Model Context Protocol (<code>mcp_server</code>)</td><td>Outside AI → Home Assistant</td><td>A URL you paste into Claude, ChatGPT, Codex or OpenCode so the agent can control Home Assistant</td></tr>
+            <tr><td>Model Context Protocol Client (<code>mcp</code>)</td><td>External MCP server → Home Assistant</td><td>Tools from any external MCP server, usable by your HA conversation agent</td></tr>
+          </tbody>
+        </table>
+        <p>Most people searching for Home Assistant MCP want the first one: an AI assistant that can flip scenes, check sensor values and — the real prize — write and debug automations with full context of the house. The rest of this guide focuses on the server side, then comes back to the client.</p>
+
+        <h2>Tool sets: how much the AI gets</h2>
+        <p>With <code>mcp_server</code>, Home Assistant groups the tools it offers into sets, which the docs call API definitions for LLMs (Assist LLM APIs). The AI agent can use any set you allow, and the default is all of them. The two sets are not equivalent, and choosing between them is the single most consequential decision in this setup:</p>
+        <ul>
+          <li><strong>Device control</strong> — the same tools Assist uses. The AI can only control and see the entities you have put on the exposed entities page. It cannot read logs, history or unlisted devices.</li>
+          <li><strong>Home Assistant</strong> — the full set. The AI can read all entities, logs and history, and perform any action. That is a big capability and a big trust step: the agent effectively sees your whole instance.</li>
+        </ul>
+        <p>If you only want Claude to switch lights and check the thermostat, expose a limited set of entities and allow Device control. If you want an AI pair-programmer that reads automation traces and hunts bugs, it needs the Home Assistant set. The per-tool-set Individual URLs let you hand different agents different sets: one URL exposes only Device control tools, another everything.</p>
+
+        <h2>Setup: getting the server URL</h2>
+        <ol>
+          <li>In Home Assistant, go to Settings, then System, then AI.</li>
+          <li>If the card shows an Enable button, select it.</li>
+          <li>Copy the Main URL, or a per-tool-set Individual URL. The Main URL exposes all tools of the default APIs.</li>
+          <li>Paste that URL into your AI client (examples below).</li>
+        </ol>
+        <p>One prerequisite that matters: if the AI agent runs in the cloud — Claude on claude.ai, ChatGPT on chatgpt.com — your Home Assistant instance must be reachable from the internet. Home Assistant Cloud handles that without port forwarding; other remote-access routes work too. If the agent runs locally on the same network as your server, like Claude Code on a laptop at home, the plain local URL is fine.</p>
+
+        <h2>Connecting the agents, per the docs</h2>
+        <p>The official mcp_server page documents four clients besides claude.ai itself. The commands are short enough to keep here:</p>
+        <ul>
+          <li><strong>ChatGPT</strong> — open the Plugins page, choose Add custom MCP server, paste the URL, and complete the OAuth flow.</li>
+          <li><strong>Claude Code</strong> — <code>claude mcp add --transport http home-assistant &lt;url&gt;</code>, then <code>claude mcp login home-assistant</code>. Claude Code connects over HTTPS only.</li>
+          <li><strong>Codex</strong> — <code>codex mcp add homeassistant --url &lt;url&gt;</code>. The docs use <code>http://homeassistant.local:8123/api/mcp</code> as the example URL.</li>
+          <li><strong>OpenCode</strong> — <code>opencode mcp add home-assistant --url &lt;url&gt;</code>, then <code>opencode mcp auth home-assistant</code>.</li>
+        </ul>
+        <p>Note what each client needs. ChatGPT and claude.ai live in the cloud and need your instance exposed. Codex happily points at a local <code>.local</code> address. Claude Code works, per the docs, over HTTPS — so plan for a proper certificate if Claude Code is your client of choice.</p>
+
+        <h2>What MCP actually passes through</h2>
+        <p>Home Assistant's MCP server supports Prompts, Tools, and Resources. Resources work only for the Device control set. Sampling and Notifications are not supported. In practice, everything useful is in Tools: the device-control tools from Assist, plus the broader read-and-act tools from the full set.</p>
+        <p>One extra resource is worth knowing about. When your configured LLM API includes the GetLiveContext tool, Home Assistant exposes a read-only MCP Resource at <code>homeassistant://assist/context-snapshot</code> that returns a plain-text snapshot of the current context. Home Assistant describes it as intended for inspection, debugging, and explanation workflows — that is, for when you want a second AI to look at what the assistant knows about the house, rather than to act on anything.</p>
+
+        <h2>The OAuth gotcha</h2>
+        <p>The most common failure in this setup is also the easiest to fix. Home Assistant authenticates MCP clients with OAuth built on IndieAuth, and IndieAuth requires the redirect URI to be on the same scheme and domain as the Client ID. The Client ID must therefore be the base URL of the AI client application — <code>https://claude.ai</code> for Claude or <code>https://chatgpt.com</code> for ChatGPT — never your Home Assistant instance's URL. Put the wrong URL there and login fails repeatedly, and the fix is not obvious from the error.</p>
+        <p>Two related details from the docs: Home Assistant uses no client secret, so if the client demands one, enter any text. And if IP bans are enabled on your instance, repeated failed logins can add your IP to <code>ip_bans.yaml</code> — which presents as your whole LAN being locked out, a far scarier symptom than the cause deserves.</p>
+
+        <h2>The MCP Client integration, briefly</h2>
+        <p>The other direction — <code>mcp</code>, the Model Context Protocol Client — attaches tools from an external MCP server to your Home Assistant conversation agent. Prerequisites: an AI conversation agent that can use tools (the docs name Anthropic, Google Gemini, Ollama and OpenAI) and a network-reachable MCP server URL. A server that only speaks stdio and runs locally needs an MCP proxy, such as mcp-proxy, to become reachable over the network. This is how Assist gains, say, a specialist tool from some third-party service while your automations keep running locally. It is the quieter of the two integrations, but if you have already standardized on Assist as your voice interface, it is the one that extends it.</p>
+
+        <h2>What it looks like in practice</h2>
+        <p>The Home Assistant docs tell you what is possible; a real deployment shows what it is good for. <a href="https://blog.beguelin.com/">Adam Beguelin</a>, HA News's editor, uses Claude Code against his own instance over MCP and wrote up the workflow in April 2026, with his Home Assistant configuration in git and automations kept as individual YAML files. The working loop he described: edit an automation locally, copy it to the server, reload automations, verify in Home Assistant, then commit to git. Claude Code reads entity states, searches entities, reloads configs and, crucially, reads automation traces.</p>
+        <p>Two cases from that setup are worth recounting, because they show both halves of the value. First, debugging: a presence automation fired five times in 40 minutes on home-to-home GPS updates. The state trigger had no <code>from</code>/<code>to</code> filter, so every GPS refresh of the same state re-triggered it. Reading the automation trace through MCP showed the cause in seconds, and adding explicit filters fixed it — from question to deployed fix in under two minutes. Anyone who has chased a mystery trigger through the UI's trace viewer will recognize the shape of that win: the answer was in the trace all along; an AI with tool access just reads it faster than a human scrolling.</p>
+        <p>Second, building: a motion-light automation for a shed, written from scratch in conversation. Claude reused the house's existing motion-automation patterns, asked clarifying questions where its instructions were ambiguous, and proposed something a careful human would: snapshot each light's prior state into variables so that lights already on before the motion are not switched off after the 10-minute delay, with <code>mode: restart</code>. The overhead point generalizes — with the setup, writing a new automation costs little enough that you build the ones you had been postponing.</p>
+        <p>Two housekeeping notes from the same deployment. Claude Code uses project skills files (in that setup, <code>ha</code> and <code>openwrt</code> skills) that auto-load and teach conventions: automation file format, trigger patterns (including a quirk where Inovelli switch same-type consecutive presses don't fire attribute-based triggers), entity naming, and known bugs such as a Tuya double-conversion problem. And for safety's sake: Claude Code asks permission before calling any MCP tool, which keeps a debugging session from rearranging your house unbidden.</p>
+
+        <h2>Security in brief</h2>
+        <ul>
+          <li>Choose tool sets deliberately. Device control plus a curated exposed-entities list is a hard ceiling; the full set is not.</li>
+          <li>Cloud agents need remote access. Home Assistant Cloud is the documented path; weigh any self-hosted alternative on its own merits.</li>
+          <li>The Client ID is the AI app's base URL, not your instance's. Get this right first and you skip the most common failure mode.</li>
+          <li>If IP bans are enabled, repeated failed logins can ban your IP. Fix the Client ID before hammering login.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, ESPHome and OpenWrt releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>How do I connect Claude to Home Assistant via MCP?</h3>
+        <p>Copy the MCP server URL from Settings, then System, then AI in Home Assistant. In Claude Code, run <code>claude mcp add --transport http home-assistant &lt;url&gt;</code> and then <code>claude mcp login home-assistant</code>. Claude Code connects over HTTPS only.</p>
+        <h3>Which entities can an AI agent see and control through the Home Assistant MCP server?</h3>
+        <p>With the Device control tool set, the agent can only control or see entities exposed on the exposed entities page. With the Home Assistant tool set, it can read all entities, logs and history and perform any action.</p>
+        <h3>Does the Home Assistant MCP integration expose my whole instance or only exposed devices?</h3>
+        <p>It depends on the tool set you allow. The Device control set is limited to exposed entities. The Home Assistant set hands the agent access to everything, including logs and history, and by default the Main URL exposes all tool sets, so turn off Expose all AI tools in the integration options if you want to limit it.</p>
+        <h3>How do I fix repeated OAuth failures when connecting ChatGPT or Claude to Home Assistant?</h3>
+        <p>Set the Client ID to the base URL of the AI client application, such as <code>https://claude.ai</code> or <code>https://chatgpt.com</code>, never your Home Assistant URL. IndieAuth requires the redirect URI to be on the same scheme and domain as the client ID.</p>
+        <h3>What is the difference between Home Assistant's two MCP integrations?</h3>
+        <p>The Model Context Protocol integration (<code>mcp_server</code>) makes Home Assistant an MCP server so an outside AI application can control it. The Model Context Protocol Client integration (<code>mcp</code>) does the opposite: your HA conversation agent gains tools from an external MCP server.</p>
+        <h3>Can Home Assistant's Assist use tools from external MCP servers?</h3>
+        <p>Yes, through the Model Context Protocol Client integration. You need an AI conversation agent that can use tools — Anthropic, Google Gemini, Ollama or OpenAI — and a network-reachable MCP server URL. A stdio-only local server needs an MCP proxy such as mcp-proxy.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/integrations/mcp_server/">Home Assistant Model Context Protocol (mcp_server) integration</a>; <a href="https://www.home-assistant.io/integrations/mcp/">Home Assistant Model Context Protocol Client (mcp) integration</a>; <a href="https://blog.beguelin.com/2026/04/claude-code-home-assistant/">Claude Code + Home Assistant (Adam Beguelin's blog)</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
