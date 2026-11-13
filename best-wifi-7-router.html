@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best Wi-Fi 7 router (2026): OpenWrt vs stock, smart-home notes — HA News</title>
+  <meta name="description" content="Which Wi-Fi 7 router to buy: ASUS ZenWiFi BT8 and RT-BE96U specs, the GL.iNet Beryl 7 for OpenWrt, and which flagships can't be flashed. With an OpenWrt-support column for people who run their own home network.">
+  <link rel="canonical" href="https://hanews.org/best-wifi-7-router">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best Wi-Fi 7 router (2026): OpenWrt vs stock, smart-home notes", "image": "https://hanews.org/images/gl-inet-beryl-7-gl-mt3600be.png", "datePublished": "2026-11-13", "dateModified": "2026-11-13", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/best-wifi-7-router"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which Wi-Fi 7 routers can run OpenWrt today?", "acceptedAnswer": {"@type": "Answer", "text": "As of the November 2026 OpenWrt device-data refresh, the ASUS ZenWiFi BT8 and the GL.iNet Beryl 7 (GL-MT3600BE) have official OpenWrt 25.12.6 builds. Flagships such as the ASUS RT-BE96U, ROG Rapture GT-BE98 and GL.iNet Flint 4 do not."}}, {"@type": "Question", "name": "Is a Wi-Fi 7 mesh like the ASUS ZenWiFi BT8 better for smart-home devices than Wi-Fi 6?", "acceptedAnswer": {"@type": "Answer", "text": "For 2.4 GHz-only smart-home devices, Wi-Fi 7 adds little: 320 MHz channels, 4096-QAM and MLO operate in the 5 and 6 GHz bands. What helps is newer radios and a less congested 2.4 GHz band, plus 6 GHz taking laptops and phones off shared spectrum."}}, {"@type": "Question", "name": "Does 6 GHz Wi-Fi 7 help Zigbee or Thread smart-home performance?", "acceptedAnswer": {"@type": "Answer", "text": "Not directly. Zigbee and Thread use 2.4 GHz, so the 6 GHz band does not touch or overlap them. The benefit is indirect: phones, laptops and TVs that move onto 6 GHz stop crowding the 2.4 GHz band that Zigbee, Thread and your IoT devices share."}}, {"@type": "Question", "name": "Do I need quad-band Wi-Fi 7 for a smart home?", "acceptedAnswer": {"@type": "Answer", "text": "No. Quad-band flagships like the ROG Rapture GT-BE98 are aimed at multi-gigabit links, gaming and dense households. A smart home's IoT devices stay on 2.4 GHz, so a dual-band Wi-Fi 7 router with OpenWrt support often serves a smart home better than a closed flagship."}}, {"@type": "Question", "name": "Does MLO matter for IoT devices?", "acceptedAnswer": {"@type": "Answer", "text": "Not yet. Multi-Link Operation lets one client use two radios at once for speed and reliability, but it is a Wi-Fi 7 client feature. Most IoT devices are 2.4 GHz-only and stay on older standards, so they neither use nor benefit from MLO today."}}, {"@type": "Question", "name": "Dual-band or tri-band Wi-Fi 7 router for a large house?", "acceptedAnswer": {"@type": "Answer", "text": "Two nodes usually beat one big router. A dual-band Wi-Fi 7 kit such as the ASUS ZenWiFi BT8 sold as a two- or three-pack, or a dual-band router plus a second node, covers more floor area than a single tri-band unit. Tri-band adds headroom for heavy wired-backhaul-free use, not for smart-home devices."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 13 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="HA News home">HA News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Networking</p>
+        <h1>The best Wi-Fi 7 router (2026): OpenWrt vs stock, with smart-home notes</h1>
+        <p class="byline">HA News · 13 Nov 2026</p>
+
+        <p>A Wi-Fi 7 (802.11be) router today is a bet on two things at once: raw speed for the few devices that can use it, and a choice of firmware for the network your whole house depends on. Most Wi-Fi 7 buyers look at the ASUS lineup, where the headline features are 320 MHz channels in the 6 GHz band, 4096-QAM, Multi-Link Operation (MLO) and Multi-RU puncturing — all per ASUS's own product pages. But if you run your own home network, the question that actually changes what you buy is simpler: <strong>which Wi-Fi 7 routers support OpenWrt today?</strong></p>
+
+        <p>Our answer, shortlist-first for people who want to keep control of their own home network:</p>
+        <ul>
+          <li><strong>Best Wi-Fi 7 router you can flash:</strong> the ASUS ZenWiFi BT8 (official OpenWrt 25.12.6 build) — and the GL.iNet Beryl 7 (GL-MT3600BE) if you want dual-band and OpenWrt-first design. Check <a href="https://www.amazon.com/s?k=ASUS+ZenWiFi+BT8&amp;tag=hanews01-20" rel="sponsored nofollow">ASUS ZenWiFi BT8 on Amazon</a> or <a href="https://www.amazon.com/s?k=GL.iNet+Beryl+7&amp;tag=hanews01-20" rel="sponsored nofollow">GL.iNet Beryl 7 on Amazon</a>.</li>
+          <li><strong>Best Wi-Fi 7 router on stock firmware:</strong> ASUS RT-BE96U (BE19000 tri-band) for throughput; ROG Rapture GT-BE98 (BE30000 quad-band) for the spec ceiling. Neither has an official OpenWrt build. Check <a href="https://www.amazon.com/s?k=ASUS+RT-BE96U&amp;tag=hanews01-20" rel="sponsored nofollow">ASUS RT-BE96U on Amazon</a> and <a href="https://www.amazon.com/s?k=ASUS+ROG+Rapture+GT-BE98&amp;tag=hanews01-20" rel="sponsored nofollow">ASUS ROG Rapture GT-BE98 on Amazon</a>.</li>
+          <li><strong>For a smart home specifically:</strong> 2.4 GHz IoT devices don't care about 320 MHz channels or MLO. What they need is stable 2.4 GHz, sane band steering, and (if you're local-first) firmware you control. That pushes most smart-home buyers toward the mid-class MTK Filogic hardware above, not the flagships.</li>
+        </ul>
+
+        <p>If you're still weighing whether Wi-Fi 7 is worth it at all, we compare the standards in <a href="wifi-6-vs-wifi-7">Wi-Fi 6 vs Wi-Fi 7</a>. And if your priority is an open router platform generally rather than Wi-Fi 7 specifically, start at <a href="best-openwrt-router">the best OpenWrt router</a>.</p>
+
+        <h2>What Wi-Fi 7 actually changes, per the spec sheet</h2>
+        <p>Four vendor-confirmed features separate Wi-Fi 7 from Wi-Fi 6/6E hardware, all listed across the ASUS Wi-Fi 7 lineup:</p>
+        <ul>
+          <li><strong>320 MHz channels in 6 GHz.</strong> Twice the channel width of Wi-Fi 6's 160 MHz. One 320 MHz channel in 6 GHz is where the multi-gigabit numbers come from.</li>
+          <li><strong>4096-QAM.</strong> Higher signal density per symbol than Wi-Fi 6's 1024-QAM — more bits over the same airtime at close range.</li>
+          <li><strong>Multi-Link Operation (MLO).</strong> A Wi-Fi 7 client can use two bands at once. This is a client-and-router negotiation, not something a 2.4 GHz-only sensor can opt into.</li>
+          <li><strong>Multi-RU puncturing.</strong> The router can transmit around occupied spectrum instead of waiting for a clean channel — useful in crowded 5/6 GHz air, invisible to your Zigbee coordinator.</li>
+        </ul>
+        <p>Note what's absent from that list: anything 2.4 GHz-only devices can use. Zigbee, Thread, most plugs, most sensors and most cameras connect at 2.4 GHz, where Wi-Fi 7 adds nothing over Wi-Fi 6. The smart-home benefit of a Wi-Fi 7 router is indirect — newer radios, better CPUs, and 6 GHz absorbing the laptops, phones and TVs that currently crowd your 2.4 GHz band.</p>
+
+        <figure class="figure">
+          <img src="images/gl-inet-beryl-7-gl-mt3600be.png" alt="GL.iNet Beryl 7 (GL-MT3600BE) dual-band Wi-Fi 7 travel router" width="1200" height="1200" loading="lazy">
+          <figcaption>GL.iNet Beryl 7 (GL-MT3600BE). Source: <a href="https://www.gl-inet.com/products/gl-mt3600be/">GL.iNet product page</a></figcaption>
+        </figure>
+
+        <h2>The OpenWrt-support shortlist (as of the current device database)</h2>
+        <p>OpenWrt's current stable release is <strong>25.12.6</strong> (oldstable 24.10.8). Our verification baseline is the OpenWrt device database refreshed <strong>2026-11-09</strong>; anything not in it has no official build. Here is where official OpenWrt support stands for Wi-Fi 7-class routers today:</p>
+        <table>
+          <thead><tr><th>Router</th><th>Class</th><th>OpenWrt support today</th><th>Firmware</th></tr></thead>
+          <tbody>
+            <tr><td>ASUS ZenWiFi BT8</td><td>BE14000 mesh node (MediaTek Filogic)</td><td><strong>Yes</strong> — official 25.12.6 build (plus a U-Boot mod profile)</td><td>Stock or OpenWrt</td></tr>
+            <tr><td>GL.iNet Beryl 7 (GL-MT3600BE)</td><td>Dual-band Wi-Fi 7 travel router</td><td><strong>Yes</strong> — official 25.12.6 build</td><td>Stock (OpenWrt-based) or vanilla OpenWrt</td></tr>
+            <tr><td>Routerich BE7200</td><td>BE7200-class</td><td><strong>Yes</strong> — official 25.12.6 build</td><td>Stock or OpenWrt</td></tr>
+            <tr><td>TP-Link BE450</td><td>BE450-class</td><td><strong>Yes</strong> — official 25.12.6 build</td><td>Stock or OpenWrt</td></tr>
+            <tr><td>Zyxel WX5600-T0</td><td>BE5600-class</td><td><strong>U-Boot layout only</strong> (ubootmod profile)</td><td>Stock or OpenWrt</td></tr>
+            <tr><td>ASUS RT-BE96U</td><td>BE19000 tri-band flagship</td><td><strong>No</strong> — not in the device database</td><td>ASUS stock, AiMesh</td></tr>
+            <tr><td>ASUS ROG Rapture GT-BE98</td><td>BE30000 quad-band flagship</td><td><strong>No</strong> — not in the device database</td><td>ASUS stock</td></tr>
+            <tr><td>GL.iNet Flint 4 (GL-BE14000)</td><td>Wi-Fi 7, newly announced</td><td><strong>No</strong> — no official build yet</td><td>GL.iNet stock</td></tr>
+          </tbody>
+        </table>
+        <p>The pattern is worth stating plainly: <strong>the big-number flagships have no official OpenWrt builds yet.</strong> If OpenWrt is a requirement, you buy mid-class MediaTek Filogic hardware — the ZenWiFi BT8 or the Beryl 7 — not the 19,000- or 30,000-segment boxes.</p>
+
+        <h2>Pick 1: ASUS ZenWiFi BT8 — the flagship mesh you can flash</h2>
+        <p>The ZenWiFi BT8 is the ASUS Wi-Fi 7 mesh node that happens to have an OpenWrt build. Per <a href="https://www.asus.com/us/networking-iot-servers/wifi-routers/asus-wifi-routers/asus-zenwifi-bt8/techspec/">ASUS's spec page</a>:</p>
+        <table>
+          <thead><tr><th>Spec</th><th>ASUS ZenWiFi BT8</th></tr></thead>
+          <tbody>
+            <tr><td>Wi-Fi</td><td>Wi-Fi 7 (802.11be); BE14000 segment: 688 Mbps (2.4 GHz) + 4323 Mbps (5 GHz) + 8643 Mbps (6 GHz)</td></tr>
+            <tr><td>Antennas / streams</td><td>6 GHz 3&times;3, 5 GHz 3&times;3, 2.4 GHz 2&times;2</td></tr>
+            <tr><td>OFDMA features</td><td>4096-QAM; 20/40/80/160/320 MHz channel widths</td></tr>
+            <tr><td>Memory</td><td>1 GB RAM, 128 MB flash</td></tr>
+            <tr><td>Ports</td><td>1&times; 2.5G WAN, 1&times; 2.5G LAN, 2&times; 1G LAN, 1&times; USB 3.0</td></tr>
+            <tr><td>Modes</td><td>Wireless router, access point, AiMesh node</td></tr>
+            <tr><td>Security and network stack</td><td>WPA3-Personal; DNS-over-TLS; VPN client and server including WireGuard</td></tr>
+            <tr><td>Packs</td><td>Sold as 1-, 2- or 3-packs (W-1-PK / W-2-PK / W-3-PK)</td></tr>
+          </tbody>
+        </table>
+        <p>OpenWrt's device page for the <a href="https://openwrt.org/toh/asus/zenwifi-bt8">ZenWiFi BT8</a> lists a MediaTek Filogic target with the official <code>asus_zenwifi-bt8</code> profile on 25.12.6 — plus an <code>asus_zenwifi-bt8-ubootmod</code> U-Boot variant if you prefer a different boot layout. Flashing is done through the <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=asus_zenwifi-bt8">OpenWrt firmware selector</a>, and the usual first step is verifying your exact hardware revision against the device page before you flash.</p>
+        <p>For a smart home this is the rare combination: vendor mesh hardware with real per-node specs (2.5G backhaul-capable ports, four radio chains on 6 GHz) that also accepts a mainstream open firmware if the stock stack's cloud-app ecosystem — the ASUS Router app, AiProtection — isn't how you want to run a network.</p>
+
+        <h2>Pick 2: GL.iNet Beryl 7 — dual-band Wi-Fi 7, OpenWrt-first by design</h2>
+        <p>GL.iNet positions the <a href="https://www.gl-inet.com/products/gl-mt3600be/">Beryl 7 (GL-MT3600BE)</a> as a dual-band Wi-Fi 7 travel router, and the company's devices ship with an OpenWrt-derived stock firmware — the design intent is OpenWrt-first. There is an official OpenWrt 25.12.6 build for it (MediaTek Filogic, <code>glinet_gl-mt3600be</code>), documented on the <a href="https://openwrt.org/toh/glinet/gl_mt3600be">OpenWrt device page</a> and fetchable from the <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=mediatek/filogic&amp;id=glinet_gl-mt3600be">firmware selector</a>.</p>
+        <p>Who this is for: a smaller space, a second network, a travel/spot setup, or a smart-home lab VLAN where you want vanilla OpenWrt on Wi-Fi 7 silicon without paying a flagship's radio count for radios your 2.4 GHz devices will never use. It is dual-band (no 6 GHz), so treat it as the compact, fully-open pick rather than a whole-house anchor — for house-wide coverage, the ZenWiFi BT8's 6 GHz band and mesh role are the reasons to pick it instead.</p>
+        <p>GL.iNet also announced the GL-BE14000 "Flint 4", a new Wi-Fi 7 release. It is <strong>not</strong> yet in OpenWrt's device database, so there is no official vanilla build — only GL.iNet's stock firmware for now.</p>
+
+        <h2>Pick 3: ASUS RT-BE96U — the stock-firmware flagship</h2>
+        <p>If you're staying on vendor firmware, the RT-BE96U is ASUS's tri-band Wi-Fi 7 flagship. Per <a href="https://www.asus.com/us/networking-iot-servers/wifi-routers/asus-gaming-routers/rt-be96u/techspec">ASUS's spec page</a>:</p>
+        <ul>
+          <li>BE19000 tri-band: up to 11529 Mbps on 6 GHz, 5764 on 5 GHz, 1376 on 2.4 GHz; 4&times;4 on all three bands.</li>
+          <li>2.6 GHz quad-core CPU, 2 GB RAM, 256 MB flash.</li>
+          <li>Dual 10G ports (one 10G WAN/LAN, one 10G LAN) plus three 1G LAN ports.</li>
+          <li>AiMesh node, media bridge and access-point modes supported.</li>
+        </ul>
+        <p>It is not in OpenWrt's device database, so there is no official OpenWrt build — you're buying into the ASUS stock stack. If that's a dealbreaker, it isn't the router for you no matter the radio count.</p>
+
+        <h2>Pick 4: ROG Rapture GT-BE98 — the spec ceiling</h2>
+        <p>The GT-BE98 is ASUS's quad-band BE30000 flagship: per <a href="https://press.asus.com/news/press-releases/3332">ASUS's press page</a>, four radios (1376 + 5764 + 11529 + 11529 Mbps, roughly 25 Gbps aggregate), three 10 Gbps LAN ports including a WAN/LAN port, a 2.6 GHz quad-core CPU, and the full Wi-Fi 7 feature set — 320 MHz, 4096-QAM and MLO. Also no official OpenWrt build. This is the box for a house full of multi-gigabit clients; it is not a smart-home purchase.</p>
+
+        <h2>The smart-home tradeoff on stock firmware</h2>
+        <p>The flagships' stock firmware ecosystem — ASUS Router app, AiProtection, cloud-tied dashboards, AiMesh — is polished, but it is also the vendor-cloud tradeoff. Your router's management surface lives partly in an app and partly behind vendor accounts, and features arrive or disappear on the vendor's schedule. On supported hardware, OpenWrt (or GL.iNet's OpenWrt-based stock) runs the whole network stack locally: your firewall rules, VLANs, DNS and WireGuard tunnels are config files you own and back up. If local control is why you run Home Assistant in the first place, the router is part of that stack, not an exception to it. We cover the VLAN side of this in <a href="openwrt-iot-vlan">a separate IoT VLAN guide</a>.</p>
+
+        <h2>Setup notes: flashing the BT8 or Beryl 7</h2>
+        <ol>
+          <li>Confirm the exact hardware on the OpenWrt device page. The BT8 has two profiles (<code>asus_zenwifi-bt8</code> and an <code>-ubootmod</code> variant); pick the one matching your intended boot method before you download anything.</li>
+          <li>Use the OpenWrt firmware selector link above to download the image for the current stable release (25.12.6 at the time of writing). Match the version and target shown on the device page.</li>
+          <li>Flash per the device page's install instructions for ASUS/GL.iNet hardware (typically via stock-firmware or U-Boot depending on the profile). Do not cross-flash profiles.</li>
+          <li>After flashing, redo your network basics by hand: admin password, Wi-Fi SSIDs and security (WPA3 where your clients support it), VLAN setup for IoT devices, and DNS. Don't restore a stock backup onto OpenWrt.</li>
+          <li>Only then reattach the smart-home stuff: 2.4 GHz IoT SSID, and whatever your Zigbee/Thread infrastructure needs — which lives on its own radios, not on the Wi-Fi router.</li>
+        </ol>
+        <p>If you're flashing a used or travel router rather than a mesh node, the same steps apply — our <a href="travel-router-openwrt">GL.iNet travel router guide</a> walks the small-router case.</p>
+
+        <h2>Gotchas</h2>
+        <ul>
+          <li><strong>MLO won't apply to most of your house.</strong> Smart-home devices are 2.4 GHz and largely Wi-Fi 4/6 clients. MLO, 320 MHz and 4096-QAM benefit your laptop and NAS, not your sensors.</li>
+          <li><strong>"Dual-band Wi-Fi 7" is not a spec downgrade for IoT.</strong> IoT devices don't use 6 GHz; the Beryl 7 covering 2.4 + 5 GHz serves them the same as a tri-band box.</li>
+          <li><strong>Devices.csv-vs-marketing lag is real.</strong> A "Wi-Fi 7 router" in a store may have no OpenWrt entry for months after launch; the Flint 4 is current proof. Check the device database before committing either way.</li>
+          <li><strong>Zyxel's support ships with an asterisk:</strong> the WX5600-T0's official build is U-Boot layout only. If you don't want to deal with a custom boot process, pick one of the two mainline-profile devices instead.</li>
+          <li><strong>2.4 GHz is still the smart-home air.</strong> No Wi-Fi 7 feature fixes 2.4 GHz congestion except removing clients from it — which 6 GHz devices do, which is the honest version of this upgrade's smart-home value.</li>
+        </ul>
+
+        <aside class="rail-sub article-cta" aria-label="Newsletter">
+          <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, ESPHome and the local networking stack, sourced from the projects themselves.</p>
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </aside>
+
+        <h2>FAQ</h2>
+        <h3>Which Wi-Fi 7 routers can run OpenWrt today?</h3>
+        <p>As of the November 2026 OpenWrt device-data refresh, the ASUS ZenWiFi BT8 and the GL.iNet Beryl 7 (GL-MT3600BE) have official OpenWrt 25.12.6 builds. Flagships such as the ASUS RT-BE96U, ROG Rapture GT-BE98 and GL.iNet Flint 4 do not.</p>
+        <h3>Is a Wi-Fi 7 mesh like the ASUS ZenWiFi BT8 better for smart-home devices than Wi-Fi 6?</h3>
+        <p>For 2.4 GHz-only smart-home devices, Wi-Fi 7 adds little: 320 MHz channels, 4096-QAM and MLO operate in the 5 and 6 GHz bands. What helps is newer radios and a less congested 2.4 GHz band, plus 6 GHz taking laptops and phones off shared spectrum.</p>
+        <h3>Does 6 GHz Wi-Fi 7 help Zigbee or Thread smart-home performance?</h3>
+        <p>Not directly. Zigbee and Thread use 2.4 GHz, so the 6 GHz band does not touch or overlap them. The benefit is indirect: phones, laptops and TVs that move onto 6 GHz stop crowding the 2.4 GHz band that Zigbee, Thread and your IoT devices share.</p>
+        <h3>Do I need quad-band Wi-Fi 7 for a smart home?</h3>
+        <p>No. Quad-band flagships like the ROG Rapture GT-BE98 are aimed at multi-gigabit links, gaming and dense households. A smart home's IoT devices stay on 2.4 GHz, so a dual-band Wi-Fi 7 router with OpenWrt support often serves a smart home better than a closed flagship.</p>
+        <h3>Does MLO matter for IoT devices?</h3>
+        <p>Not yet. Multi-Link Operation lets one client use two radios at once for speed and reliability, but it is a Wi-Fi 7 client feature. Most IoT devices are 2.4 GHz-only and stay on older standards, so they neither use nor benefit from MLO today.</p>
+        <h3>Dual-band or tri-band Wi-Fi 7 router for a large house?</h3>
+        <p>Two nodes usually beat one big router. A dual-band Wi-Fi 7 kit such as the ASUS ZenWiFi BT8 sold as a two- or three-pack, or a dual-band router plus a second node, covers more floor area than a single tri-band unit. Tri-band adds headroom for heavy wired-backhaul-free use, not for smart-home devices.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd>
+            <a href="https://www.asus.com/us/networking-iot-servers/wifi-routers/asus-wifi-routers/asus-zenwifi-bt8/techspec/">ASUS ZenWiFi BT8 specs</a>;
+            <a href="https://www.asus.com/us/networking-iot-servers/wifi-routers/asus-gaming-routers/rt-be96u/techspec">ASUS RT-BE96U specs</a>;
+            <a href="https://press.asus.com/news/press-releases/3332">ASUS Wi-Fi 7 lineup press release</a>;
+            <a href="https://www.gl-inet.com/products/gl-mt3600be/">GL.iNet Beryl 7 (GL-MT3600BE)</a>;
+            <a href="https://openwrt.org/toh/asus/zenwifi-bt8">OpenWrt: ASUS ZenWiFi BT8</a>;
+            <a href="https://openwrt.org/toh/glinet/gl_mt3600be">OpenWrt: GL.iNet GL-MT3600BE</a>;
+            <a href="https://firmware-selector.openwrt.org/">OpenWrt firmware selector</a>
+          </dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">&times;</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
