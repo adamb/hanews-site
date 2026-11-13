@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Best LoRaWAN sensors for a rural property (tank, gate, freezer, soil) — HA News</title>
+  <meta name="description" content="Long-range LoRaWAN sensors for rural homes: water tank level, gate and mailbox contacts, freezer temperature, soil moisture — plus battery life and how to get the data into Home Assistant over The Things Network.">
+  <link rel="canonical" href="https://hanews.org/lorawan-sensors">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Best LoRaWAN sensors for a rural property (tank, gate, freezer, soil)", "datePublished": "2026-11-13", "dateModified": "2026-11-13", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/lorawan-sensors"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How far do LoRaWAN sensors reach in a rural property?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on line of sight more than transmit power. In open rural terrain, kilometers are common; buildings, foliage and antenna placement cut that fast. Dragino's knowledge base on antenna selection is the vendor doc to read before deciding where a gateway and sensors go."}}, {"@type": "Question", "name": "Do LoRaWAN sensors work with Home Assistant directly, or do I need The Things Network?", "acceptedAnswer": {"@type": "Answer", "text": "There is no LoRaWAN integration in Home Assistant as of this writing. Sensors report to The Things Stack (The Things Network or a self-hosted stack), which forwards decoded JSON over MQTT to Mosquitto, and Home Assistant picks it up with its MQTT integration."}}, {"@type": "Question", "name": "Which LoRaWAN sensor should I use for a water tank, a gate, or a freezer?", "acceptedAnswer": {"@type": "Answer", "text": "Tank level: a non-contact ultrasonic sensor such as the Milesight EM400-UDL, or an in-pipe submersible like the EM500-SWL. Gate or mailbox: a magnetic contact switch such as the EM300-MCS. Freezer: a low-temperature logger such as the Milesight TS301/TS302, which keeps a history buffer and retransmits after an outage."}}, {"@type": "Question", "name": "How long do LoRaWAN sensor batteries last in real use?", "acceptedAnswer": {"@type": "Answer", "text": "Vendors design these nodes for years on small batteries because the uplinks are short and infrequent, but real battery life depends on reporting interval, spread factor and temperature. Check the datasheet for the specific model and be conservative on your report rate."}}, {"@type": "Question", "name": "Can a LoRaWAN sensor trigger an HA automation without a gateway (D2D)?", "acceptedAnswer": {"@type": "Answer", "text": "Some Milesight sensors support Device-to-Device (D2D) communication, where one sensor can directly trigger another LoRaWAN device without a gateway in the loop. D2D covers the radio-to-radio trigger; the data still reaches Home Assistant through The Things Stack and MQTT when a gateway is present."}}, {"@type": "Question", "name": "What's the difference between a LoRa sensor and a LoRaWAN sensor?", "acceptedAnswer": {"@type": "Answer", "text": "LoRa is the radio modulation the sensor uses to send data over long distances at low power. LoRaWAN is the network protocol on top of it that defines how devices join, communicate and are managed. A LoRaWAN sensor speaks both; a bare 'LoRa' sensor may use a private protocol instead."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Friday, 13 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Best picks · LoRaWAN</p>
+        <h1>Best LoRaWAN sensors for a rural property (tank, gate, freezer, soil)</h1>
+        <p class="byline">HA News · 13 Nov 2026</p>
+
+        <p>Wi-Fi, Zigbee and Z-Wave sensors stop being practical once the sensor is 100 meters from the house, or at the end of a long driveway with no repeater in between. That is the job a LoRaWAN sensor is built for: a battery-powered node that wakes up, transmits a few bytes on an 868 or 915 MHz radio, and goes back to sleep. Range is measured in kilometers, batteries are designed to last years, and the sensor needs nothing from your network. <strong>For most rural jobs the answer is a ready-made LoRaWAN end device — a Milesight EM400-UDL for a water tank, an EM300-MCS for a gate or mailbox, a TS301/TS302 for a freezer, or a Dragino LSN50v2-S31 for soil — reporting through The Things Network into Home Assistant over MQTT.</strong> This page explains how those sensors work, how to get the data into Home Assistant, and where each model fits.</p>
+
+        <p>If you don't yet have the receiving side, start with <a href="lorawan-gateway">how to pick and set up a LoRaWAN gateway</a>; a sensor without a gateway is a very quiet investment. And if the job is specifically tank level, we went deeper in <a href="water-tank-level-sensor">water tank level sensors</a>.</p>
+
+        <h2>What a LoRaWAN sensor is (lora sensor vs LoRaWAN sensor)</h2>
+        <p>The two terms get swapped freely, so pin them down once. <strong>LoRa</strong> is the physical radio: a modulation technique that trades data rate for range and sensitivity, so a few bytes can travel for kilometers on milliwatts. <strong>LoRaWAN</strong> is the network protocol defined on top of that radio — it specifies how a device joins a network, identifies itself, encrypts payloads, and negotiates data rates. A "LoRa sensor" might use the radio with a private protocol point-to-point; a LoRaWAN sensor speaks the standard, which is what lets it onboard into a multi-vendor network like The Things Network. When you buy, you want a device that speaks LoRaWAN, not just LoRa, unless you plan to build your own receiver.</p>
+
+        <p>The network matters for another reason: onboarding. <a href="https://github.com/TheThingsNetwork/lorawan-devices">The Things Network's device repository</a> is the database The Things Stack uses to register a device — per-vendor profiles, hardware versions, and payload codec definitions. If a sensor has a proper entry there (or you use a generic profile and supply a decoder yourself), you can onboard it cleanly. The repository's README describes it as the catalog of LoRaWAN devices for The Things Stack. Before buying any node, check it exists in that repo or that the vendor supplies a payload codec.</p>
+
+        <h2>How LoRaWAN sensors get data into Home Assistant</h2>
+        <p>There is no native "LoRaWAN" integration in Home Assistant as of this writing, and there isn't one on home-assistant.io. The working path runs through MQTT, and it is genuinely local-first if you self-host the stack:</p>
+        <ol>
+          <li><strong>Sensor to gateway.</strong> The battery sensor transmits an uplink to your LoRaWAN gateway. Per <a href="https://www.thethingsnetwork.org/docs/">The Things Network's documentation</a>, the gateway is just radio hardware that forwards packets.</li>
+          <li><strong>Gateway to The Things Stack.</strong> Packets go to The Things Stack — either The Things Network's hosted community stack (free, but it is a cloud service) or your own TTS instance (fully local).</li>
+          <li><strong>Decode the payload.</strong> Sensors don't send JSON; they send binary. TTS applies the payload codec from the device repository — or the vendor's decoder — to turn bytes into readable fields.</li>
+          <li><strong>MQTT into Home Assistant.</strong> TTS publishes the decoded JSON to an MQTT topic. The standard setup pairs the <a href="https://www.thethingsnetwork.org/docs/">Things Stack MQTT feature</a> with the Mosquitto broker and Home Assistant's MQTT integration, which watches the topic and creates entities.</li>
+        </ol>
+        <p>Because TTS stores device keys and applies codecs, each sensor type needs its payload decoder — the <a href="https://raw.githubusercontent.com/TheThingsNetwork/lorawan-devices/master/README.md">lorawan-devices repository</a> carries codec definitions per vendor, which is most of the integration work already done for you.</p>
+
+        <h2>Pick by job: the sensors that fit a rural property</h2>
+        <p>These are not the only LoRaWAN sensors on the market, but each exists in the TTN device ecosystem, is documented by its manufacturer, and maps to a job where long range and years of battery life are the point. No prices here; check current listings on Amazon.</p>
+
+        <h3>Water tank level: Milesight EM400-UDL</h3>
+        <p>For a cistern or rain tank, the <a href="https://www.milesight.com/iot/product/lorawan-sensor/em400-udl">Milesight EM400-UDL</a> is an ultrasonic distance and level sensor. It measures the distance to the water surface — no submerged probe, nothing to corrode or foul — and reports level over LoRaWAN. Non-contact sensing is the practical advantage for a tank you'd rather not open regularly, and the unit is built for outdoor deployment. If the tank has a narrow access pipe instead of an open top, Milesight makes the <a href="https://www.milesight.com/iot/product/lorawan-sensor/em500-swl">EM500-SWL submersible water level sensor</a>, which goes inside the pipe and measures pressure instead of distance. For the full picture, including DIY alternatives, see <a href="water-tank-level-sensor">water tank level sensors</a>.</p>
+
+        <h3>Gate, mailbox, and door open/close: Milesight EM300-MCS</h3>
+        <p>A long driveway usually means you learn about a delivery when you walk down and look. The <a href="https://www.milesight.com/iot/product/lorawan-sensor/em300-mcs">Milesight EM300-MCS</a> is a battery-powered magnetic contact switch: it reports open and closed over LoRaWAN, the same job a Zigbee door sensor does on your front door, at radio range instead of room range. Stick the magnet half on the gate leaf and the body on the frame. The same family covers leaks — Milesight's EM300-MLD and EM300-SLD are leak-detection siblings — and a <a href="https://www.milesight.com/iot/product/lorawan-sensor/em500-swl">pulse-counter (EM300-DI) and tilt sensor (EM320-TILT)</a> sit in the same product line for jobs like counting pump cycles. Check <a href="https://www.amazon.com/s?k=Milesight+EM300-MCS&amp;tag=hanews01-20" rel="sponsored nofollow">the EM300-MCS on Amazon</a>.</p>
+
+        <h3>Freezer and cold storage: Milesight TS301 / TS302</h3>
+        <p>A chest freezer in a detached building is the classic silent failure: nobody notices a bad compressor until the smell does. The <a href="https://www.milesight.com/iot/product/lorawan-sensor/ts30x">Milesight TS301 and TS302 temperature sensors</a> are LoRaWAN loggers built for cold storage. The features worth knowing about, per the product documentation:</p>
+        <ul>
+          <li><strong>IP65 housing</strong> and low-temperature operation, with an optional food-grade probe.</li>
+          <li><strong>Up to 10,000 stored history records with retransmission.</strong> If your gateway or internet link goes down, the sensor keeps logging and uploads the gap when it can reach the network again. For freezer monitoring this is the feature that matters — an outage does not blind you.</li>
+          <li><strong>Instant temperature-alert uplink</strong> when the reading crosses a threshold.</li>
+          <li><strong>Milesight D2D (device-to-device) support:</strong> the sensor can directly trigger another Milesight LoRaWAN device without a gateway in the loop — for example, ringing a local alarm on high temperature. Per Milesight's documentation, D2D works alongside normal LoRaWAN uplinks.</li>
+          <li>NFC configuration through the vendor's ToolBox app, firmware update over the air, and EN12830 certification for food cold-chain use.</li>
+        </ul>
+        <p>Check <a href="https://www.amazon.com/s?k=Milesight+TS301&amp;tag=hanews01-20" rel="sponsored nofollow">the TS301 on Amazon</a> and <a href="https://www.amazon.com/s?k=Milesight+TS302&amp;tag=hanews01-20" rel="sponsored nofollow">the TS302 on Amazon</a>.</p>
+
+        <h3>Soil moisture and temperature: Dragino LSN50v2-S31</h3>
+        <p>For garden beds, orchards, or a pumphouse you want to keep an eye on, the <a href="https://wiki.dragino.com/">Dragino LSN50v2-S31</a> is a soil moisture and temperature node in the LSN50v2 line of battery LoRaWAN end devices. Dragino's wiki (the company routes product detail through wiki.dragino.com, with "user manuals and quick start guides for all Dragino LoRaWAN sensor nodes") documents the sensor, gateway configuration, and The Things Network and ChirpStack integration guides in one place. Alternatives in the same family include other LSN50v2 variants and SenseCAP's S2100-series soil sensor — verify the exact model and its payload codec in the TTN device repository before committing. Check <a href="https://www.amazon.com/s?k=Dragino+LSN50v2+soil+moisture+LoRaWAN&amp;tag=hanews01-20" rel="sponsored nofollow">Dragino soil sensors on Amazon</a>.</p>
+
+        <h2>Range and placement: the honest physics</h2>
+        <p>Manufacturers like to quote maximum range figures. What actually determines whether your mailbox sensor reaches the gateway is line of sight. A flat stretch of pasture at 868/915 MHz with tall antennas on both ends will do kilometers. A sensor inside a steel mailbox half a meter off the ground behind a wall of vegetation will not. Dragino's knowledge base — which covers antenna selection and power management specifically — is the vendor reference worth reading before you plan, because its advice is blunt: antenna height and placement matter more than transmit power, and the sensor-side antenna placement usually matters more than the gateway's.</p>
+        <p>Practical consequences: mount the gateway antenna as high as you legally and structurally can; prefer sensors with accessible external antennas for indoor placements such as a freezer; and test with one sensor before buying five. One gateway covers most rural properties, but trees are water, and water is not your friend at sub-GHz frequencies either — it attenuates, wet-season performance can be worse than dry-season.</p>
+
+        <h2>Battery life in real use</h2>
+        <p>LoRaWAN sensor batteries are designed around a simple budget: a few-millisecond transmit burst, a few times a day. Vendors design these nodes for years on small cells at default reporting intervals. Nobody should promise you a number without context, though. Three variables dominate:</p>
+        <ul>
+          <li><strong>Reporting interval.</strong> A level sensor checking every 10 minutes versus every hour is roughly a multiplier on one of your two big costs. Match the rate to the risk: tank level hourly is plenty; a gate contact needs to report events, which it does anyway on change.</li>
+          <li><strong>Spread factor.</strong> A sensor at the far edge of your gateway's range uses a higher spread factor, which means longer airtime per uplink, which means more battery per message. Placing the gateway generously buys battery life everywhere.</li>
+          <li><strong>Temperature and chemistry.</strong> A freezer sensor's battery works hardest in exactly the coldest jobs; note what the manufacturer says about operating range and pick models rated for the installation environment.</li>
+        </ul>
+        <p>The conservative planning move: pick the reporting interval you'd accept if the battery lasted half as long as the datasheet suggests, and enable any vendor retransmission buffer so a gateway outage doesn't cost you data (the TS30x does this; see above).</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>Gotchas before you buy</h2>
+        <ul>
+          <li><strong>Region matters.</strong> 868 MHz (EU) and 915 MHz (US) hardware are not interchangeable. Buy for your region's frequency plan and select it in The Things Stack.</li>
+          <li><strong>Check the device repository first.</strong> A sensor without an entry in the TTN <a href="https://github.com/TheThingsNetwork/lorawan-devices">lorawan-devices repo</a> and no vendor codec means you're writing your own decoder.</li>
+          <li><strong>The hosted TTN community stack is a cloud service.</strong> If local-only matters to you, self-host The Things Stack (or run ChirpStack, which LoRaWAN sensors generally also support) so payloads never route through someone else's servers. Milesight devices also target Milesight IoT Cloud and the company's own gateways, but for a Home Assistant-first setup the TTN/ChirpStack-plus-MQTT path is the one that keeps data in your hands.</li>
+          <li><strong>Not every "smart" Milesight device is LoRaWAN.</strong> The VS-series people counters (VS133, VS125, VS126) do not have LoRaWAN versions — don't try to onboard them into a LoRa network.</li>
+          <li><strong>Gateways are the prerequisite.</strong> A LoRaWAN sensor without a gateway in range just drains its battery quietly. Sort out coverage before the sensors, not after.</li>
+        </ul>
+
+        <h2>Setup steps, end to end</h2>
+        <ol>
+          <li>Stand up the receiving side first — gateway, The Things Stack (self-hosted or the community network), Mosquitto, and Home Assistant's MQTT integration. <a href="lorawan-gateway">The gateway guide</a> covers the choices.</li>
+          <li>Find your sensor in the TTN device repository and note its hardware version and JoinEUI-style registration details from the label or the vendor page.</li>
+          <li>Register the device in The Things Stack with the correct region frequency plan and the profile from the repository.</li>
+          <li>Power it up, trigger a reading (press the button, open the contact), and confirm the uplink arrives and decodes with human-readable fields in TTS.</li>
+          <li>Point TTS's MQTT subscription at Mosquitto and create Home Assistant entities from the observed fields — the payload codec already did the hard part.</li>
+          <li>Build the automations: a tank-level alert below a threshold, a gate contact notification, a freezer temperature above minus-15 for two readings, whatever your property needs.</li>
+        </ol>
+
+        <h2>FAQ</h2>
+        <h3>How far do LoRaWAN sensors reach in a rural property?</h3>
+        <p>It depends on line of sight more than transmit power. In open rural terrain, kilometers are common; buildings, foliage and antenna placement cut that fast. Dragino's knowledge base on antenna selection is the vendor doc to read before deciding where a gateway and sensors go.</p>
+        <h3>Do LoRaWAN sensors work with Home Assistant directly, or do I need The Things Network?</h3>
+        <p>There is no LoRaWAN integration in Home Assistant as of this writing. Sensors report to The Things Stack (The Things Network or a self-hosted stack), which forwards decoded JSON over MQTT to Mosquitto, and Home Assistant picks it up with its MQTT integration.</p>
+        <h3>Which LoRaWAN sensor should I use for a water tank, a gate, or a freezer?</h3>
+        <p>Tank level: a non-contact ultrasonic sensor such as the Milesight EM400-UDL, or an in-pipe submersible like the EM500-SWL. Gate or mailbox: a magnetic contact switch such as the EM300-MCS. Freezer: a low-temperature logger such as the Milesight TS301/TS302, which keeps a history buffer and retransmits after an outage.</p>
+        <h3>How long do LoRaWAN sensor batteries last in real use?</h3>
+        <p>Vendors design these nodes for years on small batteries because the uplinks are short and infrequent, but real battery life depends on reporting interval, spread factor and temperature. Check the datasheet for the specific model and be conservative on your report rate.</p>
+        <h3>Can a LoRaWAN sensor trigger an HA automation without a gateway (D2D)?</h3>
+        <p>Some Milesight sensors support Device-to-Device (D2D) communication, where one sensor can directly trigger another LoRaWAN device without a gateway in the loop. D2D covers the radio-to-radio trigger; the data still reaches Home Assistant through The Things Stack and MQTT when a gateway is present.</p>
+        <h3>What's the difference between a lora sensor and a LoRaWAN sensor?</h3>
+        <p>LoRa is the radio modulation the sensor uses to send data over long distances at low power. LoRaWAN is the network protocol on top of it that defines how devices join, communicate and are managed. A LoRaWAN sensor speaks both; a bare "LoRa" sensor may use a private protocol instead.</p>
+        <p>We publish a daily brief on Home Assistant, Matter, ESPHome and the radio layer underneath. <a href="brief-2026-11-13">Read today's</a>.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.thethingsnetwork.org/docs/">The Things Network documentation</a>; <a href="https://github.com/TheThingsNetwork/lorawan-devices">TTN device repository</a>; <a href="https://www.milesight.com/iot/product/lorawan-sensor/em400-udl">Milesight EM400-UDL</a>; <a href="https://www.milesight.com/iot/product/lorawan-sensor/ts30x">Milesight TS301/TS302</a>; <a href="https://www.milesight.com/iot/product/lorawan-sensor/em300-mcs">Milesight EM300-MCS</a>; <a href="https://wiki.dragino.com/">Dragino wiki</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
