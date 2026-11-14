@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meshtastic solar node: build a solar repeater for a rural property — HA News</title>
+  <meta name="description" content="How to build a Meshtastic solar repeater node: parts list, power budget, enclosure, placement, and the roles and firmware settings (ROUTER vs deprecated REPEATER) that matter in 2026.">
+  <link rel="canonical" href="https://hanews.org/meshtastic-solar-node">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Meshtastic solar node: build a solar repeater for a rural property", "datePublished": "2026-11-14", "dateModified": "2026-11-14", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/meshtastic-solar-node"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I still use the REPEATER role on a solar node?", "acceptedAnswer": {"@type": "Answer", "text": "No. The REPEATER role is deprecated as of firmware 2.7.11. Use ROUTER (rebroadcasts once, visible in the topology) or ROUTER_LATE (rebroadcasts after other modes, best for local dead spots)."}}, {"@type": "Question", "name": "Which board draws the least power for a solar node?", "acceptedAnswer": {"@type": "Answer", "text": "nRF52-based boards such as the RAK WisBlock RAK4631 idle at lower current than ESP32-based boards like the Heltec LoRa32. The Meshtastic docs describe the RAK4631 as low-power and solar ready."}}, {"@type": "Question", "name": "Why won't my solar repeater join the mesh?", "acceptedAnswer": {"@type": "Answer", "text": "Usually the node was never given a region, so it does not transmit at all, or the modem preset does not match. All nodes on a mesh must share the same region and modem preset; a node first set from its own screen in the US starts on LONG_TURBO, which cannot interoperate with the default LONG_FAST."}}, {"@type": "Question", "name": "How do I keep settings changes possible with Power Saving on?", "acceptedAnswer": {"@type": "Answer", "text": "Power Saving disables Bluetooth, Serial, Wi-Fi and the screen. Wake the device with its user button or a reset, use the admin channel for remote admin, or temporarily change the node's role to something with a live interface so you can update it."}}, {"@type": "Question", "name": "Why does my battery gauge read wrong on solar power?", "acceptedAnswer": {"@type": "Answer", "text": "The board estimates battery voltage from its voltage divider, and the default ADC multiplier may not match the board. Correct the ADC Multiplier Override for the divider on the board, then verify the board detects external power via the plug icon in the app."}}, {"@type": "Question", "name": "What happens after several cloudy days?", "acceptedAnswer": {"@type": "Answer", "text": "If the panel cannot keep up and the battery drains, the Shutdown after losing power setting will shut the device down automatically after the defined period — but only if the board correctly detects external power, so verify the detection first."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Saturday, 14 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · LoRa mesh</p>
+        <h1>Meshtastic solar node: build a solar repeater for a rural property</h1>
+        <p class="byline">HA News · 14 Nov 2026</p>
+
+        <p>A Meshtastic solar node is a small, panel-charged radio that sits on a post, roof or tree line and rebroadcasts mesh traffic for a property too big for one node to cover. It is the classic answer to a rural question: the gate is a kilometre from the house, the mesh dies in the valley in between, and nobody wants to trench Ethernet. <strong>The short version: build it on an nRF52-based board such as the RAK WisBlock RAK4631, set it to the ROUTER role (the old REPEATER role is deprecated), enable Power Saving, match the region and modem preset of the rest of the mesh, and budget the panel and battery for the cloudy week.</strong> Here are the parts, the settings, and the gotchas.</p>
+
+        <h2>What a solar Meshtastic node actually does</h2>
+        <p>Meshtastic is a LoRa mesh: each node forwards other nodes' packets so the network spans further than any pair of radios could alone. A solar node exists purely to extend that reach across a property — it relays traffic between the gate, the water tank, the shed and whatever node is near the house. Unlike the handheld and starter picks in <a href="best-meshtastic-device">best Meshtastic devices</a>, a solar node is infrastructure. Nobody holds it. It sits outdoors, permanently, on power it generates itself.</p>
+        <p>That changes what matters in the hardware. Battery life is no longer a spec sheet promise; it is your engineering problem. Idle current — what the board draws hour after hour while waiting for packets — dominates the power budget. And because the node lives on a pole, you care about how firmware behaves when the sun does not show up for a week, and how you update it without climbing a ladder. If you are comparing Meshtastic against LoRaWAN for the same job, see <a href="lorawan-gateway">LoRaWAN gateways</a> and our <a href="meshtastic-vs-meshcore">Meshtastic vs MeshCore</a> comparison.</p>
+
+        <h2>Pick the board: nRF52 for solar, ESP32 when you want Wi-Fi</h2>
+        <p>The single biggest hardware decision is the microcontroller family, because it decides the idle draw. ESP32 boards ship with Wi-Fi and Bluetooth radios and idle at meaningfully higher current than nRF52 boards, even when the radios are off. On mains power nobody notices; on a solar node, the whole panel is sized off that number.</p>
+        <p>The Meshtastic device documentation points to the RAK WisBlock RAK4631 core module as the low-power path: an nRF52840 MCU paired with an SX1262 LoRa radio, no Wi-Fi on board, Bluetooth 5.0, with an optional GPS module. RAK and the Meshtastic docs describe it as low-power and solar ready — the docs literally sell the RAK4631 + RAK19007 WisBlock starter kit for this purpose.</p>
+        <p>Check <a href="https://www.amazon.com/s?k=RAK+WisBlock+Meshtastic+Starter+Kit+RAK4631+RAK19007&amp;tag=hanews01-20" rel="sponsored nofollow">the RAK WisBlock RAK4631 starter kit on Amazon</a> for current price and stock.</p>
+        <p>The alternatives, per the Meshtastic RAK and Heltec device pages:</p>
+        <ul>
+          <li><strong>RAK11200</strong> — ESP32 core with a radio add-on. This is the choice when the node also needs Wi-Fi, e.g. to report over the network instead of purely relaying. Higher idle draw than the RAK4631.</li>
+          <li><strong>RAK11310</strong> — RP2040 + SX1262, no Wi-Fi and no Bluetooth. Low power, but no BLE means phone setup is more awkward than on the nRF52 core.</li>
+          <li><strong>RAK3312</strong> — ESP32-S3 + SX1262 with Wi-Fi, for builds that want the compute.</li>
+          <li><strong>Heltec LoRa32 V3/V4 family</strong> — ESP32-S3 + SX1262, Wi-Fi 2.4 GHz b/g/n, Bluetooth 5.0, optional GPS. Cheap and popular, but the docs' point stands: ESP32 boards idle at higher current than nRF52. Check <a href="https://www.amazon.com/s?k=Heltec+LoRa32+V3&amp;tag=hanews01-20" rel="sponsored nofollow">the Heltec LoRa32 V3 on Amazon</a> if you accept the power trade for the price.</li>
+        </ul>
+        <p>LILYGO's T-Beam and T-Echo are also on the support list; if you build around one, verify the exact variant against <a href="https://meshtastic.org/docs/hardware/devices/lilygo/">the LILYGO page on meshtastic.org</a> before ordering, since revisions differ.</p>
+        <p>For a dedicated solar repeater the RAK4631 is the default answer: lowest idle draw, BLE for setup and diagnostics, no Wi-Fi radio burning margin. You buy the starter kit, add a solar charger board and a LiFePO4 or Li-ion cell, and the node firmware is Meshtastic's own.</p>
+
+        <h2>The role: ROUTER, not REPEATER</h2>
+        <p>Here is the setting that most older guides get wrong. The <code>REPEATER</code> device role is deprecated as of firmware 2.7.11. It used to be the "set and forget" role — rebroadcast every packet once with minimal overhead, invisible in the Nodes list. Its visible replacement is <strong>ROUTER</strong>: it also rebroadcasts packets once, but it appears in the network topology, and on ESP32 boards it enables Power Saving mode by default.</p>
+        <p>The docs also define <strong>ROUTER_LATE</strong>, which rebroadcasts after the other roles do, deliberately late. Per the device configuration docs, ROUTER_LATE is for nodes bridging local dead spots — the valley node on your fence line is exactly that. If your repeater's job is to fill one dead pocket rather than be the mesh backbone, try ROUTER_LATE before assuming you need a taller mast.</p>
+        <p>Two ROUTER consequences to know before you set it:</p>
+        <ul>
+          <li>ROUTER disables Bluetooth, Wi-Fi, Serial and the screen by default — fine, even ideal, on a node you will never touch. But it also means the phone app cannot talk to the node until you do something about it.</li>
+          <li>Updating a ROUTER node is done via the admin channel. The documented procedure: temporarily change the role, do the update, then revert. Factor this into your first build — you want the admin channel keys sorted before the node goes up the tower.</li>
+        </ul>
+        <p>Source: the <a href="https://meshtastic.org/docs/configuration/radio/device/">Meshtastic device configuration docs</a>.</p>
+
+        <h2>Power Saving and the cloudy-week plan</h2>
+        <p>Power Saving mode disables Bluetooth, Serial, Wi-Fi and the screen to conserve power. The power configuration docs call it "particularly beneficial for devices relying on low-current power sources, like solar panels" — which is your node. On a solar build this should almost always be on, and ROUTER enables it by default on ESP32 boards.</p>
+        <p>The cost is convenience: with Power Saving on, settings changes require waking the device — user button, reset, or remote admin from another node's admin channel. On a pole-mounted node, the button and the reset button are both a ladder trip away. So the practical pattern is: configure everything thoroughly at the bench, enable Power Saving last, and make sure the admin channel works from the house before the node leaves your hands. Source: the <a href="https://meshtastic.org/docs/configuration/radio/power/">power configuration docs</a>.</p>
+        <p>For the cloudy week, the relevant setting is <strong>Shutdown after losing power</strong>: when external power is lost, the device shuts itself down after a defined period instead of deep-discharging the battery. That protects the cell (Li-ion cells do not like being held at zero) and keeps the node from broadcasting increasingly degraded packets for days. But the docs flag a real trap: the shutdown only happens if the board correctly detects external power — verify it via the plug icon in the app before you trust the feature. Some boards report the wrong voltage until the <strong>ADC Multiplier Override</strong> is corrected; the docs describe correcting it to a float between 2 and 6, with the example 3.20 for a divider of R1=100k / R2=220k. Get the battery gauge right first, or both the charge-state display and the shutdown logic are running on fiction.</p>
+
+        <h2>Region and modem preset: why your node ignores the mesh</h2>
+        <p>Two settings decide whether a solar repeater actually joins the mesh at all. All nodes on a mesh must share identical <strong>Region</strong> and identical <strong>Modem Preset</strong> (or identical custom modem settings) to hear each other. Per the LoRa configuration docs:</p>
+        <ul>
+          <li>A node with no region set does not transmit at all. If your new repeater sits silent, check the region first — it is the most common cause.</li>
+          <li>The default preset is <strong>LONG_FAST</strong>, the strong mix of speed and range. But a node in the US that is first configured from its own on-device screen starts on <strong>LONG_TURBO</strong>, which cannot interoperate with LONG_FAST. So a fresh node set up at the bench while staring at its OLED may join nothing, purely because of preset mismatch.</li>
+          <li>Not every preset is legal in every band; the node only accepts presets the selected region permits.</li>
+        </ul>
+        <p>Source: the <a href="https://meshtastic.org/docs/configuration/radio/lora/">LoRa configuration docs</a>.</p>
+        <p>The bench procedure: flash the RAK4631, connect over BLE (the nRF52 core has Bluetooth 5.0), set the same region your existing nodes use, set the modem preset to whatever the mesh runs — LONG_FAST unless you deliberately chose otherwise — set the role to ROUTER (or ROUTER_LATE for a dead-spot filler), confirm the plug icon shows correct external power detection, enable Power Saving, then test the admin channel from a second node before mounting.</p>
+
+        <h2>Power budget and enclosure, in brief terms</h2>
+        <p>The docs do not give a one-line panel recommendation, so this section is method, not numbers. The budget always follows the same five lines:</p>
+        <ol>
+          <li>Measure or find the board's average idle draw — this is the dominant term for an nRF52 ROUTER node, and the reason ESP32 solar builds need proportionally bigger panels.</li>
+          <li>Assume the node relays occasionally and transmit bursts add on top; a repeater in a busy mesh transmits more than a leaf node.</li>
+          <li>Derive daily energy, then size the battery for days of autonomy, not one dark day — clouds cluster. LiFePO4 is the usual choice for outdoor cycled cells because of its cycle life and temperature tolerance.</li>
+          <li>Size the solar panel for the worst month of sun at your latitude, not the annual average, and derate for the enclosure's mounting angle and heat.</li>
+          <li>Verify wiring losses and the solar charger's quiescent draw; a charger that burns more in standby than a small panel harvests in winter is a real failure mode.</li>
+        </ol>
+        <p>The enclosure needs UV-stable material or a shielded mount, cable glands with strain relief, the antenna external (an antenna inside a metal box is a physics problem, not a firmware problem), and the panel angled for drainage. Match the whole assembly against what you verify in the app before mounting: the external-power plug icon, the corrected battery gauge, and an admin-channel ping that gets an answer.</p>
+
+        <h2>Placement beats power</h2>
+        <p>A solar repeater's placement is decided by radio first and sunlight second, in that order, and the two often fight — the sunniest exposed location is usually also the best radio spot, which is why the combination works so well on ridgelines. Put the node where it can hear both sides: the dead-spot filler should sit roughly between the endpoints it joins, with line of sight where terrain allows. Then confirm placement with the app's node list rather than faith — a ROUTER node is visible in the topology, so after mounting, check that the house-side and gate-side nodes both see it and that traffic actually hops through it.</p>
+        <p>One habit worth adopting: leave headroom. A node placed "just good enough" on a clear day loses its margin the first time foliage fills in or a shed goes up. If the topology shows the repeater hearing its neighbours weakly, a second mount height or 10 metres of lateral move usually changes more than any firmware setting.</p>
+
+        <aside class="rail-sub article-cta" aria-label="Newsletter">
+          <p><strong>Get the HA News brief.</strong> One short weekday email on the local stack — releases, radios and automations, sourced from the projects themselves.</p>
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </aside>
+
+        <h2>FAQ</h2>
+        <h3>Do I still use the REPEATER role on a solar node?</h3>
+        <p>No — it is deprecated as of firmware 2.7.11. Use <strong>ROUTER</strong>, which rebroadcasts once and shows up in the topology, or <strong>ROUTER_LATE</strong>, which rebroadcasts after other modes and suits local dead spots.</p>
+        <h3>Which board draws the least power for a solar node?</h3>
+        <p>nRF52-based boards such as the RAK WisBlock RAK4631 idle at lower current than ESP32-based boards like the Heltec LoRa32 V3/V4. The Meshtastic device docs describe the RAK4631 as low-power and solar ready.</p>
+        <h3>Why won't my solar repeater join the mesh?</h3>
+        <p>Usually the region was never set, so the node transmits nothing at all, or the modem preset mismatches the rest of the mesh. A US node first set from its own screen starts on LONG_TURBO, which cannot interoperate with the default LONG_FAST.</p>
+        <h3>How do I keep settings changes possible with Power Saving on?</h3>
+        <p>Power Saving disables Bluetooth, Serial, Wi-Fi and the screen. Wake the device with its user button or a reset, use the admin channel for remote admin from another node, or temporarily change the role so the node has a live interface.</p>
+        <h3>Why does my battery gauge read wrong on solar power?</h3>
+        <p>The board estimates battery voltage through its voltage divider, and the default ADC multiplier may not match the board. Correct the ADC Multiplier Override for the divider (the docs give 3.20 as the example for R1=100k / R2=220k), then verify external power detection via the plug icon in the app.</p>
+        <h3>What happens after several cloudy days?</h3>
+        <p>When external power is lost, the Shutdown after losing power setting shuts the device down automatically after the defined period instead of deep-discharging the battery — but only if the board correctly detects external power, so verify that first.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://meshtastic.org/docs/configuration/radio/device/">Meshtastic device configuration docs</a>; <a href="https://meshtastic.org/docs/configuration/radio/power/">Meshtastic power configuration docs</a>; <a href="https://meshtastic.org/docs/configuration/radio/lora/">Meshtastic LoRa configuration docs</a>; <a href="https://meshtastic.org/docs/hardware/devices/rak-wireless/wisblock/">Meshtastic RAK WisBlock device docs</a>; <a href="https://meshtastic.org/docs/hardware/devices/heltec-automation/lora32/">Meshtastic Heltec LoRa32 device docs</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
