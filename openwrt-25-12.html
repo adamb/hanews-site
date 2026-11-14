@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt 25.12: what's new, and should your smart-home router upgrade? — HA News</title>
+  <meta name="description" content="What changed in OpenWrt 25.12 vs 24.10: the apk package manager, attended sysupgrade by default, ucode rewriting, 180 new devices, and the security fixes in 25.12.6. How to upgrade safely.">
+  <link rel="canonical" href="https://hanews.org/openwrt-25-12">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt 25.12: what's new, and should your smart-home router upgrade?", "datePublished": "2026-11-14", "dateModified": "2026-11-14", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-25-12"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is OpenWrt 25.12 worth upgrading to for a smart-home router?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, mostly for security reasons. The 24.10 series stops receiving security updates after September 2026, and 25.12.6 fixes five unauthenticated remotely triggerable vulnerabilities in the LuCI web server. A router running your Zigbee, Matter and Thread backbone should not sit on an unmaintained release."}}, {"@type": "Question", "name": "What changed between OpenWrt 24.10 and 25.12?", "acceptedAnswer": {"@type": "Answer", "text": "The package manager switched from opkg to apk, Attended Sysupgrade is installed by default, Wi-Fi and network scripts were rewritten in ucode, shell history now survives reboots, and over 180 new devices are supported."}}, {"@type": "Question", "name": "Is upgrading from 24.10 to 25.12 safe? Will I lose my configuration?", "acceptedAnswer": {"@type": "Answer", "text": "On most devices, 24.10 to 25.12 should be transparent: the config is translated on first boot and Attended Sysupgrade rebuilds an image with your installed packages. Upgrading from 23.05 is not officially supported — go via 24.10 or flash without keeping settings. Some devices, like the Bananapi BPi-R4, have interface renames that need a flash without saving the config."}}, {"@type": "Question", "name": "Why won't opkg commands work on OpenWrt 25.12?", "acceptedAnswer": {"@type": "Answer", "text": "OpenWrt 25.12 replaced the opkg fork with apk (Alpine Package Keeper). The opkg fork is unmaintained. Apk supports most opkg features but uses different command-line arguments; OpenWrt publishes an opkg-to-apk cheatsheet."}}, {"@type": "Question", "name": "Which OpenWrt 24.10 devices are supported in 25.12?", "acceptedAnswer": {"@type": "Answer", "text": "Most of them. OpenWrt states most 24.10 devices are still supported in 25.12, which added over 180 new devices for a total above 2,200. Check the Firmware Selector for your exact model."}}, {"@type": "Question", "name": "What is fixed in OpenWrt 25.12.6?", "acceptedAnswer": {"@type": "Answer", "text": "Five unauthenticated remotely triggerable uhttpd (LuCI web server) vulnerabilities, Wi-Fi 7 MLO frame handling crashes and memory corruption in hostapd/wpa_supplicant, rpcd privilege escalations, a cgi-io use-after-free, an Mbed TLS remote ECDHE-PSK buffer overflow, and a luci-app-ser2net root-command bug, among others."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Saturday, 14 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Release · OpenWrt</p>
+        <h1>OpenWrt 25.12: what's new, and should your smart-home router upgrade?</h1>
+        <p class="byline">HA News · 14 Nov 2026</p>
+
+        <p>OpenWrt 25.12.0, the first stable release of the 25.12 series, shipped on 5 March 2026 with over 4,700 commits since 24.10 branched. The series carries codename "Dave's Guitar", honoring the late Dave Täht of bufferbloat and SQM fame. The latest point release is 25.12.6 (18 October 2026), and it is a security-heavy one. <strong>Short answer: if your router runs OpenWrt as part of your smart-home backbone, upgrade to 25.12.x now — 24.10 stopped receiving security updates after September 2026, and the current point release, 25.12.6, patches remotely exploitable holes in the LuCI web server.</strong> Per the <a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.0">v25.12.0 release notes</a>, here is what changed and how to move over without losing your install.</p>
+
+        <h2>The big change: apk replaces opkg</h2>
+        <p>The package manager is no longer opkg. OpenWrt switched to apk, the Alpine Package Keeper. The OpenWrt opkg fork is unmaintained, so there was no future in it. Apk supports most opkg features and few package names changed, but the command-line arguments differ: <code>opkg install</code> becomes <code>apk add</code>, and <code>opkg update</code> is <code>apk update</code> — the details vary, so keep the <a href="https://openwrt.org/docs/guide-user/additional-software/opkg-to-apk-cheatsheet">official opkg-to-apk cheatsheet</a> open the first time you install something new. Scripts and forum copy-pastes that hardcode opkg will break on 25.12. This is the change most likely to trip up anyone who has run the same router setup for years.</p>
+
+        <h2>Attended Sysupgrade ships by default</h2>
+        <p>The second change is the one that makes upgrades less painful forever after. Attended Sysupgrade (ASU) is now installed by default. The <code>luci-app-attendedsysupgrade</code> LuCI app rebuilds a custom image containing all the packages you currently have installed, then installs it and preserves your configuration. A command-line client, <code>owut</code>, comes by default on devices with larger flash. ASU integrates installed packages into the SquashFS image itself, which is more efficient than a package overlay. In practice: on 25.12 you stop choosing between "keep settings but lose my packages" and "clean flash but reinstall everything by hand."</p>
+
+        <h2>Smaller changes worth knowing</h2>
+        <ul>
+          <li><strong>Shell history persists.</strong> Command history now survives reboots and sessions via a RAM-backed filesystem. No flash writes by default — writing history to flash would increase write cycles — and it is configurable in <code>/etc/profile.d/busybox-history-file.sh</code>. Per the <a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.0">25.12.0 release notes</a>.</li>
+          <li><strong>Wi-Fi and network scripts rewritten from shell to ucode</strong> — faster and safer, with direct ubus and UCI integration.</li>
+          <li><strong>An OpenWrt video feed</strong> (Qt5 plus UI apps) is integrated by default.</li>
+        </ul>
+
+        <h2>Core components and new hardware support</h2>
+        <p>25.12.0 runs Linux kernel 6.12.71 on all targets, with musl 1.2.5 or glibc 2.41, gcc 14.3.0, dnsmasq 2.91, dropbear 2025.89, busybox 1.37.0, a hostapd master snapshot from August 2025, and cfg80211/mac80211 taken from kernel 6.18.7 — all per the release notes.</p>
+        <p>Hardware support widened noticeably. The qualcommax target now covers ipq50xx and ipq60xx SoCs; realtek extended with 10G Ethernet switch SoCs; there are new siflower (SF21A6826/SF21H8898) and microchipsw/lan969x targets, plus a sunxi/arm926ejs subtarget for Allwinner F1C100/200s boards. Over 180 new devices were added, bringing total device support past 2,200. Most 24.10 devices are still supported.</p>
+
+        <h2>What is fixed in 25.12.6 — the upgrade driver</h2>
+        <p>25.12.6 (18 October 2026) fixes five unauthenticated, remotely triggerable vulnerabilities in uhttpd, the LuCI web server: a type confusion in POST <code>/ubus/call/</code>, unlimited memory growth, HTTP request smuggling (CL.0), a leaked client reference blocking <code>/ubus/subscribe/</code>, and a Basic Auth realm bypass. The release notes say updating is strongly recommended. If you ever reach LuCI from outside a fully trusted network, this is not optional maintenance.</p>
+        <p>The same release fixes Wi-Fi issues that matter for modern hardware: hostapd and wpa_supplicant crashes and memory corruption in Wi-Fi 7 MLO frame handling (AP mode affects only 802.11be devices; client mode wpa_supplicant is generally affected — see <a href="https://w1.fi/security/2026-1/">w1.fi security advisory 2026-1</a>). It also fixes rpcd privilege escalations (symlink file operations, CVSS 8.4; a session-token temp-dir hijack, CVSS 7.0, relevant only with delegated LuCI users), a cgi-io use-after-free, a luci-app-ser2net root-command bug (CVSS 9.9), umdns out-of-bounds reads, and an APuP beacon NULL-dereference crash for anyone with <code>option apup</code> enabled. Crypto libraries moved to Mbed TLS 3.6.7 (including a fix for a remote ECDHE-PSK buffer overflow), OpenSSL 3.5.9 and wolfSSL 5.9.4; the kernel is now 6.12.112.</p>
+
+        <h2>Should a smart-home router upgrade?</h2>
+        <p>For a router that carries your smart home — the Wi-Fi or VLANs that your Zigbee coordinator, Matter border router and Home Assistant box depend on — the case is unusually clean. The 24.10 series ends security support after September 2026, and OpenWrt urges upgrading to 25.12 before then. Meanwhile 25.12.6 closes unauthenticated remote vulnerabilities in the very web server you use to administer the box. Per the release notes, an unmaintained router with a remotely exploitable LuCI is the kind of device you do not want sitting on the same network as your door locks and cameras. If you segment IoT devices into their own VLAN — see our guide on <a href="openwrt-iot-vlan.html">OpenWrt and IoT VLANs</a> — you have some defense, but the router itself remains a standing target.</p>
+        <p>Feature-wise, nothing in 25.12 is urgent for a stable install, but apk plus default Attended Sysupgrade make every future upgrade easier. The one feature to know about for home-automation routing: with wireguard and VPN packages now surviving upgrades via ASU, the "clean flash wipes my relay" problem mostly goes away.</p>
+
+        <h2>How to upgrade safely</h2>
+        <p>The supported paths, from the 25.12.0 release notes:</p>
+        <ol>
+          <li><strong>LuCI Attended Sysupgrade.</strong> The app auto-collects your installed packages, requests a custom image, builds and installs it while keeping settings. On 24.10 this app may need installing first; on 25.12 it is default.</li>
+          <li><strong>The Firmware Selector online builder.</strong> Pick your device at <a href="https://firmware-selector.openwrt.org/?version=25.12.6">firmware-selector.openwrt.org</a>, add your installed packages to the request, and download a custom image.</li>
+          <li><strong><code>owut</code> from the command line</strong> on devices with larger flash.</li>
+        </ol>
+        <p>Before flashing, take a backup. If you would rather do a scratch install: back up your config, then run <code>sysupgrade -n /tmp/firmware.bin</code>, or flash via LuCI with "keep settings" unchecked.</p>
+        <p>Two upgrade-path rules. First, sysupgrade from 23.05 straight to 25.12 is <em>not</em> officially supported: go via 24.10, or flash without keeping settings. Second, 24.10 to 25.12 "should be transparent on most devices", with configuration translated on first boot — but two gotchas are documented. On the Bananapi BPi-R4, interface names changed (eth1 → sfp-lan/lan4, eth2 → sfp-wan), which requires upgrading without saving the config. And the busybox cron log level moved: set <code>system.@system[0].cronloglevel</code> to 7, which is now the default. If you log cron jobs on the router, check that after upgrading.</p>
+        <p>Point releases since 25.12.0, per the project's release history (github-releases.json via openwrt-data): 25.12.1 (18 March 2026), 25.12.2 (27 March 2026), 25.12.3 (7 May 2026), 25.12.4 (14 May 2026), 25.12.5 (1 July 2026) and 25.12.6 (18 October 2026). The latest 24.10 release is 24.10.8 (26 July 2026). We will update this page as further 25.12.x point releases ship.</p>
+
+        <p>Still picking hardware? Our <a href="best-openwrt-router.html">best OpenWrt router</a> roundup lists current picks by use case, and <a href="openwrt.html">the OpenWrt pillar</a> covers the project as a whole. If you want to compare router operating systems instead, we also have OpenWrt vs DD-WRT.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, OpenWrt and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Is OpenWrt 25.12 worth upgrading to for a smart-home router?</h3>
+        <p>Yes, mostly for security reasons. The 24.10 series stops receiving security updates after September 2026, and 25.12.6 fixes five unauthenticated remotely triggerable vulnerabilities in the LuCI web server. A router running your Zigbee, Matter and Thread backbone should not sit on an unmaintained release.</p>
+        <h3>What changed between OpenWrt 24.10 and 25.12?</h3>
+        <p>The package manager switched from opkg to apk, Attended Sysupgrade is installed by default, Wi-Fi and network scripts were rewritten in ucode, shell history now survives reboots, and over 180 new devices are supported.</p>
+        <h3>Is upgrading from 24.10 to 25.12 safe? Will I lose my configuration?</h3>
+        <p>On most devices, 24.10 to 25.12 should be transparent: the config is translated on first boot and Attended Sysupgrade rebuilds an image with your installed packages. Upgrading from 23.05 is not officially supported — go via 24.10 or flash without keeping settings. Some devices, like the Bananapi BPi-R4, have interface renames that need a flash without saving the config.</p>
+        <h3>Why won't opkg commands work on OpenWrt 25.12?</h3>
+        <p>OpenWrt 25.12 replaced the opkg fork with apk (Alpine Package Keeper). The opkg fork is unmaintained. Apk supports most opkg features but uses different command-line arguments; OpenWrt publishes an opkg-to-apk cheatsheet.</p>
+        <h3>Which OpenWrt 24.10 devices are supported in 25.12?</h3>
+        <p>Most of them. OpenWrt states most 24.10 devices are still supported in 25.12, which added over 180 new devices for a total above 2,200. Check the Firmware Selector for your exact model.</p>
+        <h3>What is fixed in OpenWrt 25.12.6?</h3>
+        <p>Five unauthenticated remotely triggerable uhttpd (LuCI web server) vulnerabilities, Wi-Fi 7 MLO frame handling crashes and memory corruption in hostapd/wpa_supplicant, rpcd privilege escalations, a cgi-io use-after-free, an Mbed TLS remote ECDHE-PSK buffer overflow, and a luci-app-ser2net root-command bug, among others.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.0">OpenWrt 25.12.0 release notes</a>; <a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.6">OpenWrt 25.12.6 release notes</a>; <a href="https://openwrt.org/docs/guide-user/additional-software/opkg-to-apk-cheatsheet">opkg-to-apk cheatsheet</a>; <a href="https://firmware-selector.openwrt.org/?version=25.12.6">OpenWrt Firmware Selector</a>; <a href="https://w1.fi/security/2026-1/">w1.fi security advisory 2026-1</a></dd>
+        </dl>
+        <p>Assisted by AI (Hermes). Facts sourced from the official OpenWrt release notes linked above; review welcome.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
