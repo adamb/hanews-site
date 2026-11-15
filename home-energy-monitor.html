@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best home energy monitor for Home Assistant — HA News</title>
+  <meta name="description" content="Which whole home energy monitor to use with Home Assistant: Sense vs Emporia Vue vs Shelly EM vs a DIY ESPHome CT clamp build — cloud and local options, solar netting and setup.">
+  <link rel="canonical" href="https://hanews.org/home-energy-monitor">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best home energy monitor for Home Assistant", "image": "https://hanews.org/images/shelly-em-wiring.png", "datePublished": "2026-11-15", "dateModified": "2026-11-15", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-energy-monitor"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is Sense or Emporia the better home energy monitor?", "acceptedAnswer": {"@type": "Answer", "text": "Both feed the Home Assistant Energy dashboard, but both route data through their maker's cloud. Sense leans on device-level disaggregation in its app per sense.com; Emporia ships a full lineup of energy monitors, smart plugs and a home battery. If you want local control, neither of them is the answer — a Shelly EM or an ESPHome build is."}}, {"@type": "Question", "name": "Which whole home energy monitors work locally with Home Assistant (no cloud)?", "acceptedAnswer": {"@type": "Answer", "text": "Shelly devices expose a local API and are supported by Home Assistant's built-in Shelly integration. A DIY ESPHome build with a CT clamp or a metering chip such as the ATM90E32 is fully local, feeding Home Assistant as native ESPHome sensors."}}, {"@type": "Question", "name": "Does the Shelly EM work with Home Assistant without a cloud account?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Shelly publishes a documented local API, and Home Assistant's built-in Shelly integration supports Shelly devices. The Shelly EM has two CT channels, so it can watch the main load and one circuit or a pair from the same unit."}}, {"@type": "Question", "name": "Can I build my own energy monitor with ESPHome and CT clamps?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. ESPHome's CT Clamp Current Sensor component converts a clamp's output into watts using calibration, and ESPHome also supports dedicated power-metering chips (ATM90E32, ATM90E26, BL0940/BL0942, CS5460A, CSE7766, HLW8012) and OpenEnergyMonitor EmonTx. Everything runs locally and appears in Home Assistant as native sensors."}}, {"@type": "Question", "name": "How do I net out solar production in the HA Energy dashboard?", "acceptedAnswer": {"@type": "Answer", "text": "The Home Assistant Energy dashboard groups sources into consumed, produced and stored energy and works with any integrated monitor, smart plug, inverter or utility meter. Add your production sensor under Sources alongside your grid consumption, and the dashboard handles the netting."}}, {"@type": "Question", "name": "Do I need a Riemann sum sensor if my monitor only reports watts?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Instantaneous power sensors in watts or kilowatts are not energy sensors until you pass them through the Riemann sum integral integration. The power input must have state_class: measurement for Home Assistant to use it."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 15 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Energy</p>
+        <h1>The best home energy monitor for Home Assistant</h1>
+        <p class="byline">HA News · 15 Nov 2026</p>
+
+        <p>A home energy monitor sits where your power comes in and turns the whole house's electrical flow into numbers a computer can read: watts right now, kilowatt-hours over the day. Used with Home Assistant, it feeds the built-in <a href="https://www.home-assistant.io/integrations/energy/">Energy dashboard</a>, which tracks what you consume, what your solar produces and what your battery stores. <strong>For most Home Assistant homes, the best choice is the monitor that fits your panel and speaks to Home Assistant locally</strong> — which is a different answer for every panel. This guide walks through the four honest ways to get whole-home numbers into Home Assistant: Sense, Emporia, Shelly EM and a DIY ESPHome build.</p>
+
+        <h2>Start with the Energy dashboard, not the gadget</h2>
+        <p>Home Assistant's Energy dashboard is built in and vendor-neutral. It works with electricity plus gas and water, and it takes readings from any integrated energy monitor, smart plug, solar inverter or utility meter. Sources are grouped into consumed, produced and stored energy, and you set it up under Settings, then Dashboards, then Energy, adding one source at a time. <a href="https://www.home-assistant.io/integrations/energy/">Home Assistant's Energy documentation</a> describes the full setup.</p>
+        <p>One mechanical detail matters before you buy anything: the dashboard wants kilowatt-hours, but many monitors report instantaneous watts. A power sensor needs the <a href="https://www.home-assistant.io/integrations/energy/">Riemann sum integral integration</a> to become an energy sensor, and its power input must carry <code>state_class: measurement</code>. If the monitor you pick reports watts only, this is the step that converts them.
+
+        <h2>Sense: the app-first choice, with a cloud in the middle</h2>
+        <p>Sense is the best-known name in consumer energy monitoring, built around device-level disaggregation in its mobile app — its <a href="https://sense.com/">site</a> pitches lower electricity bills and a carbon-footprint view. For Home Assistant, what matters is the official <a href="https://www.home-assistant.io/integrations/sense/">Sense integration</a>, which pulls a Sense meter's data into Home Assistant. Setup runs through Home Assistant's Add Integration flow with a login to a Sense account; the meter is auto-discovered.</p>
+        <p>Per the integration documentation, Sense updates power readings every 60 seconds and energy trends every 5 minutes. You get active usage and production power in watts, plus daily, weekly, monthly and yearly trend sensors in kWh — including To Grid, From Grid, Net Production, Net Production % and Solar Powered %, and binary sensors for each device Sense detects.</p>
+        <p>The gotcha, stated plainly on the same <a href="https://www.home-assistant.io/integrations/sense/">integration page</a>: data flows through Sense's cloud. Home Assistant logs into a Sense account, and no local API is documented. If your network or your principles rule out a mandatory cloud hop, Sense is out. If you want its device-detection app experience alongside Home Assistant, it works. <a href="https://www.amazon.com/s?k=Sense+Energy+Monitor&amp;tag=hanews01-20" rel="sponsored nofollow">Check Sense energy monitor price and stock on Amazon</a>.</p>
+
+        <h2>Emporia: the broad kit, same cloud gate</h2>
+        <p>Emporia makes the widest lineup in this group. Per its <a href="https://www.emporiaenergy.com/">site</a>, the current products include the Vue Energy Monitor, the Vue Utility Connect (wireless monitoring offered in select utility service areas), smart plugs with energy monitoring and a Home Battery. Platform features include Excess Solar Management, Smart Scheduling and Peak Demand Management.</p>
+        <p>The gotcha mirrors Sense's: Emporia is a mobile-app-centric platform, and data goes through Emporia's cloud, with support via the app or chat. There is a community-side Emporia integration path, but the vendor's own pitch is app-first. Choose Emporia if you want a single vendor's whole kit — monitor, plugs, battery, all in one app — and you accept the cloud. Note that some deep product URLs on the Emporia site currently 404, so verify links at buy time. <a href="https://www.amazon.com/s?k=Emporia+Vue+Energy+Monitor&amp;tag=hanews01-20" rel="sponsored nofollow">Check Emporia Vue on Amazon</a> for the current configuration that fits your panel.</p>
+
+        <h2>Shelly EM: the local-API middle path</h2>
+        <p>The Shelly EM is the compact option for a consumer-unit install. Shelly's <a href="https://kb.shelly.cloud/knowledge-base/shelly-em">knowledge base documents the wiring</a>, including a Gen1 diagram (credited below), and the unit takes two CT channels. In a single unit it can watch the main incoming feed and one more circuit, or two circuits of your choosing.</p>
+        <p>Why it's the middle path: Shelly devices expose a <a href="https://kb.shelly.cloud/knowledge-base/shelly-em">documented local API</a>, and Home Assistant has a <a href="shelly-home-assistant.html">built-in Shelly integration</a> — read our full Shelly and Home Assistant guide for what that buys you. That makes the Shelly EM the smallest ready-made monitor that keeps readings inside your network instead of routing through a vendor's cloud like the Sense and Emporia platforms do. <a href="https://www.amazon.com/s?k=Shelly+EM&amp;tag=hanews01-20" rel="sponsored nofollow">Check Shelly EM on Amazon</a>.</p>
+        <figure class="figure">
+          <img src="images/shelly-em-wiring.png" alt="Shelly EM Gen1 wiring diagram showing two CT channels installed in a consumer unit" width="597" height="580" loading="lazy">
+          <figcaption>Shelly EM Gen1 wiring diagram. Source: <a href="https://kb.shelly.cloud/knowledge-base/shelly-em">Shelly knowledge base</a> (Shelly)</figcaption>
+        </figure>
+
+        <h2>ESPHome: build it, own it, zero cloud</h2>
+        <p>For the fully local path, build the monitor yourself with an ESP32 board and a current transformer (CT) clamp — the donut that snaps around a conductor and reports current without cutting anything. ESPHome's <a href="https://esphome.io/components/sensor/ct_clamp.html">CT Clamp Current Sensor component</a> converts the clamp's output into watts using calibration, and the sensor appears in Home Assistant as a native ESPHome sensor. From there, the Riemann sum step above turns watts into kWh for the Energy dashboard.</p>
+        <p>You are not limited to analog clamps. ESPHome also has components for dedicated power-metering chips: the <a href="https://esphome.io/components/sensor/ct_clamp.html">ATM90E32, ATM90E26, BL0940/BL0942, CS5460A, CSE7766 and HLW8012</a>, plus support for the OpenEnergyMonitor EmonTx. Several commercial energy-monitoring boards are built around these same chips, so a DIY board can be as capable as a box you buy. Everything runs entirely on your network; no account exists at all. Cost is a board, a clamp and calibration time rather than a retail price, and we don't quote prices we can't verify — check current parts on your usual supplier. <a href="https://www.amazon.com/s?k=SCT-013+current+transformer+clamp&amp;tag=hanews01-20" rel="sponsored nofollow">CT clamps on Amazon</a> are the usual starting point.</p>
+        <figure class="figure">
+          <img src="images/esphome-ct-clamp.webp" alt="ESPHome interface showing Measured Current of 12.96 A from a CT clamp sensor" width="936" height="134" loading="lazy">
+          <figcaption>A CT clamp sensor reporting live current in ESPHome. Source: <a href="https://esphome.io/components/sensor/ct_clamp.html">ESPHome CT Clamp documentation</a> (ESPHome)</figcaption>
+        </figure>
+        <p>New to ESPHome itself? Our <a href="esphome.html">ESPHome section</a> covers the tooling, and our write-up of the ESPHome starter kit walks a first build end to end.</p>
+
+        <aside class="rail-sub article-cta" aria-label="Newsletter">
+          <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </aside>
+
+        <h2>Picking by situation</h2>
+        <ul>
+          <li><strong>You already have Sense or Emporia hardware.</strong> Use the official Sense integration, or the vendor's cloud app for Emporia, and feed the Energy dashboard from it. Just know the data path runs through their cloud.</li>
+          <li><strong>You want local readings with no DIY.</strong> The Shelly EM with Home Assistant's built-in Shelly integration is the shortest route to a consumer-unit monitor that answers to your network.</li>
+          <li><strong>You want zero dependencies and don't mind a wiring project.</strong> An ESPHome CT-clamp or metering-chip build is the only option in this list with no vendor cloud anywhere in the chain.</li>
+          <li><strong>You have solar.</strong> Any of the above that reports production feeds the Energy dashboard's Sources; Sense's integration even exposes To Grid, From Grid and Net Production sensors directly.</li>
+        </ul>
+
+        <h2>Gotchas we'd flag before you order</h2>
+        <p><strong>Cloud paths are structural, not optional extras.</strong> Home Assistant's own integration documentation for <a href="https://www.home-assistant.io/integrations/sense/">Sense</a> states the data flows through Sense's cloud with no local API documented; Emporia's platform is mobile-app-centric per its <a href="https://www.emporiaenergy.com/">site</a>. If your Energy dashboard should keep working when the internet is down, that constraint picks the hardware for you — Shelly or ESPHome.</p>
+        <p><strong>Watts are not kilowatt-hours.</strong> Plan for the Riemann sum integral step from day one; a monitor that reports watts only still works, it just needs the conversion sensor configured before the dashboard shows totals.</p>
+        <p><strong>Clamp work means panel work.</strong> The Shelly EM installs in the consumer unit per Shelly's <a href="https://kb.shelly.cloud/knowledge-base/shelly-em">documented wiring diagram</a>. CT clamps clip around conductors without cutting, but panel access is still live-panel territory — follow your local electrical rules.</p>
+        <p><strong>Vendor web pages shift.</strong> Sense's product page currently redirects and 404s at some old URLs — content lives on sense.com — and several Emporia deep URLs return 404. Verify links when you buy, not just when you read a guide.</p>
+
+        <h2>FAQ</h2>
+        <h3>Is Sense or Emporia the better home energy monitor?</h3>
+        <p>Both feed the Home Assistant Energy dashboard, but both route data through their maker's cloud. Sense leans on device-level disaggregation in its app per sense.com; Emporia ships a full lineup of energy monitors, smart plugs and a home battery. If you want local control, neither of them is the answer — a Shelly EM or an ESPHome build is.</p>
+        <h3>Which whole home energy monitors work locally with Home Assistant (no cloud)?</h3>
+        <p>Shelly devices expose a local API and are supported by Home Assistant's built-in Shelly integration. A DIY ESPHome build with a CT clamp or a metering chip such as the ATM90E32 is fully local, feeding Home Assistant as native ESPHome sensors.</p>
+        <h3>Does the Shelly EM work with Home Assistant without a cloud account?</h3>
+        <p>Yes. Shelly publishes a documented local API, and Home Assistant's built-in Shelly integration supports Shelly devices. The Shelly EM has two CT channels, so it can watch the main load and one circuit or a pair from the same unit.</p>
+        <h3>Can I build my own energy monitor with ESPHome and CT clamps?</h3>
+        <p>Yes. ESPHome's CT Clamp Current Sensor component converts a clamp's output into watts using calibration, and ESPHome also supports dedicated power-metering chips (ATM90E32, ATM90E26, BL0940/BL0942, CS5460A, CSE7766, HLW8012) and OpenEnergyMonitor EmonTx. Everything runs locally and appears in Home Assistant as native sensors.</p>
+        <h3>How do I net out solar production in the HA Energy dashboard?</h3>
+        <p>The Home Assistant Energy dashboard groups sources into consumed, produced and stored energy and works with any integrated monitor, smart plug, inverter or utility meter. Add your production sensor under Sources alongside your grid consumption, and the dashboard handles the netting.</p>
+        <h3>Do I need a Riemann sum sensor if my monitor only reports watts?</h3>
+        <p>Yes. Instantaneous power sensors in watts or kilowatts are not energy sensors until you pass them through the Riemann sum integral integration. The power input must have state_class: measurement for Home Assistant to use it.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/integrations/energy/">Home Assistant Energy integration</a>; <a href="https://www.home-assistant.io/integrations/sense/">Home Assistant Sense integration</a>; <a href="https://www.emporiaenergy.com/">Emporia Energy</a>; <a href="https://kb.shelly.cloud/knowledge-base/shelly-em">Shelly EM knowledge base</a>; <a href="https://esphome.io/components/sensor/ct_clamp.html">ESPHome CT Clamp component</a>; <a href="https://sense.com/">sense.com</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
