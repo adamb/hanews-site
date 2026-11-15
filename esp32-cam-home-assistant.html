@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP32-CAM with Home Assistant: setup, limits, and picks (2026) — HA News</title>
+  <meta name="description" content="ESP32-CAM and Home Assistant: how the ESPHome esp32_camera component works, what resolution and frame rate to expect, which boards to buy, and when Frigate is the better tool.">
+  <link rel="canonical" href="https://hanews.org/esp32-cam-home-assistant">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "ESP32-CAM with Home Assistant: setup, limits, and picks", "datePublished": "2026-11-15", "dateModified": "2026-11-15", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/esp32-cam-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can an ESP32-CAM work with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The ESPHome esp32_camera component puts the camera on Home Assistant as a native camera entity over the ESPHome API. No cloud service, no MQTT, and no vendor account is needed."}}, {"@type": "Question", "name": "Is an ESP32-CAM good enough to watch a shed or a 3D printer?", "acceptedAnswer": {"@type": "Answer", "text": "For a snapshot on demand or a low-frame-rate stream, yes. The default configuration is 640x480 at 10 fps, and the ESPHome documentation warns that pushing frame rates up causes overheating. It is not a continuous-recording security camera."}}, {"@type": "Question", "name": "Should I use the ESPHome camera or Frigate for object detection?", "acceptedAnswer": {"@type": "Answer", "text": "They solve different problems. ESPHome streams MJPEG frames to Home Assistant; Frigate does object detection and recording and wants H.264 RTSP streams from a proper IP camera. Frigate's documentation explicitly does not recommend Wi-Fi camera streams, so an ESP32-CAM is not the robust path into Frigate."}}, {"@type": "Question", "name": "Does the ESP32-CAM need PSRAM?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The ESPHome esp32_camera component requires PSRAM and I2C to be configured, and JPEG image compression requires the psram component to be enabled."}}, {"@type": "Question", "name": "What resolution and frame rate can an ESP32-CAM do?", "acceptedAnswer": {"@type": "Answer", "text": "Depending on the sensor, resolutions up to 2560x1920 (QSXGA) are offered; the default is 640x480 at 10 fps with a 0.1 fps idle rate. Sixty fps is possible only at reduced frame sizes, and the documentation warns about overheating."}}, {"@type": "Question", "name": "What detection hardware does Frigate support?", "acceptedAnswer": {"@type": "Answer", "text": "First-party: Hailo8 and Hailo8L, Google Coral EdgeTPU (USB or M.2), MemryX MX3, OpenVINO on Intel, Nvidia GPUs, Apple Silicon, and AMD ROCm. Jetson and Rockchip are community-supported."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 15 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · ESPHome</p>
+        <h1>ESP32-CAM with Home Assistant: setup, limits, and picks</h1>
+        <p class="byline">HA News · 15 Nov 2026</p>
+
+        <p>A $10-ish ESP32-CAM board is the cheapest way to put a camera into Home Assistant, and the ESPHome <code>esp32_camera</code> component makes it a first-class camera entity on your dashboard — no cloud, no MQTT broker, no vendor account. The catch is honesty about what the hardware is: a 2-megapixel sensor on a microcontroller that streams compressed JPEG frames over Wi-Fi. For checking whether the shed is closed, whether the 3D printer is still printing, or whether a package is on the porch, it is genuinely useful. For recording evidence overnight, it is the wrong tool. This guide walks through the setup, the real limits per the official documentation, which boards to pick, and when to step up to Frigate with a proper IP camera.</p>
+
+        <h2>How the ESP32-CAM reaches Home Assistant</h2>
+        <p>The path is entirely local. You flash the board with ESPHome, and the <a href="https://esphome.io/components/esp32_camera.html"><code>esp32_camera</code> component</a> exposes the camera to Home Assistant over the native ESPHome API. Home Assistant shows it as a camera entity, with snapshots and a stream available from the UI. Per the ESPHome documentation, two things must be configured on the board for the component to work: <strong>I2C</strong> (the camera is an I2C device for control purposes) and <strong>PSRAM</strong>, the extra external RAM these boards carry. JPEG image compression specifically requires the <code>psram</code> component to be enabled in your configuration. No MQTT broker is involved anywhere in this path, which keeps the whole thing inside your network.</p>
+
+        <h2>Setting it up</h2>
+        <ol>
+          <li>Pick a supported board. The ESPHome documentation ships example configurations for the Ai-Thinker Camera, M5Stack Camera, M5Stack Timer Camera X/F, M5Stack M5CameraF New, and M5Stack AtomS3R-CAM. Starting from one of these examples is far easier than deriving a pin map yourself.</li>
+          <li>In the ESPHome YAML, enable <code>psram</code> and <code>i2c</code>, then add the <code>esp32_camera</code> block with the example's pin definitions. The defaults — 640x480 at 10 fps — are the right starting point.</li>
+          <li>Flash the board over USB or, after the first flash, over the network. ESPHome shows it in the dashboard.</li>
+          <li>Home Assistant adopts the device over the native API; the camera entity appears alongside any sensors or switches on the same board.</li>
+          <li>Add the camera to a dashboard card, or wire it into an automation that takes a snapshot when a door contact opens.</li>
+        </ol>
+        <p>One configuration detail that bites people: the camera occupies PWM timer #1 on the ESP32. If you have other LEDC PWM outputs on the same board — a status LED, a buzzer — the documentation says those need to use channel 2 onward. If you use GPIO16 as a button input on an Ai-Thinker board, expect watchdog resets; on that board, GPIO16 is wired to the onboard PSRAM, and touching it confuses the RAM the camera depends on.</p>
+
+        <h2>What the camera can actually do</h2>
+        <p>Per the <a href="https://esphome.io/components/esp32_camera.html">esp32_camera component documentation</a>, an ESP32 camera board offers resolutions up to <strong>2560x1920 (QSXGA)</strong> depending on the sensor, with <strong>640x480 (VGA) as the default</strong>. The default frame rate is <strong>10 fps</strong>, with an idle frame rate of just <strong>0.1 fps</strong> so the board cools down and saves power when nobody is watching. You can push <code>max_framerate</code> up to 60 fps, but the documentation is blunt that this is only achievable "with reduced frame sizes" and warns of overheating. Frame buffers default to 1 (configurable 1-2), drawn from PSRAM. JPEG quality runs on a scale from 6 (best) to 63 (worst), with 10 as the default.</p>
+        <p>Read as a whole, that spec sheet describes a camera that wakes up, serves a frame or a short stream, and goes back to sleep. That is exactly right for a peek-at-the-shed or a printer-cam. It is not a 24/7 security camera, and treating it as one ends in thermal throttling and dropped frames.</p>
+
+        <h2>Which board to buy</h2>
+        <p>All of these are ESP32-family boards with a camera sensor, and all have published ESPHome example configurations. No board below ships firmware worth keeping; flash ESPHome from the start.</p>
+        <ul>
+          <li><strong>Ai-Thinker ESP32-CAM</strong> — the budget classic. ESP32-S with an OV2640 2-megapixel sensor and a microSD slot. The pin config is in the ESPHome docs. Mind GPIO16 (it is wired to the onboard PSRAM) and give it a 5 V supply that can actually deliver, because brownouts cause boot loops many people misdiagnose as flash failures. <a href="https://www.amazon.com/s?k=Ai-Thinker+ESP32-CAM&amp;tag=hanews01-20" rel="sponsored nofollow">Ai-Thinker ESP32-CAM on Amazon</a></li>
+          <li><strong>M5Stack M5Camera-F New (SKU U037)</strong> — a neater package: OV2640 2 MP sensor behind a 150-degree fisheye lens, 4 MB flash plus 4 MB PSRAM. Per <a href="https://docs.m5stack.com/en/unit/m5camera_f_new">M5Stack's product documentation</a>, the factory firmware streams roughly 5-6 fps at 600x800 over its own Wi-Fi access point; under ESPHome you control resolution and frame rate yourself. <a href="https://www.amazon.com/s?k=M5Stack+M5Camera-F&amp;tag=hanews01-20" rel="sponsored nofollow">M5Stack M5Camera-F on Amazon</a></li>
+        </ul>
+        <figure class="figure">
+          <img src="images/m5stack-m5camera-f-new.webp" alt="M5Stack M5Camera-F New, a small square ESP32 camera board with a fisheye lens" width="799" height="799" loading="lazy">
+          <figcaption>M5Stack M5Camera-F New (U037). Source: <a href="https://docs.m5stack.com/en/unit/m5camera_f_new">M5Stack documentation</a></figcaption>
+        </figure>
+        <ul>
+          <li><strong>M5Stack AtomS3R-CAM (SKU C126-CAM)</strong> — the smallest of the lot at 24x24x13.5 mm. It runs an ESP32-S3-PICO-1-N8R8 with 8 MB flash and 8 MB PSRAM, carries a 0.3-megapixel GC0308 sensor with IR transmission control, and ships with driver-free UVC factory firmware. If you want a discrete peek camera inside an enclosure, this is the one; it is also the example board in the ESPHome docs. <a href="https://www.amazon.com/s?k=M5Stack+AtomS3R-CAM&amp;tag=hanews01-20" rel="sponsored nofollow">M5Stack AtomS3R-CAM on Amazon</a></li>
+        </ul>
+        <figure class="figure">
+          <img src="images/m5stack-atoms3r-cam.jpg" alt="M5Stack AtomS3R-CAM, a tiny ESP32-S3 camera module photographed next to a coin for scale" width="800" height="800" loading="lazy">
+          <figcaption>M5Stack AtomS3R-CAM (C126-CAM). Source: <a href="https://docs.m5stack.com/en/core/atoms3r%20cam">M5Stack documentation</a></figcaption>
+        </figure>
+        <ul>
+          <li><strong>M5Stack Timer Camera X/F</strong> — an OV2640 variant built to be battery-ready, with an ESPHome example config in the docs.</li>
+          <li><strong>TTGO T-Camera (V05/V162/V17) and T-Journal</strong> — ESPHome example configs published; handy if you want a display or buttons on the same board.</li>
+          <li><strong>ESP-EYE</strong> — Espressif's own devkit, with an ESPHome example config. The safest choice if you want the reference hardware.</li>
+        </ul>
+        <p>A note on heat: the M5Stack documentation for its camera boards notes insufficient cooling and overheating in continuous operation. That matches the ESPHome warning about high frame rates. Mount these boards where air moves, and let the idle frame rate do its job.</p>
+
+        <h2>ESPHome camera or Frigate?</h2>
+        <p>These two answers overlap in search results but solve different problems. ESPHome's camera component streams MJPEG frames to Home Assistant and gives you a live entity. It does not detect anything, and it does not record. <a href="https://docs.frigate.video/integrations/home-assistant">Frigate</a> is the reverse: a full NVR with object detection, recording, and an official Home Assistant integration installed via HACS. If your real question is "did a person walk up the driveway at 3 a.m.," Frigate is the tool.</p>
+        <p>Frigate has its own hardware expectations, and it is worth reading them before buying anything. Per the <a href="https://docs.frigate.video/frigate/hardware">Frigate hardware documentation</a>, cameras should output <strong>H.264 with AAC audio</strong>, ideally with multiple substreams; Wi-Fi cameras are explicitly "not recommended" because of unreliable streams and lost video data; and for Reolink it suggests sticking to 5 MP and lower. Detection accelerators with first-party support include Hailo8/Hailo8L, Google Coral EdgeTPU (USB or M.2), MemryX MX3, OpenVINO on Intel, Nvidia GPUs, Apple Silicon, and AMD ROCm, with Jetson and Rockchip community-supported. The server itself can be any Intel CPU with AVX/AVX2 that runs Debian; even a small N100 mini PC qualifies, which is why compact machines like the ones in our <a href="best-mini-pc-home-assistant">mini PC for Home Assistant</a> guide keep coming up in Frigate builds.</p>
+        <p>The integration itself is straightforward if your networking is already sane: the MQTT integration must be configured in Home Assistant first, Frigate must have MQTT enabled and point at the same MQTT server, the <code>media_source</code> component must be enabled for the Media Browser, and the integration URL points at Frigate's unauthenticated port 5000 or authenticated port 8971.</p>
+        <p>Where does the ESP32-CAM fit then? Two honest uses. First, it is a cheap second glance at places a proper camera does not need to go — inside a printer enclosure, on a shelf, at a chicken coop. Second, it is the on-ramp to the whole ESPHome ecosystem; most people who flash one camera end up flashing sensors for the rest of the house. If your goal ends at "Frigate with real detection," buy a wired IP camera with an RTSP H.264 stream instead and skip the ESP32-CAM entirely. A restream through go2rtc can bridge odd sources, but the Frigate documentation's warning about Wi-Fi streams stands regardless of the brand.</p>
+
+        <h2>Gotchas worth knowing before you flash</h2>
+        <ul>
+          <li><strong>GPIO16 on Ai-Thinker boards</strong> is wired to the onboard PSRAM. Using it as a button pin causes watchdog resets per the ESPHome docs. Pick another pin.</li>
+          <li><strong>PWM timer collision</strong>: the camera component uses LEDC timer #1. Other PWM outputs need channel 2 or higher.</li>
+          <li><strong>Frame rate heat</strong>: 60 fps is technically available at reduced sizes, but the documented overheating warning is not decorative. Keep 10-15 fps for continuous-looking streams and let <code>idle_framerate</code> drop to 0.1 fps when nothing is watching.</li>
+          <li><strong>M5Stack camera cooling</strong>: per M5Stack's own documentation, its camera boards have insufficient cooling for continuous operation. Same advice: airflow, low idle rate.</li>
+          <li><strong>PSRAM is not optional</strong>: the component requires it, and JPEG compression needs it too. Boards with only internal RAM will fail to configure.</li>
+        </ul>
+
+        <h2>Where this fits in your stack</h2>
+        <p>The ESP32-CAM is one entry in a much larger set of builds on this chip. Our <a href="esp32-projects">ESP32 projects guide</a> covers the sensors, displays, and actuators that pair naturally with a camera board, and the <a href="esphome">ESPHome hub page</a> explains how ESPHome devices talk to Home Assistant in general. Choosing between a C6 and an S3 board matters for cameras specifically — the <a href="esp32-c6-vs-s3">ESP32-C6 vs ESP32-S3 comparison</a> covers why the S3 is the camera and voice chip of the family, and the same reasoning applies at the cheaper end of the range.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Can an ESP32-CAM work with Home Assistant?</h3>
+        <p>Yes. The ESPHome <code>esp32_camera</code> component puts the camera on Home Assistant as a native camera entity over the ESPHome API. No cloud service, no MQTT, and no vendor account is needed.</p>
+        <h3>Is an ESP32-CAM good enough to watch a shed or a 3D printer?</h3>
+        <p>For a snapshot on demand or a low-frame-rate stream, yes. The default configuration is 640x480 at 10 fps, and the ESPHome documentation warns that pushing frame rates up causes overheating. It is not a continuous-recording security camera.</p>
+        <h3>Should I use the ESPHome camera or Frigate for object detection?</h3>
+        <p>They solve different problems. ESPHome streams MJPEG frames to Home Assistant; Frigate does object detection and recording and wants H.264 RTSP streams from a proper IP camera. Frigate's documentation explicitly does not recommend Wi-Fi camera streams, so an ESP32-CAM is not the robust path into Frigate.</p>
+        <h3>Does the ESP32-CAM need PSRAM?</h3>
+        <p>Yes. The ESPHome <code>esp32_camera</code> component requires PSRAM and I2C to be configured, and JPEG image compression requires the <code>psram</code> component to be enabled.</p>
+        <h3>What resolution and frame rate can an ESP32-CAM do?</h3>
+        <p>Depending on the sensor, resolutions up to 2560x1920 (QSXGA) are offered; the default is 640x480 at 10 fps with a 0.1 fps idle rate. Sixty fps is possible only at reduced frame sizes, and the documentation warns about overheating.</p>
+        <h3>What detection hardware does Frigate support?</h3>
+        <p>First-party: Hailo8 and Hailo8L, Google Coral EdgeTPU (USB or M.2), MemryX MX3, OpenVINO on Intel, Nvidia GPUs, Apple Silicon, and AMD ROCm. Jetson and Rockchip are community-supported.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://esphome.io/components/esp32_camera.html">ESPHome esp32_camera component</a>; <a href="https://docs.frigate.video/integrations/home-assistant">Frigate Home Assistant integration</a>; <a href="https://docs.frigate.video/frigate/hardware">Frigate hardware</a>; <a href="https://docs.m5stack.com/en/unit/m5camera_f_new">M5Stack M5Camera-F New</a>; <a href="https://docs.m5stack.com/en/core/atoms3r%20cam">M5Stack AtomS3R-CAM</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
