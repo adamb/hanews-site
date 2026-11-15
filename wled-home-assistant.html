@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WLED controllers for Home Assistant: ready-made vs DIY (2026) — HA News</title>
+  <meta name="description" content="WLED controller guide: which ESP32 WLED controller to buy, pre-flashed picks from Athom, SMLIGHT, QuinLED and cod.m, wiring and level shifters, and how WLED shows up in Home Assistant.">
+  <link rel="canonical" href="https://hanews.org/wled-home-assistant">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "WLED controllers for Home Assistant: ready-made vs DIY (2026)", "datePublished": "2026-11-15", "dateModified": "2026-11-15", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/wled-home-assistant"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is a WLED controller and why use one with Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "A WLED controller is an ESP8266 or ESP32 board running WLED, a web server firmware that drives addressable LED strips such as WS2812B and APA102. Home Assistant discovers it on the network and exposes each segment as a light entity, so your strips join the same automations as the rest of the house with no cloud account."}}, {"@type": "Question", "name": "Do I have to flash WLED myself, or do controllers come pre-installed?", "acceptedAnswer": {"@type": "Answer", "text": "Both options exist. Boards like the QuinLED Dig2go, Athom LS8P, Esp32-Stick-WLED and RGB2Go Duo2Go ship with WLED pre-installed. A bare ESP32 dev board needs a one-time browser flash, and the ESPHome route lets you run WLED code alongside Home Assistant-native firmware."}}, {"@type": "Question", "name": "ESP8266 or ESP32 for a new WLED install?", "acceptedAnswer": {"@type": "Answer", "text": "ESP32. The WLED documentation says ESP8266 should not be used for new installations, and ESP32-C3/S2/S3 are still only experimentally supported, with some ESP32-C3 mini boards shipping with broken Wi-Fi."}}, {"@type": "Question", "name": "Do I really need a level shifter on the data line?", "acceptedAnswer": {"@type": "Answer", "text": "Yes for reliable installs. The WLED documentation lists a level shifter between the controller and the LED data line as required for reliable data transmission, especially with 12 V and 24 V strips, and notes it is built into the QuinLED and cod.m controller boards."}}, {"@type": "Question", "name": "How does WLED show up in Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "The integration requires WLED 0.14.0 or newer and auto-discovers devices on the network. Each segment becomes its own light entity, a master light controls strip power and brightness, and the integration exposes presets, playlists, effect intensity and speed, sensors for current draw, LED count and uptime, and switches for the nightlight and segment controls."}}, {"@type": "Question", "name": "Which ready-made WLED controller should I buy instead of building one?", "acceptedAnswer": {"@type": "Answer", "text": "For a single strip, the QuinLED Dig2go or an Athom pre-flashed board. For medium builds, QuinLED Dig-Uno or Dig-Quad. For large multi-output installs, the QuinLED Dig-Octa, which the WLED author recommends, or an Athom 8-port distro or E8-WiFi Plus. All are on the official WLED compatibility page."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 15 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · ESPHome &amp; LED</p>
+        <h1>WLED controllers for Home Assistant: ready-made vs DIY</h1>
+        <p class="byline">HA News · 15 Nov 2026</p>
+
+        <p>WLED is the local-first way to run addressable LED strips: it is an ESP8266 or ESP32 webserver firmware that drives NeoPixel-type chipsets (WS2812B, WS2811, SK6812) and SPI strip families like WS2801 and APA102 directly, with presets, effects and a web UI of its own. When you pair it with Home Assistant, the strips become ordinary light entities — dimmed, scheduled, and triggered by any automation, entirely on your LAN. <strong>The best WLED controller for most people is a pre-flashed ESP32 board with a level shifter onboard: a QuinLED Dig2go for one strip, a QuinLED Dig-Quad or Dig-Uno for a medium build, and an 8-output board such as the Athom 8 Port LED Distro or QuinLED Dig-Octa for large installs.</strong> All are listed on the official WLED controller compatibility page, which is the source for every spec on this page.</p>
+
+        <h2>What a WLED controller actually does</h2>
+        <p>An addressable strip is just a chain of LEDs with one data line. The controller's firmware clocks out the per-pixel color data in real time — that is the whole job, and it is timing-sensitive, which is why controller quality matters. WLED runs on the two Espressif chips only. Per the WLED compatibility documentation, it fully supports ESP8266 and the dual-core ESP32 family; the ESP32-C3, S2 and S3 variants are "experimentally supported" and not recommended for productive use yet, and some ESP32-C3 mini V1.0.0 boards are known to ship with broken Wi-Fi.</p>
+        <p>The practical consequence for buyers: pick ESP32, not a bargain ESP8266 board, and prefer the classic ESP32 unless a vendor has done the variant debugging for you. The WLED documentation is blunt that ESP8266 should not be used for new installations.</p>
+
+        <h2>How WLED shows up in Home Assistant</h2>
+        <p>Setup is uneventful, which is a compliment. The Home Assistant WLED integration requires WLED 0.14.0 or newer, discovers controllers on the network automatically, and can also be added manually from Settings, then Devices &amp; services, then Add integration, then WLED with the controller's IP or hostname.</p>
+        <p>What you get, per the integration documentation:</p>
+        <ul>
+          <li><strong>Light entities per segment.</strong> Each WLED segment is a separate light in Home Assistant, plus a master light for strip power and overall brightness. With the default single segment, you get exactly one light entity.</li>
+          <li><strong>Select entities</strong> for preset, playlist, per-segment color palette and live override.</li>
+          <li><strong>Number entities</strong> for effect intensity and effect speed.</li>
+          <li><strong>Sensors</strong>: estimated and maximum current in mA when the auto brightness limiter is configured, LED count, uptime, free memory, Wi-Fi signal, BSSID and IP.</li>
+          <li><strong>Switches</strong>: nightlight, sync send/receive, AudioReactive, and per-segment reverse and freeze.</li>
+          <li><strong>An update entity</strong> for WLED firmware, plus temperature and humidity sensors from usermods such as DS18B20 or SHT.</li>
+        </ul>
+        <p>Because everything talks over your network to the strip itself, there is no cloud account in the path. Automation ideas are the same as for any light: motion-triggered stair lighting, sunset scenes, or an "all strips off" end-of-night routine tied to your alarm.</p>
+
+        <h2>The wiring facts nobody reads early enough</h2>
+        <p>Three items from the WLED documentation trip up almost every first build:</p>
+        <ol>
+          <li><strong>Level shifter.</strong> The documentation calls for a level shifter between the controller and the LED data line as required for reliable data transmission — mandatory especially with 12 V and 24 V strips, whose logic thresholds are unforgiving. Good controller boards build this in; a bare dev board does not.</li>
+          <li><strong>Power and fuses.</strong> Long strips need intermediate power feeds, and a relay on the strip's power line saves energy when the strip is off. The documentation points to its power/wiring/fuse calculator for sizing.</li>
+          <li><strong>Heat sinking.</strong> Aluminum profiles should be used for heat sinking, especially with high-density strips in enclosed channels.</li>
+        </ol>
+        <p>Buying a controller with these already handled is the shortcut: that is the real argument for ready-made over DIY.</p>
+
+        <h2>Ready-made picks: what the official list offers</h2>
+        <p>Every board below appears on the official WLED compatibility page; specs follow that page.</p>
+        <h3>Single strips and small builds</h3>
+        <ul>
+          <li><strong>QuinLED Dig2go</strong> — USB-C powered, up to roughly 15 W of strip, data level shifter, fuses, IR and digital mic, pre-flashed with WLED; sold available bundled with a power supply and LEDs.</li>
+          <li><strong>Athom LS8P</strong> — 8 MB ESP32, dual output, mic and IR, WLED preinstalled.</li>
+          <li><strong>RGB2Go Duo2Go</strong> — 2 outputs with removable ESP8266, two fused level-shifted 5 A ports, WLED pre-installed; aimed at beginners.</li>
+        </ul>
+        <h3>Medium and DIY-leaning builds</h3>
+        <ul>
+          <li><strong>QuinLED Dig-Uno</strong> (medium projects) and <strong>Dig-Quad</strong> — 4(5)-channel with five onboard fuses, level shifters, auto 5-24 V; available DIY or pre-assembled. Aircoookie, the WLED author, personally recommends Dig-Uno for medium-size projects.</li>
+        </ul>
+        <h3>Large, multi-output installs</h3>
+        <ul>
+          <li><strong>QuinLED Dig-Octa</strong> — pre-assembled 8-channel controller with brain and power boards, stackable, built-in level shifters, Ethernet plus external-antenna Wi-Fi, auto 5-24 V, 50-100 A handling, fully fused, relay, I2C temp sensor, WLED pre-flashed. Also the author's recommendation for large projects.</li>
+          <li><strong>Athom 8 Port LED Distro</strong> — based on WT32-ETH01, Wi-Fi or Ethernet, 5/12/24 V strips, level shifter, 5 A fuse per port, USB-C powering.</li>
+          <li><strong>E8-WiFi Plus</strong> — 8-port ESP32, 5-24 V with 30 A total and 5 A auto fuses per output, SD card slot, XLights-compatible.</li>
+          <li><strong>ABC! WLED Controller V43 / V73 / V57</strong> — 5-24 V auto recognition, up to 4 outputs, mic or line-in options, Ethernet adapter option.</li>
+          <li><strong>Esp32-Stick-WLED</strong> — PoE Ethernet, level shifters, WLED pre-flashed.</li>
+        </ul>
+        <h3>Wired and DIN-rail installations</h3>
+        <ul>
+          <li><strong>SMLIGHT A1-SLWF-03</strong> — ESP32 with 16 MB flash, ICS-43434 microphone for sound-reactive effects, IR, 5-24 V output.</li>
+          <li><strong>SMLIGHT A1-SLWF-09</strong> — Ethernet/PoE add-ons, USB-C PD can power 5 V or 12 V strips directly, built-in level shifters, relay output.</li>
+          <li><strong>cod.m WLED Controller and WLED LAN</strong> — PoE and DIN-rail controllers, made in Germany with CE/RoHS.</li>
+        </ul>
+        <p>Ready-made search links (prices and stock are on Amazon; HA News earns from qualifying purchases):</p>
+        <ul>
+          <li><a href="https://www.amazon.com/s?k=QuinLED+Dig2go&tag=hanews01-20" rel="sponsored nofollow">QuinLED Dig2go on Amazon</a></li>
+          <li><a href="https://www.amazon.com/s?k=Athom+WLED+controller&tag=hanews01-20" rel="sponsored nofollow">Athom WLED controllers on Amazon</a></li>
+          <li><a href="https://www.amazon.com/s?k=SMLIGHT+SLWF-03&tag=hanews01-20" rel="sponsored nofollow">SMLIGHT A1-SLWF-03 on Amazon</a></li>
+          <li><a href="https://www.amazon.com/s?k=QuinLED+Dig-Quad&tag=hanews01-20" rel="sponsored nofollow">QuinLED Dig-Quad on Amazon</a></li>
+          <li><a href="https://www.amazon.com/s?k=WS2812B+LED+strip&tag=hanews01-20" rel="sponsored nofollow">WS2812B LED strips on Amazon</a></li>
+        </ul>
+
+        <h2>DIY route: a bare ESP32 and WLED</h2>
+        <p>The alternative is a generic ESP32 dev board flashed with WLED, which is cheaper per output and a good match for a workbench project. You take on the three wiring items above yourself: add a small level shifter module to the data line, fuse the strip power, and feed long runs. If you want Home Assistant-native firmware running on the same board instead, or want to mix in sensors, that is where the ESPHome route overlaps — see our <a href="esphome-guide">ESPHome guide</a> and our other <a href="esp32-projects">ESP32 projects</a> for how that stack fits together.</p>
+        <p>For new builds, start from a classic dual-core ESP32, not an ESP8266 and not a C3/S2/S3 variant, per the WLED documentation cited above. Budget extra for the level shifter and proper wiring; they are what make the difference between a strip that flickers and one that just works.</p>
+
+        <h2>Gotchas</h2>
+        <ul>
+          <li>One light entity by default: if you expect per-zone control, create WLED segments first, then re-check Home Assistant — the integration maps segments to light entities automatically.</li>
+          <li>The update entity updates WLED firmware; the chip-level ESP8266/ESP32 limitations do not go away with updates, so hardware choice is a one-way door.</li>
+          <li>Sound-reactive effects need a microphone: the SMLIGHT SLWF-03 (ICS-43434) and ABC! controllers with mic options carry the AudioReactive path; Dig2go also bundles a digital mic.</li>
+          <li>Current-limit sensors require the auto brightness limiter to be configured in WLED before Home Assistant sees meaningful current readings.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>What is a WLED controller and why use one with Home Assistant?</h3>
+        <p>A WLED controller is an ESP8266 or ESP32 board running WLED, a web server firmware that drives addressable LED strips such as WS2812B and APA102. Home Assistant discovers it on the network and exposes each segment as a light entity, so your strips join the same automations as the rest of the house with no cloud account.</p>
+        <h3>Do I have to flash WLED myself, or do controllers come pre-installed?</h3>
+        <p>Both options exist. Boards like the QuinLED Dig2go, Athom LS8P, Esp32-Stick-WLED and RGB2Go Duo2Go ship with WLED pre-installed. A bare ESP32 dev board needs a one-time browser flash before Home Assistant can find it.</p>
+        <h3>ESP8266 or ESP32 for a new WLED install?</h3>
+        <p>ESP32. The WLED documentation says ESP8266 should not be used for new installations, and ESP32-C3/S2/S3 are still only experimentally supported, with some ESP32-C3 mini boards shipping with broken Wi-Fi.</p>
+        <h3>Do I really need a level shifter on the data line?</h3>
+        <p>Yes for reliable installs. The WLED documentation lists a level shifter between the controller and the LED data line as required for reliable data transmission, especially with 12 V and 24 V strips, and notes it is built into the QuinLED and cod.m controller boards.</p>
+        <h3>How does WLED show up in Home Assistant?</h3>
+        <p>The integration requires WLED 0.14.0 or newer and auto-discovers devices on the network. Each segment becomes its own light entity, a master light controls strip power and brightness, and the integration exposes presets, playlists, effect intensity and speed, sensors for current draw, LED count and uptime, and switches for the nightlight and segment controls.</p>
+        <h3>Which ready-made WLED controller should I buy instead of building one?</h3>
+        <p>For a single strip, the QuinLED Dig2go or an Athom pre-flashed board. For medium builds, QuinLED Dig-Uno or Dig-Quad. For large multi-output installs, the QuinLED Dig-Octa, which the WLED author recommends, or an Athom 8-port distro or E8-WiFi Plus. All are on the official WLED compatibility page.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://kno.wled.ge/basics/compatible-controllers/">WLED compatible controllers documentation</a>; <a href="https://www.home-assistant.io/integrations/wled/">Home Assistant WLED integration</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
