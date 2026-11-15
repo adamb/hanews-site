@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP32-P4 explained for home builders: displays, cameras, voice and the C6 Wi-Fi problem — HA News</title>
+  <meta name="description" content="What the ESP32-P4 is and what it means for ESPHome builds in 2026: dual-core RISC-V at 400 MHz, MIPI-DSI displays and MIPI-CSI cameras, no on-die Wi-Fi, and ESPHome support via variant: esp32p4 and esp32_hosted.">
+  <link rel="canonical" href="https://hanews.org/esp32-p4">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "ESP32-P4 explained for home builders: displays, cameras, voice and the C6 Wi-Fi problem", "image": "https://hanews.org/images/esp32-p4x-function-ev-board.png", "datePublished": "2026-11-15", "dateModified": "2026-11-15", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/esp32-p4"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does the ESP32-P4 have Wi-Fi?", "acceptedAnswer": {"@type": "Answer", "text": "No. The ESP32-P4 has no radio on-die. Pair it with an ESP32-C6 (or C5) co-processor using ESPHome's esp32_hosted component, which carries Wi-Fi and Bluetooth over SDIO or SPI."}}, {"@type": "Question", "name": "Is the ESP32-P4 supported in ESPHome?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Set variant: esp32p4 in the esp32: platform config. ESPHome documents ESP-IDF framework support, plus esp32_hosted, esp-now, LVGL and camera support."}}, {"@type": "Question", "name": "What is the ESP32-P4 good for in a smart home?", "acceptedAnswer": {"@type": "Answer", "text": "Displays (MIPI-DSI up to 1080p), cameras (MIPI-CSI with an integrated ISP), voice and audio front ends, Ethernet and USB devices."}}, {"@type": "Question", "name": "How fast is the ESP32-P4?", "acceptedAnswer": {"@type": "Answer", "text": "It is a dual-core RISC-V SoC running up to 400 MHz with 768 KB of on-chip SRAM, plus a low-power core up to 40 MHz."}}, {"@type": "Question", "name": "Where can I buy an ESP32-P4 board?", "acceptedAnswer": {"@type": "Answer", "text": "Espressif sells the ESP32-P4X Function EV Board and the ESP32-P4X-EYE camera board through distributors such as DigiKey and Mouser; partner boards from makers like Waveshare and M5Stack pair the P4 with a C6 co-processor."}}, {"@type": "Question", "name": "Do ESP-NOW devices built on the P4 show the P4's MAC address?", "acceptedAnswer": {"@type": "Answer", "text": "No. ESP-NOW traffic on the P4 is forwarded to the co-processor, so the source MAC is the co-processor's radio MAC, not the P4's."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 15 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Explainer · ESPHome</p>
+        <h1>ESP32-P4 explained for home builders: displays, cameras, voice and the C6 Wi-Fi problem</h1>
+        <p class="byline">HA News · 15 Nov 2026</p>
+
+        <p>The ESP32-P4 is Espressif's newest chip, and the first one that is not really a wireless chip at all. Per the <a href="https://www.espressif.com/en/products/socs/esp32-p4">Espressif product page</a>, it is a dual-core RISC-V system on chip running up to 400 MHz, built around screens, cameras and audio rather than radios: it has no Wi-Fi or Bluetooth of its own and is designed to pair with a wireless co-processor, typically an ESP32-C6. If you build ESPHome devices — dashboards, camera front ends, voice satellites — this is the chip that changes what a DIY board can do. This guide explains what is inside it, what ESPHome supports today, how to handle the missing radio, and which boards to buy.</p>
+
+        <h2>What the ESP32-P4 is</h2>
+        <p>The headline spec, straight from the <a href="https://www.espressif.com/en/products/socs/esp32-p4">Espressif datasheet page</a>: two RISC-V cores at up to 400 MHz with AI instruction extensions and a single-precision floating point unit, plus a low-power core that runs up to 40 MHz for intermittent background work such as waking on a timer without spinning up the main cores. Memory is 768 KB of on-chip SRAM plus 8 KB of zero-wait tightly coupled memory; external PSRAM is cacheable, which matters for anything that renders a display or buffers camera frames.</p>
+        <p>The AI instruction extensions are the quiet part of the story. ESPHome's voice pipeline does wake-word detection and audio processing on-chip, and earlier chips did that with vector extensions on the S3. The P4 continues that direction with more headroom per the spec sheet, at a higher clock speed than the S3's 240 MHz ceiling.</p>
+
+        <h2>Why the P4 exists: screens and cameras first</h2>
+        <p>Espressif positions the P4 as a human-machine interface and edge-computing chip. Concretely, per the same product page:</p>
+        <ul>
+          <li><strong>MIPI-DSI display output up to 1080p</strong>, plus a parallel display interface for simpler panels (the kind used by cheap RGB and I80 screens).</li>
+          <li><strong>MIPI-CSI camera input up to 1080p with an integrated image signal processor</strong>, plus a parallel camera interface. The ISP is on-chip, which means de-mosaic, color and exposure handling do not need to be done by your firmware.</li>
+          <li><strong>Hardware H.264 encoding at 1080p at 30 frames per second</strong>, alongside a Pixel Processing Accelerator (PPA) and 2D-DMA for scaling, rotation and blending without loading the CPU.</li>
+          <li><strong>Capacitive touch and speech recognition support</strong> — the touch controller interface drives the screens, and the audio path feeds voice front ends.</li>
+        </ul>
+        <p>For comparison, the S3 took parallel camera interfaces and drove displays over SPI or parallel RGB, which caps resolution and eats CPU time. DSI, CSI and hardware H.264 encode are new territory for an ESP-class chip. Choose carefully between the radio-equipped and display-equipped chips — our <a href="esp32-c6-vs-s3.html">ESP32-C6 vs ESP32-S3</a> comparison covers that choice for the previous generation.</p>
+
+        <figure class="figure">
+          <img src="images/esp32-p4x-function-ev-board.png" alt="Espressif ESP32-P4X Function EV Board development board" width="264" height="144" loading="lazy">
+          <figcaption>ESP32-P4X Function EV Board. Image: Espressif Systems</figcaption>
+        </figure>
+
+        <h2>The catch: no radio on-die</h2>
+        <p>Here is the single fact that surprises people: the ESP32-P4 has no Wi-Fi and no Bluetooth. Espressif sells it as a wired-or-companion design — for a connected device, you add a wireless co-processor. The P4 has the peripherals to make that clean: 55 programmable GPIOs (more than any earlier Espressif SoC per the product page), SPI, I2S, I2C, LED PWM, MCPWM, RMT, ADC, UART, TWAI (CAN bus), USB OTG 2.0 High Speed, Ethernet and SDIO Host 3.0.</p>
+        <p>The intended companion is an ESP32-C6: it gives the P4 Wi-Fi 6, Bluetooth 5 and — importantly — 802.15.4, the radio under Thread and Zigbee. So a P4-plus-C6 board can be a wall panel with a 1080p screen that is also a Thread router. The C5 companion appears on newer devkits and adds 5 GHz Wi-Fi.</p>
+
+        <h2>ESPHome support today</h2>
+        <p>ESPHome supports the chip natively. The <a href="https://esphome.io/components/esp32.html">esp32 component documentation</a> lists <code>variant: esp32p4</code> in the <code>esp32:</code> platform config, running on the ESP-IDF framework (the Arduino framework is supported per the same docs). Two configuration details matter before your first flash:</p>
+        <ol>
+          <li><strong>Engineering sample silicon.</strong> The docs expose an <code>engineering_sample: true</code> option for rev 3.0-or-earlier silicon. If you use <code>variant: esp32p4</code> without setting <code>engineering_sample</code> explicitly, ESPHome logs a warning. If you bought a board recently, set it to <code>false</code> and move on; boards with early silicon need the option set to <code>true</code>.</li>
+          <li><strong>Valid CPU clocks are 40, 360 and 400 MHz</strong>, and flash sizes run 2–32 MB. A config that uses another clock value will not validate.</li>
+        </ol>
+        <p>Everything else falls into place from there: display and LVGL support work over the DSI and parallel interfaces, camera support uses the CSI interface, and the new ESPHome builds for a P4 wall panel are mostly a <code>lvgl</code> config plus a <code>display</code> driver. If you are new to the toolchain, our <a href="esphome.html">ESPHome guide</a> covers the basics, and <a href="esp32-projects.html">ESP32 projects</a> lists builds you can start on the chips you already own.</p>
+
+        <h2>Adding Wi-Fi with esp32_hosted</h2>
+        <p>Because the P4 cannot talk on a radio, Wi-Fi is provided by ESPHome's <a href="https://esphome.io/components/esp32_hosted.html">esp32_hosted component</a> (ESP-Hosted-MCU). It runs firmware on the co-processor — supported variants are ESP32, S2, S3, C2, C3 and C6 — and carries the networking over SDIO (the default) or SPI. For a P4 board, the C6 is the typical choice and covers Wi-Fi, Bluetooth and 802.15.4.</p>
+        <p>One documented gotcha is worth knowing before it boots: on the P4 (and the S3), the esp32_hosted transport buffer pool can be placed in PSRAM with <code>use_psram: true</code> — PSRAM is supported on those two variants only. The docs recommend it for large LVGL UIs, and warn that without it, booting with a heavy display stack can fail with an <code>sdio_mempool_create</code> assertion. If your P4 panel refuses to boot with Wi-Fi enabled, that option is the first thing to check.</p>
+        <p>Ethernet sidesteps the issue entirely for anything mounted on a wall near wiring: the P4 has an Ethernet MAC on-die, so a wired wall panel is a natural build.</p>
+
+        <h2>ESP-NOW on the P4: one config line, one surprise</h2>
+        <p>ESP-NOW — Espressif's connectionless, low-latency protocol that many DIY sensor projects use instead of Wi-Fi — works on the P4. The esp32_hosted documentation says ESP-NOW packets are forwarded to the co-processor; you just add <code>espnow:</code> to the config.</p>
+        <p>Two documented caveats. First, the ESP-NOW source MAC address is the co-processor's radio MAC, not the P4's own MAC — so if you filter or log by MAC on the receiving side, you will see the C6's address. Second, do not run ESP-NOW while Wi-Fi is in access-point mode on the P4: the docs state ESP-NOW on this setup needs the station interface up, so a P4 board acting as a Wi-Fi AP plus ESP-NOW sender is not a supported combination.</p>
+
+        <h2>Security, for what it is worth in a house</h2>
+        <p>The P4 carries the standard Espressif security set, per the product page: Secure Boot, flash encryption, hardware crypto accelerators, a true random number generator, a Digital Signature Peripheral, and a Key Management Unit that generates private keys on-chip and keeps them there. For home builders the practical meaning is simple: a P4 device holding credentials — say, a wall panel that talks to Home Assistant over the LAN — has documented hardware support for not storing those keys in readable flash. It is the same story as the C6 and S3, applied to the chip most likely to display a camera feed.</p>
+
+        <h2>Boards you can buy</h2>
+        <p>Espressif lists two official P4 devkits on the <a href="https://www.espressif.com/en/products/devkits">devkits page</a>: the ESP32-P4X Function EV Board, which pairs the P4 with an ESP32-C5 co-processor (per the <a href="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32p4/esp32-p4x-function-ev-board/index.html">official documentation</a>), and the ESP32-P4X-EYE, a camera board documented separately (<a href="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32p4/esp32-p4x-eye/index.html">docs here</a>). Both are retailed through distributors such as DigiKey and Mouser. Partner boards — the devkit page notes boards from makers such as Waveshare and M5Stack — typically pair the P4 with a C6 co-processor, which is the combination most ESPHome projects want.</p>
+
+        <figure class="figure">
+          <img src="images/esp32-p4x-eye.png" alt="Espressif ESP32-P4X-EYE camera development board" width="264" height="144" loading="lazy">
+          <figcaption>ESP32-P4X-EYE. Image: Espressif Systems</figcaption>
+        </figure>
+
+        <p>Check current listings via the Amazon search index (<a href="https://www.amazon.com/s?k=ESP32-P4+board&amp;tag=hanews01-20" rel="sponsored nofollow">ESP32-P4 boards on Amazon</a>, <a href="https://www.amazon.com/s?k=ESP32-P4X+EYE&amp;tag=hanews01-20" rel="sponsored nofollow">ESP32-P4X-EYE on Amazon</a>) or go direct to DigiKey or Mouser, which list the official devkits. HA News does not quote prices; they move too fast to be useful in print.</p>
+
+        <h2>Should you build on it?</h2>
+        <p>A short answer, per primary sources only. The P4 is the right chip when your build is fundamentally a screen, a camera or a voice front end: a wall-mounted dashboard, a doorbell or periscope camera, a music or intercom node. For sensor nodes, switches and anything battery-powered, the C6, C3 or S3 remain the better fit — they are cheaper per the market they serve, and the P4's extra muscle buys you nothing in a mailbox sensor. The LP core handles intermittent tasks, but a whole P4 board to blink an LED is not a sensible bill of materials.</p>
+        <p>For anything that must be wireless and simple, our <a href="esp32-c6-vs-s3.html">ESP32-C6 vs ESP32-S3</a> guide still answers most project decisions. Reach for the P4 when the spec sheet item you actually need is MIPI-DSI or MIPI-CSI — and accept that the radio belongs to its neighbor.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Does the ESP32-P4 have Wi-Fi?</h3>
+        <p>No. The ESP32-P4 has no radio on-die. Pair it with an ESP32-C6 (or C5) co-processor using ESPHome's esp32_hosted component, which carries Wi-Fi and Bluetooth over SDIO or SPI.</p>
+        <h3>Is the ESP32-P4 supported in ESPHome?</h3>
+        <p>Yes. Set <code>variant: esp32p4</code> in the <code>esp32:</code> platform config. ESPHome documents ESP-IDF framework support, plus esp32_hosted, esp-now, LVGL and camera support.</p>
+        <h3>What is the ESP32-P4 good for in a smart home?</h3>
+        <p>Displays (MIPI-DSI up to 1080p), cameras (MIPI-CSI with an integrated ISP), voice and audio front ends, Ethernet and USB devices.</p>
+        <h3>How fast is the ESP32-P4?</h3>
+        <p>It is a dual-core RISC-V SoC running up to 400 MHz with 768 KB of on-chip SRAM, plus a low-power core up to 40 MHz.</p>
+        <h3>Where can I buy an ESP32-P4 board?</h3>
+        <p>Espressif sells the ESP32-P4X Function EV Board and the ESP32-P4X-EYE camera board through distributors such as DigiKey and Mouser; partner boards from makers like Waveshare and M5Stack pair the P4 with a C6 co-processor.</p>
+        <h3>Do ESP-NOW devices built on the P4 show the P4's MAC address?</h3>
+        <p>No. ESP-NOW traffic on the P4 is forwarded to the co-processor, so the source MAC is the co-processor's radio MAC, not the P4's.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.espressif.com/en/products/socs/esp32-p4">Espressif ESP32-P4 product page</a>; <a href="https://esphome.io/components/esp32.html">ESPHome esp32 component documentation</a>; <a href="https://esphome.io/components/esp32_hosted.html">ESPHome esp32_hosted documentation</a>; <a href="https://www.espressif.com/en/products/devkits">Espressif devkits</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+        <p><small>Assisted by AI (Hermes). Facts sourced from the Espressif product and devkit pages and ESPHome documentation linked above; review welcome.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
