@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP32-CAM with Home Assistant: setup, limits, and picks (2026) — HA News</title>
+  <meta name="description" content="ESP32-CAM and Home Assistant: how the ESPHome esp32_camera component works, what resolution and frame rate to expect, which boards to buy, and when Frigate is the better tool.">
+  <link rel="canonical" href="https://hanews.org/esp32-cam-home-assistant">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "ESP32-CAM with Home Assistant: setup, limits, and picks", "datePublished": "2026-11-15", "dateModified": "2026-11-15", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/esp32-cam-home-assistant"}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 15 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · ESPHome</p>
+        <h1>ESP32-CAM with Home Assistant: setup, limits, and picks</h1>
+        <p class="byline">HA News · 15 Nov 2026</p>
+
+        <p>Is the 3D printer still printing or making spaghetti? Did the shed door blow open? Is that a package on the porch or just the neighbor's cat again? You don't need a full security camera setup for questions like these. A tiny ESP32 camera board and <a href="https://esphome.io/components/esp32_camera/">ESPHome</a> will do it, with no cloud, no app and no account.</p>
+        <p>Just know what you're buying: a small sensor on a microcontroller, sending JPEG frames over Wi-Fi. Great for a quick peek. Wrong tool for overnight security.</p>
+
+        <h2>How it works</h2>
+        <p>You flash the board with ESPHome. Its <code>esp32_camera</code> component shows up in Home Assistant as a normal camera entity over ESPHome's native API. No MQTT broker, nothing leaves your network.</p>
+        <ol>
+          <li>Pick a board that has a ready-made example in the ESPHome docs (list below). Copying a working pin map beats working one out yourself.</li>
+          <li>In your YAML, enable <code>i2c</code> and <code>psram</code>, then add the <code>esp32_camera</code> block from the example. The component needs both.</li>
+          <li>Flash over USB the first time, then over Wi-Fi after that.</li>
+          <li>Adopt it in Home Assistant and drop the camera on a dashboard, or grab a snapshot when a door sensor opens.</li>
+        </ol>
+
+        <h2>What it can do</h2>
+        <p>Per the ESPHome docs, the default is 640x480 at 10 frames per second. When nobody is watching, it drops to an idle 0.1 fps, which keeps it cool. You can push it to 60 fps at smaller frame sizes, but the docs warn about overheating. Resolution can go much higher, depending on the sensor.</p>
+        <p>In other words: it wakes up, shows you a picture, and goes back to snoozing. Perfect for a printer cam. Not a 24/7 recorder.</p>
+
+        <h2>Which board?</h2>
+        <p>ESPHome publishes example configs for the Ai-Thinker ESP32-CAM, several M5Stack cameras, TTGO T-Camera boards and Espressif's ESP-EYE, among others. Three good picks:</p>
+        <ul>
+          <li><strong>Ai-Thinker ESP32-CAM</strong>: the budget classic, with an OV2640 2 MP sensor. Give it a solid 5 V supply (weak power causes boot loops) and don't use GPIO16, which the ESPHome docs say is wired to the onboard PSRAM. <a href="https://www.amazon.com/s?k=Ai-Thinker+ESP32-CAM&amp;tag=hanews01-20" rel="sponsored nofollow">Ai-Thinker ESP32-CAM on Amazon</a></li>
+          <li><strong>M5Stack M5Camera-F New (U037)</strong>: a neater package with a 2 MP OV2640 behind a 150° fisheye lens, plus 4 MB of PSRAM, per <a href="https://docs.m5stack.com/en/unit/m5camera_f_new">M5Stack</a>. <a href="https://www.amazon.com/s?k=M5Stack+M5Camera-F&amp;tag=hanews01-20" rel="sponsored nofollow">M5Camera-F on Amazon</a></li>
+        </ul>
+        <figure class="figure">
+          <img src="images/m5stack-m5camera-f-new.webp" alt="M5Stack M5Camera-F New, a small square ESP32 camera board with a fisheye lens" width="799" height="799" loading="lazy">
+          <figcaption>M5Stack M5Camera-F New (U037). Image: <a href="https://docs.m5stack.com/en/unit/m5camera_f_new">M5Stack</a></figcaption>
+        </figure>
+        <ul>
+          <li><strong>M5Stack AtomS3R-CAM (C126-CAM)</strong>: tiny at 24 x 24 x 13.5 mm, with an ESP32-S3, 8 MB of PSRAM and a 0.3 MP GC0308 sensor, per <a href="https://docs.m5stack.com/en/core/atoms3r%20cam">M5Stack</a>. Low resolution, but it hides anywhere. <a href="https://www.amazon.com/s?k=M5Stack+AtomS3R-CAM&amp;tag=hanews01-20" rel="sponsored nofollow">AtomS3R-CAM on Amazon</a></li>
+        </ul>
+        <figure class="figure">
+          <img src="images/m5stack-atoms3r-cam.jpg" alt="M5Stack AtomS3R-CAM, a tiny ESP32-S3 camera module photographed next to a coin for scale" width="800" height="800" loading="lazy">
+          <figcaption>M5Stack AtomS3R-CAM (C126-CAM). Image: <a href="https://docs.m5stack.com/en/core/atoms3r%20cam">M5Stack</a></figcaption>
+        </figure>
+
+        <h2>Gotchas</h2>
+        <ul>
+          <li><strong>PSRAM isn't optional.</strong> The component needs it, and JPEG mode needs it too.</li>
+          <li><strong>PWM clash.</strong> The camera uses PWM timer 1. If you add an LED or buzzer on <code>ledc</code>, set <code>channel: 2</code>, per the docs.</li>
+          <li><strong>Heat.</strong> ESPHome warns that the original M5Stack Camera board has poor cooling and overheats over time. Give any of these boards some airflow and let the idle frame rate do its job.</li>
+        </ul>
+
+        <h2>When to get a real camera instead</h2>
+        <p>ESPHome's camera shows you a live picture. It doesn't record or detect anything. If your real question is "who walked up the driveway at 3 a.m.?", you want <a href="https://docs.frigate.video/">Frigate</a>, a local video recorder with object detection, and a wired IP camera. Frigate's <a href="https://docs.frigate.video/frigate/hardware">hardware docs</a> say Wi-Fi cameras are not recommended, so an ESP32-CAM is not a Frigate camera.</p>
+        <p>The ESP32-CAM's real superpower: it's a gateway drug. Flash one camera and you'll be flashing sensors all over the house by next month. Our <a href="esp32-projects.html">ESP32 projects</a> list is a good next step, and <a href="esp32-c6-vs-s3.html">ESP32-C6 vs S3</a> explains why the S3 is the camera chip of the family.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Matter, Thread, Home Assistant, OpenWrt and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://esphome.io/components/esp32_camera.html">ESPHome esp32_camera component</a>; <a href="https://docs.frigate.video/integrations/home-assistant">Frigate Home Assistant integration</a>; <a href="https://docs.frigate.video/frigate/hardware">Frigate hardware</a>; <a href="https://docs.m5stack.com/en/unit/m5camera_f_new">M5Stack M5Camera-F New</a>; <a href="https://docs.m5stack.com/en/core/atoms3r%20cam">M5Stack AtomS3R-CAM</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

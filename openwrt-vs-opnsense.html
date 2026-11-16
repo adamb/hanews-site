@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt vs OPNsense: which fits your smart home — HA News</title>
+  <meta name="description" content="OpenWrt vs OPNsense compared: router-on-a-stick vs dedicated firewall, Wi-Fi support, x86 compatibility, package ecosystems, and how to combine both in a home network.">
+  <link rel="canonical" href="https://hanews.org/openwrt-vs-opnsense">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt vs OPNsense: which fits your smart home", "datePublished": "2026-11-16", "dateModified": "2026-11-16", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-vs-opnsense"}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 16 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt</p>
+        <h1>OpenWrt vs OPNsense: which fits your smart home</h1>
+        <p class="byline">HA News · 16 Nov 2026</p>
+
+        <p>Sooner or later every Home Assistant tinkerer looks at their ISP router and thinks: I can do better. Then the forums split you into two camps. One says OpenWrt. The other says OPNsense. Both are free, open source and cloud-free. They are also built for different jobs.</p>
+        <p><strong>Short answer:</strong> OpenWrt is a router operating system that can run your Wi-Fi too. OPNsense is a dedicated firewall that expects separate access points. Plenty of homes run both.</p>
+
+        <h2>OpenWrt: the all-in-one</h2>
+        <p>OpenWrt is Linux for routers. It runs on thousands of ordinary Wi-Fi routers (2,187 models have official release builds, per OpenWrt's device data) and on plain x86 PCs. Your Wi-Fi networks can live right on the router.</p>
+        <p>It also has a big package library: WireGuard for remote access, mosquitto for MQTT, AdGuard Home for ad blocking, and VLAN tools to <a href="openwrt-iot-vlan.html">fence off your smart-home gadgets</a>. Since 25.12, packages are installed with apk rather than opkg (<a href="openwrt-25-12.html">what changed in 25.12</a>).</p>
+
+        <h2>OPNsense: the bouncer</h2>
+        <p>OPNsense is built on FreeBSD and runs only on 64-bit x86 (amd64) hardware, per its <a href="https://docs.opnsense.org/manual/hardware.html">hardware docs</a>. Extra features come as plugins you install from the web UI. It wants to be the firewall and nothing else.</p>
+        <p>Wi-Fi is the giveaway. OPNsense's own <a href="https://docs.opnsense.org/manual/wireless.html">wireless page</a> says results "may vary", that wireless-ac isn't supported, and that most companies use separate access points. Believe them.</p>
+
+        <h2>Side by side</h2>
+        <table>
+          <thead><tr><th></th><th>OpenWrt</th><th>OPNsense</th></tr></thead>
+          <tbody>
+            <tr><td>Base</td><td>Linux</td><td>FreeBSD</td></tr>
+            <tr><td>Hardware</td><td>Consumer Wi-Fi routers plus x86 PCs</td><td>x86-64 PCs and appliances only</td></tr>
+            <tr><td>Wi-Fi on the box</td><td>Yes</td><td>Limited; use separate APs</td></tr>
+            <tr><td>Extras</td><td>Packages (apk): WireGuard, mosquitto, AdGuard Home…</td><td>Plugins from the web UI</td></tr>
+            <tr><td>Install</td><td>Per-model image from the <a href="openwrt-firmware-selector.html">Firmware Selector</a></td><td>Embedded image (runs from a RAM disk, easy on storage) or Full image (writes to local disk)</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Which one for a smart home?</h2>
+        <p><strong>Pick OpenWrt</strong> if you want one box that routes and does Wi-Fi, or you want handy tools running next to the router. It's also the cheaper path: you may be able to flash a router you already own.</p>
+        <p><strong>Pick OPNsense</strong> if you want a serious, dedicated firewall on a small PC, with access points doing the Wi-Fi. Its docs suggest buying hardware from Deciso or its listed partners, who contribute back to the project.</p>
+        <p><strong>Or use both:</strong> OPNsense as the firewall on a mini PC, OpenWrt routers set up as access points behind it. Build it one box at a time.</p>
+        <p>Either way, Home Assistant never needs to face the internet. For remote access, see <a href="openwrt-wireguard.html">WireGuard on OpenWrt</a>.</p>
+
+        <h2>Two gotchas</h2>
+        <ul>
+          <li><strong>One OS per box.</strong> Switching means wiping and reinstalling. Back up your config and plan so your VLANs survive the swap.</li>
+          <li><strong>Keep OpenWrt patched.</strong> The current release is <a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.6">25.12.6</a>, and its notes strongly recommend updating for web-server security fixes.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Matter, Thread, Home Assistant, OpenWrt and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://docs.opnsense.org/manual/hardware.html">OPNsense hardware documentation</a>; <a href="https://docs.opnsense.org/manual/install.html">OPNsense installation documentation</a>; <a href="https://docs.opnsense.org/manual/wireless.html">OPNsense wireless documentation</a>; <a href="https://docs.opnsense.org/manual/software_included.html">OPNsense included software</a>; <a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.6">OpenWrt 25.12.6 release notes</a>; <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=x86/64&amp;id=generic">OpenWrt Firmware Selector, x86/64</a>; <a href="https://openwrt.org/toh/generic/generic">OpenWrt device page (generic x86)</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

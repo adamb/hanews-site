@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt Firmware Selector: check if your router is supported and get the right image — HA News</title>
+  <meta name="description" content="How to use the OpenWrt Firmware Selector to find out if your router is supported, pick the right build, and choose between factory and sysupgrade images.">
+  <link rel="canonical" href="https://hanews.org/openwrt-firmware-selector">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt Firmware Selector: check if your router is supported and get the right image", "datePublished": "2026-11-16", "dateModified": "2026-11-16", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-firmware-selector"}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 16 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt</p>
+        <h1>OpenWrt Firmware Selector: check if your router is supported and get the right image</h1>
+        <p class="byline">HA News · 16 Nov 2026</p>
+
+        <p>Every OpenWrt project starts with two questions. Does OpenWrt run on my router? And which of these files do I download? Get the second one wrong and you have a very expensive paperweight, at least until you find a recovery guide.</p>
+        <p>The <a href="https://firmware-selector.openwrt.org/">OpenWrt Firmware Selector</a> answers both. Type your model, get the official images. Here is how to use it without drama.</p>
+
+        <h2>Step 1: is my router supported?</h2>
+        <p>Open <a href="https://firmware-selector.openwrt.org/">firmware-selector.openwrt.org</a> and type the model name exactly as printed on the label, for example "GL-A1300". If it shows up, you get a card with the model, its target (the chip family, such as <code>ipq40xx/generic</code>), the release and the download links.</p>
+        <p>If nothing shows up, there is no official build. Check the hardware revision too: vendors sell several versions under one name, and OpenWrt support is per revision. "v1" and "v2" can be completely different routers inside.</p>
+        <p>The odds are decent. OpenWrt's own device data, which we pulled this month, lists 2,187 devices with release builds. 2,153 of them have a build for the current release, 25.12.6.</p>
+        <p>Before you flash, open the model's page in the OpenWrt Table of Hardware (the selector links to it). It has the install steps for that exact device, plus any traps.</p>
+
+        <h2>Step 2: pick a version</h2>
+        <p>Take the default: the current stable release, 25.12.6 as of this writing (24.10.8 is the previous series). It gets the security fixes. Our <a href="openwrt-25-12.html">OpenWrt 25.12 guide</a> explains what's new.</p>
+        <p>Skip "snapshot". Those are nightly developer builds, and they don't include the LuCI web interface. Not what you want on the box your whole house depends on.</p>
+        <p>Handy trick: once you find your model, bookmark the URL. It looks like <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=ipq40xx/generic&amp;id=glinet_gl-a1300">this one for the GL-A1300</a>, with version, target and model baked in.</p>
+
+        <h2>Step 3: factory or sysupgrade?</h2>
+        <p>This is where people brick routers. The rule is simple:</p>
+        <table>
+          <thead><tr><th>Your router runs…</th><th>Download</th><th>Flash it with</th></tr></thead>
+          <tbody>
+            <tr><td>The vendor's own firmware</td><td><strong>factory</strong> image</td><td>Usually the vendor's firmware-update page (check the device page)</td></tr>
+            <tr><td>OpenWrt already</td><td><strong>sysupgrade</strong> image</td><td>LuCI (System → Backup/Flash) or the <a href="https://openwrt.org/docs/guide-user/install/sysupgrade.cli">sysupgrade command</a></td></tr>
+          </tbody>
+        </table>
+        <p>Why two files? The factory image is wrapped in whatever format the vendor's updater expects. For the GL-A1300 on 25.12.6, that is <code>glinet_gl-a1300-squashfs-factory.ubi</code>. The upgrade file for a router already on OpenWrt is <code>glinet_gl-a1300-squashfs-sysupgrade.bin</code>.</p>
+        <p>Some devices have no factory image at all and are installed another way (a bootloader, TFTP or a vendor tool). The device page tells you. The project's <a href="https://openwrt.org/docs/guide-quick-start/factory_and_sysupgrade">factory vs sysupgrade guide</a> has the full story.</p>
+
+        <h2>Step 4: bake in your extras</h2>
+        <p>Two features most people miss:</p>
+        <ul>
+          <li><strong>Customize installed packages.</strong> Add the packages you always install, like WireGuard, and the selector requests a custom build with them included. No reinstalling after every flash.</li>
+          <li><strong>First-boot script.</strong> Paste a script that runs once on first boot to set things up. Handy if you run several identical routers.</li>
+        </ul>
+
+        <h2>Before you flash: the checklist</h2>
+        <ul>
+          <li>Model <em>and</em> hardware revision match the label.</li>
+          <li>Right image type: factory from vendor firmware, sysupgrade from OpenWrt.</li>
+          <li>Stable release, not snapshot.</li>
+          <li>You read the device page in the Table of Hardware.</li>
+          <li>If it's already on OpenWrt: back up your config first.</li>
+        </ul>
+        <p>Then set a password and log in to LuCI, usually at <code>http://192.168.1.1</code>. Next stops: our <a href="openwrt.html">OpenWrt guide</a> and how to <a href="openwrt-iot-vlan.html">put smart-home gadgets on their own VLAN</a>.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, OpenWrt, ESPHome and local-first networking, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://firmware-selector.openwrt.org/">OpenWrt Firmware Selector</a>; <a href="https://downloads.openwrt.org/releases/25.12.6/targets/ipq40xx/generic/">OpenWrt 25.12.6 release directory (ipq40xx/generic example)</a>; <a href="https://openwrt.org/docs/guide-quick-start/factory_and_sysupgrade">Factory and sysupgrade guide</a>; <a href="https://openwrt.org/docs/guide-user/install/sysupgrade.cli">sysupgrade CLI documentation</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

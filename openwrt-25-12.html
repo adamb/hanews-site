@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt 25.12: what's new, and should your smart-home router upgrade? — HA News</title>
+  <meta name="description" content="What changed in OpenWrt 25.12 vs 24.10: the apk package manager, attended sysupgrade by default, ucode rewriting, 180 new devices, and the security fixes in 25.12.6. How to upgrade safely.">
+  <link rel="canonical" href="https://hanews.org/openwrt-25-12">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt 25.12: what's new, and should your smart-home router upgrade?", "datePublished": "2026-11-16", "dateModified": "2026-11-16", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-25-12"}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Saturday, 14 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Release · OpenWrt</p>
+        <h1>OpenWrt 25.12: what's new, and should your smart-home router upgrade?</h1>
+        <p class="byline">HA News · 16 Nov 2026</p>
+
+        <p>If your router runs OpenWrt 24.10, its clock is out. OpenWrt stopped promising security updates for 24.10 after September 2026, and the current release, <a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.6">25.12.6</a> (18 October 2026), patches holes in LuCI's web server that anyone can poke at without a password. <strong>Short answer: upgrade to 25.12.6.</strong> Here is what changes, and how to do it without losing your setup.</p>
+        <p>The 25.12 series is nicknamed "Dave's Guitar", after the late Dave Täht, the bufferbloat fighter whose work made home networks feel snappier for millions of people. 25.12.0 landed on 5 March 2026 with more than 4,700 commits.</p>
+
+        <h2>The one change that will bite you: apk replaces opkg</h2>
+        <p>The package manager is new. OpenWrt dropped its unmaintained opkg fork for apk, the Alpine Package Keeper. Most package names are the same, but the commands differ: <code>opkg install</code> becomes <code>apk add</code>. Any old script or forum snippet that says <code>opkg</code> will fail. Keep the <a href="https://openwrt.org/docs/guide-user/additional-software/opkg-to-apk-cheatsheet">official opkg-to-apk cheatsheet</a> open the first time.</p>
+
+        <h2>The one change you will love: upgrades keep your packages</h2>
+        <p>Attended Sysupgrade (ASU) now ships by default. It builds a fresh firmware image with every package you have installed, flashes it, and keeps your settings. No more choosing between "keep settings but reinstall everything" and "clean flash and start over". Bigger-flash devices also get <code>owut</code>, a command-line version.</p>
+
+        <h2>Also new</h2>
+        <ul>
+          <li>Shell history now survives between logins (kept in RAM, so it doesn't wear out flash).</li>
+          <li>Wi-Fi scripts were rewritten in ucode, which OpenWrt says is faster and less error-prone than shell.</li>
+          <li>More than 180 new devices, for over 2,200 in total. Most 24.10 devices are still supported. Linux kernel 6.12 throughout.</li>
+        </ul>
+
+        <h2>Why 25.12.6 matters</h2>
+        <p>The 25.12.6 notes say "updating is strongly recommended", and the list explains why. uhttpd, the web server behind LuCI, gets fixes for a batch of flaws reachable without logging in, including a type confusion in <code>/ubus/call/</code>, request smuggling and a Basic Auth realm bypass. There are also fixes for Wi-Fi 7 multi-link frames that could crash hostapd (see <a href="https://w1.fi/security/2026-1/">hostapd advisory 2026-1</a>), two rpcd privilege escalations for routers with limited LuCI users, a critical luci-app-ser2net bug, and updated Mbed TLS, OpenSSL and wolfSSL.</p>
+        <p>Your router guards the network your door locks, cameras and Home Assistant box live on. An <a href="openwrt-iot-vlan.html">IoT VLAN</a> helps, but the router itself should not be running unpatched code.</p>
+
+        <h2>How to upgrade safely</h2>
+        <ol>
+          <li><strong>Back up first.</strong> LuCI: System → Backup/Flash.</li>
+          <li><strong>Use Attended Sysupgrade.</strong> On 24.10 it is optional, so install <code>luci-app-attendedsysupgrade</code> (or <code>owut</code>) first. It requests an image with your packages and flashes it, keeping settings.</li>
+          <li><strong>Or use the <a href="https://firmware-selector.openwrt.org/?version=25.12.6">Firmware Selector</a></strong> to build a custom image for your model. Our <a href="openwrt-firmware-selector.html">Firmware Selector guide</a> walks through it.</li>
+        </ol>
+        <p>Three gotchas from the release notes:</p>
+        <ul>
+          <li><strong>From 23.05?</strong> The notes say a direct sysupgrade to 25.12 is not officially supported. The safe route is to step through 24.10 first, or do a clean flash.</li>
+          <li><strong>Banana Pi BPI-R4:</strong> interfaces were renamed (eth1 to sfp-lan or lan4, eth2 to sfp-wan). You have to upgrade without saving the configuration.</li>
+          <li><strong>Cron logging:</strong> if you set <code>cronloglevel</code>, it should be 7 for normal logging, which is now the default.</li>
+        </ul>
+        <p>Going from 24.10, the notes say the upgrade "should be transparent on most devices": settings are translated on first boot.</p>
+        <p>New to all this? Start with our <a href="openwrt.html">OpenWrt guide</a>, or see how it stacks up in <a href="openwrt-vs-dd-wrt.html">OpenWrt vs DD-WRT</a>.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Matter, Thread, Home Assistant, OpenWrt and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.0">OpenWrt 25.12.0 release notes</a>; <a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.6">OpenWrt 25.12.6 release notes</a>; <a href="https://openwrt.org/docs/guide-user/additional-software/opkg-to-apk-cheatsheet">opkg-to-apk cheatsheet</a>; <a href="https://firmware-selector.openwrt.org/?version=25.12.6">OpenWrt Firmware Selector</a>; <a href="https://w1.fi/security/2026-1/">w1.fi security advisory 2026-1</a></dd>
+        </dl>
+        <p>Assisted by AI (Hermes). Facts sourced from the official OpenWrt release notes linked above; review welcome.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ESP32-P4 explained for home builders: displays, cameras, voice and the C6 Wi-Fi problem — HA News</title>
+  <meta name="description" content="What the ESP32-P4 is and what it means for ESPHome builds in 2026: dual-core RISC-V at 400 MHz, MIPI-DSI displays and MIPI-CSI cameras, no on-die Wi-Fi, and ESPHome support via variant: esp32p4 and esp32_hosted.">
+  <link rel="canonical" href="https://hanews.org/esp32-p4">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "ESP32-P4 explained for home builders: displays, cameras, voice and the C6 Wi-Fi problem", "image": "https://hanews.org/images/esp32-p4x-function-ev-board.png", "datePublished": "2026-11-15", "dateModified": "2026-11-15", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/esp32-p4"}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 15 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Explainer · ESPHome</p>
+        <h1>ESP32-P4 explained for home builders: displays, cameras, voice and the C6 Wi-Fi problem</h1>
+        <p class="byline">HA News · 15 Nov 2026</p>
+
+        <p>Espressif built its name on cheap chips with Wi-Fi baked in. So here's the twist: its most powerful chip yet, the <a href="https://www.espressif.com/en/products/socs/esp32-p4">ESP32-P4</a>, has no Wi-Fi at all. No Bluetooth either.</p>
+        <p>That's not a mistake. The P4 is built for screens, cameras and audio. It leaves the radio to a little helper chip, usually an ESP32-C6. For ESPHome builders, it means wall panels and camera gadgets that older ESP32s simply couldn't drive.</p>
+
+        <h2>What's inside</h2>
+        <ul>
+          <li>Two RISC-V cores at up to 400 MHz, with AI instruction extensions and a floating-point unit, plus a low-power core at up to 40 MHz.</li>
+          <li>768 KB of on-chip SRAM, plus support for external PSRAM.</li>
+          <li>MIPI-DSI display and MIPI-CSI camera inputs, both up to 1080p, with a built-in image signal processor.</li>
+          <li>Hardware H.264 encoding at 1080p, 30 frames per second.</li>
+          <li>55 programmable GPIOs (Espressif says that's more than any previous chip of theirs), USB 2.0 High Speed and Ethernet.</li>
+        </ul>
+        <p>Translation: a proper touchscreen and a proper camera, handled in hardware. The S3 could do small screens and basic cameras, but it had to sweat for it (our <a href="esp32-c6-vs-s3.html">ESP32-C6 vs S3</a> comparison covers that generation).</p>
+        <figure class="figure">
+          <img src="images/esp32-p4x-function-ev-board.png" alt="Espressif ESP32-P4X Function EV Board development board" width="264" height="144" loading="lazy">
+          <figcaption>ESP32-P4X Function EV Board. Image: Espressif Systems</figcaption>
+        </figure>
+
+        <h2>The missing radio, solved</h2>
+        <p>To get the P4 online you have three choices:</p>
+        <ul>
+          <li><strong>Plug in a cable.</strong> The P4 has Ethernet, which is perfect for a wall panel near a network jack.</li>
+          <li><strong>Add a C6.</strong> ESPHome's <a href="https://esphome.io/components/esp32_hosted/">esp32_hosted component</a> runs the co-processor and talks to it over SDIO or SPI. The ESP32-C6 is the usual partner, and it brings Wi-Fi 6, Bluetooth and the 802.15.4 radio used by Thread.</li>
+          <li><strong>Add a C5</strong> for 5 GHz Wi-Fi. Espressif sells a dev board built around that combo.</li>
+        </ul>
+        <p>One fix to remember: if a P4 with a big LVGL touchscreen UI won't boot once Wi-Fi is on, the ESPHome docs point to <code>use_psram: true</code> in <code>esp32_hosted</code>. Without it, boot can fail with an <code>sdio_mempool_create</code> error.</p>
+        <p>ESP-NOW works too. Just add <code>espnow:</code>, and ESPHome forwards it to the co-processor. Small surprise: packets come from the C6's MAC address, not the P4's.</p>
+
+        <h2>ESPHome support</h2>
+        <p>ESPHome supports the chip as <code>variant: esp32p4</code> on the <a href="https://esphome.io/components/esp32/">esp32 platform</a>. Two details:</p>
+        <ul>
+          <li><strong>Early silicon.</strong> Boards with engineering-sample chips (revision below 3.0) need <code>engineering_sample: true</code>. Newer boards don't.</li>
+          <li><strong>CPU speed.</strong> Valid settings are 40, 360 or 400 MHz. Engineering samples top out at 360.</li>
+        </ul>
+        <p>New to ESPHome? Start with our <a href="esphome.html">ESPHome guide</a> and the <a href="esp32-projects.html">ESP32 projects</a> list.</p>
+
+        <h2>Boards to look at</h2>
+        <p>Espressif's own dev kits include the ESP32-P4X-Function-EV-Board, an ESP32-P4X-C5-Function-EV-Board variant with the C5 radio, and the ESP32-P4X-EYE camera board (<a href="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32p4/esp32-p4x-function-ev-board/index.html">docs</a>). Waveshare and M5Stack also make P4 boards. <a href="https://www.amazon.com/s?k=ESP32-P4+board&amp;tag=hanews01-20" rel="sponsored nofollow">See ESP32-P4 boards on Amazon</a>.</p>
+        <figure class="figure">
+          <img src="images/esp32-p4x-eye.png" alt="Espressif ESP32-P4X-EYE camera development board" width="264" height="144" loading="lazy">
+          <figcaption>ESP32-P4X-EYE. Image: Espressif Systems</figcaption>
+        </figure>
+
+        <h2>Should you build with it?</h2>
+        <p>Yes, if your project is a screen, a camera or a voice gadget: a wall dashboard, a doorbell-style camera, an intercom. No, if it's a sensor, a switch or anything on a battery. A C6, C3 or S3 is the better fit there, and putting a P4 in a mailbox sensor is like hiring a film crew to take a passport photo.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Matter, Thread, Home Assistant, OpenWrt and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.espressif.com/en/products/socs/esp32-p4">Espressif ESP32-P4 product page</a>; <a href="https://esphome.io/components/esp32.html">ESPHome esp32 component documentation</a>; <a href="https://esphome.io/components/esp32_hosted.html">ESPHome esp32_hosted documentation</a>; <a href="https://www.espressif.com/en/products/devkits">Espressif devkits</a></dd>
+        </dl>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+        <p><small>Assisted by AI (Hermes). Facts sourced from the Espressif product and devkit pages and ESPHome documentation linked above; review welcome.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>

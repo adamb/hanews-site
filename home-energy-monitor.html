@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The best home energy monitor for Home Assistant — HA News</title>
+  <meta name="description" content="Which whole home energy monitor to use with Home Assistant: Sense vs Emporia Vue vs Shelly EM vs a DIY ESPHome CT clamp build — cloud and local options, solar netting and setup.">
+  <link rel="canonical" href="https://hanews.org/home-energy-monitor">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "The best home energy monitor for Home Assistant", "image": "https://hanews.org/images/shelly-em-wiring.png", "datePublished": "2026-11-15", "dateModified": "2026-11-15", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/home-energy-monitor"}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Sunday, 15 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · Energy</p>
+        <h1>The best home energy monitor for Home Assistant</h1>
+        <p class="byline">HA News · 15 Nov 2026</p>
+
+        <p>Ever wondered which appliance is quietly eating your power bill? A whole-home energy monitor clips onto the wires where power enters your house and turns it into numbers: watts right now, kilowatt-hours over the day. Feed those into Home Assistant's built-in <a href="https://www.home-assistant.io/integrations/energy/">Energy dashboard</a> and you can watch your house breathe.</p>
+        <p>There are four realistic ways to do it. The big question is whether your data takes a detour through somebody's cloud.</p>
+
+        <h2>The quick pick</h2>
+        <table>
+          <thead><tr><th>Option</th><th>Talks to Home Assistant</th><th>Best for</th></tr></thead>
+          <tbody>
+            <tr><td>Sense</td><td>Official integration, via Sense's cloud</td><td>People who want Sense's app too</td></tr>
+            <tr><td>Emporia Vue</td><td>No core integration; community add-ons</td><td>Fans of Emporia's app and wider kit</td></tr>
+            <tr><td>Shelly EM</td><td>Built-in integration, local</td><td>Local data with no DIY</td></tr>
+            <tr><td>ESPHome + CT clamp</td><td>Native ESPHome, local</td><td>Tinkerers who want zero cloud</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Sense: polished, but cloud-only</h2>
+        <p>Sense is known for spotting individual appliances from your main feed. Home Assistant's <a href="https://www.home-assistant.io/integrations/sense/">Sense integration</a> logs in to your Sense account, and its connection type is listed as cloud polling. You get live usage and solar production every 60 seconds, daily to yearly totals (including to-grid and from-grid) every 5 minutes, and a sensor for each device Sense detects. If the internet drops, so does your data. <a href="https://www.amazon.com/s?k=Sense+Energy+Monitor&amp;tag=hanews01-20" rel="sponsored nofollow">Sense on Amazon</a></p>
+
+        <h2>Emporia: big app, no core integration</h2>
+        <p><a href="https://www.emporiaenergy.com/">Emporia</a> sells the Vue monitor alongside smart plugs and a home battery, all run from its app. Home Assistant has no built-in Emporia integration; community projects fill the gap. Pick it if you want Emporia's whole kit and don't mind the cloud. <a href="https://www.amazon.com/s?k=Emporia+Vue+Energy+Monitor&amp;tag=hanews01-20" rel="sponsored nofollow">Emporia Vue on Amazon</a></p>
+
+        <h2>Shelly EM: the local middle path</h2>
+        <p>The <a href="https://kb.shelly.cloud/knowledge-base/shelly-em">Shelly EM</a> is a small box with two clamp channels: say, your main feed plus one big circuit like the AC. Home Assistant's built-in Shelly integration talks to it on your network, no cloud needed. (More in our <a href="shelly-home-assistant.html">Shelly and Home Assistant guide</a>.) <a href="https://www.amazon.com/s?k=Shelly+EM&amp;tag=hanews01-20" rel="sponsored nofollow">Shelly EM on Amazon</a></p>
+        <figure class="figure">
+          <img src="images/shelly-em-wiring.png" alt="Shelly EM Gen1 wiring diagram" width="597" height="580" loading="lazy">
+          <figcaption>Shelly EM Gen1 wiring diagram. Image: <a href="https://kb.shelly.cloud/knowledge-base/shelly-em">Shelly</a></figcaption>
+        </figure>
+
+        <h2>ESPHome: build it, own it</h2>
+        <p>The fully local route: an ESP32 board plus a CT clamp, the little donut that snaps around a wire and measures current without cutting anything. ESPHome's <a href="https://esphome.io/components/sensor/ct_clamp/">CT Clamp sensor</a> turns that into a reading in Home Assistant. Want more accuracy? ESPHome also supports dedicated metering chips such as the ATM90E32. No account, no cloud, just a weekend of calibration. <a href="https://www.amazon.com/s?k=SCT-013+current+transformer+clamp&amp;tag=hanews01-20" rel="sponsored nofollow">CT clamps on Amazon</a></p>
+        <figure class="figure">
+          <img src="images/esphome-ct-clamp.webp" alt="A CT clamp sensor reporting live current in ESPHome" width="936" height="134" loading="lazy">
+          <figcaption>A CT clamp reading in ESPHome. Image: <a href="https://esphome.io/components/sensor/ct_clamp/">ESPHome</a></figcaption>
+        </figure>
+        <p>New to ESPHome? Start with our <a href="esphome.html">ESPHome guide</a>.</p>
+
+        <h2>Two things to know before you buy</h2>
+        <ul>
+          <li><strong>Watts aren't kilowatt-hours.</strong> The Energy dashboard's totals need kWh. If your monitor only reports watts, add a <a href="https://www.home-assistant.io/integrations/integration/">Riemann sum integral</a> helper to convert it. (The dashboard can now show power sensors alongside energy ones, too.)</li>
+          <li><strong>Clamps mean panel work.</strong> The clamps don't cut wires, but you're still opening a live electrical panel. If that's not your thing, hire an electrician.</li>
+        </ul>
+        <p>Solar at home? Sense's integration exposes production and grid import/export directly; with the others, add your inverter's integration as the solar source.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+          <p><strong>Get the HA News brief.</strong> One short weekday email on Matter, Thread, Home Assistant, OpenWrt and ESPHome releases, sourced from the projects themselves.</p>
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </aside>
+
+        <h2>Picking by situation</h2>
+        <ul>
+          <li><strong>You already have Sense or Emporia hardware.</strong> Use the official Sense integration, or the vendor's cloud app for Emporia, and feed the Energy dashboard from it. Just know the data path runs through their cloud.</li>
+          <li><strong>You want local readings with no DIY.</strong> The Shelly EM with Home Assistant's built-in Shelly integration is the shortest route to a consumer-unit monitor that answers to your network.</li>
+          <li><strong>You want zero dependencies and don't mind a wiring project.</strong> An ESPHome CT-clamp or metering-chip build is the only option in this list with no vendor cloud anywhere in the chain.</li>
+          <li><strong>You have solar.</strong> Any of the above that reports production feeds the Energy dashboard's Sources; Sense's integration even exposes To Grid, From Grid and Net Production sensors directly.</li>
+        </ul>
+
+        <h2>Gotchas we'd flag before you order</h2>
+        <p><strong>Cloud paths are structural, not optional extras.</strong> Home Assistant's own integration documentation for <a href="https://www.home-assistant.io/integrations/sense/">Sense</a> states the data flows through Sense's cloud with no local API documented; Emporia's platform is mobile-app-centric per its <a href="https://www.emporiaenergy.com/">site</a>. If your Energy dashboard should keep working when the internet is down, that constraint picks the hardware for you — Shelly or ESPHome.</p>
+        <p><strong>Watts are not kilowatt-hours.</strong> Plan for the Riemann sum integral step from day one; a monitor that reports watts only still works, it just needs the conversion sensor configured before the dashboard shows totals.</p>
+        <p><strong>Clamp work means panel work.</strong> The Shelly EM installs in the consumer unit per Shelly's <a href="https://kb.shelly.cloud/knowledge-base/shelly-em">documented wiring diagram</a>. CT clamps clip around conductors without cutting, but panel access is still live-panel territory — follow your local electrical rules.</p>
+        <p><strong>Vendor web pages shift.</strong> Sense's product page currently redirects and 404s at some old URLs — content lives on sense.com — and several Emporia deep URLs return 404. Verify links when you buy, not just when you read a guide.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://www.home-assistant.io/integrations/energy/">Home Assistant Energy integration</a>; <a href="https://www.home-assistant.io/integrations/sense/">Home Assistant Sense integration</a>; <a href="https://www.emporiaenergy.com/">Emporia Energy</a>; <a href="https://kb.shelly.cloud/knowledge-base/shelly-em">Shelly EM knowledge base</a>; <a href="https://esphome.io/components/sensor/ct_clamp.html">ESPHome CT Clamp component</a>; <a href="https://sense.com/">sense.com</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
