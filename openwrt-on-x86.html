@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt on x86: turn a mini PC into your router (2026) — HA News</title>
+  <meta name="description" content="How to run OpenWrt on an x86 mini PC: the generic x86/64 image, EFI vs BIOS builds, hardware picks like Protectli and PC Engines apu2, and why you still need a separate access point.">
+  <link rel="canonical" href="https://hanews.org/openwrt-on-x86">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt on x86: turn a mini PC into your router (2026)", "datePublished": "2026-11-16", "dateModified": "2026-11-16", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-on-x86"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I run OpenWrt on any x86 mini PC or old laptop?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, if it is 64-bit and boots from USB or an SSD. OpenWrt publishes a generic x86/64 image that does not need a per-model build, so any 64-bit x86 PC falls under the Generic x86/64 target."}}, {"@type": "Question", "name": "Should I run Home Assistant and OpenWrt on the same mini PC?", "acceptedAnswer": {"@type": "Answer", "text": "Usually not. OpenWrt is a flash-based appliance OS with a read-only squashfs root, and Home Assistant Supervised will not install on it. Home Assistant OS and OpenWrt are separate OS images for the same hardware class — pick one per box."}}, {"@type": "Question", "name": "Which OpenWrt image do I install on x86: squashfs-combined-efi or combined?", "acceptedAnswer": {"@type": "Answer", "text": "For UEFI machines use generic-squashfs-combined-efi.img.gz; for legacy BIOS machines use generic-squashfs-combined.img.gz. Write the image straight to the target SSD or USB drive with dd or Etcher — do not install into a running OS."}}, {"@type": "Question", "name": "Is a mini PC a better router than a consumer OpenWrt router?", "acceptedAnswer": {"@type": "Answer", "text": "A mini PC gives you a faster CPU, more RAM and better NIC options, many with 2.5GbE, and OpenWrt's generic x86/64 target covers them without per-model builds. Consumer routers are cheaper and include radios. The x86 route trades wireless support for routing muscle."}}, {"@type": "Question", "name": "Does OpenWrt on x86 provide Wi-Fi, or do I need a separate access point?", "acceptedAnswer": {"@type": "Answer", "text": "The x86 image ships no Wi-Fi drivers, and typical mini PC Intel NICs are generally unsupported or awkward under OpenWrt. Plan on a separate access point."}}, {"@type": "Question", "name": "OpenWrt vs OPNsense on x86 hardware — which should I run?", "acceptedAnswer": {"@type": "Answer", "text": "Both run on the same class of hardware. OpenWrt needs less RAM and integrates with the smart-home side of your network; OPNsense is a heavier firewall-focused FreeBSD system. The same mini PC works for either, so you can revisit later."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 16 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt</p>
+        <h1>OpenWrt on x86: turn a mini PC into your router (2026)</h1>
+        <p class="byline">HA News · 16 Nov 2026</p>
+
+        <p>You do not need a "supported router" to run OpenWrt. OpenWrt publishes generic builds for x86, the same instruction set as a desktop PC, laptop or mini PC, so any 64-bit Intel or AMD machine can become your router by writing one image to disk. The current stable release is <strong>25.12.6</strong> (released 18 October 2026) and the oldstable branch is <strong>24.10.8</strong> (released 26 July 2026, with many security fixes). This guide covers which image to pick, which hardware makes sense, and the gotchas — including the biggest one: an x86 OpenWrt box has no Wi-Fi, so you pair it with a separate access point and keep the router and your Home Assistant box as two machines.</p>
+
+        <h2>Why run OpenWrt on x86 at all</h2>
+        <p>Most OpenWrt setups run on consumer Wi-Fi routers, where the CPU is the constraint. An x86 box inverts the trade: you get a real desktop-class processor, gigabytes of RAM and proper Ethernet silicon, and you give up built-in wireless. For a smart home that choice is defensible. The router's job — NAT, firewall rules, WireGuard or Tailscale for remote access, an IoT VLAN for your Home Assistant network — is mostly CPU and packet forwarding, and a mini PC has far more headroom than a sub-$200 router's SoC.</p>
+        <p>Support also works differently. On consumer routers, OpenWrt needs a per-model build assembled for that exact board. On x86 there is a <strong>generic <code>x86/64</code> target</strong> ("Generic x86/64" in OpenWrt's device table) that covers any 64-bit PC: one image, no model match, no firmware selector archaeology. OpenWrt currently supports four x86 subtargets: <code>x86/64</code> for modern 64-bit machines, <code>x86/generic</code> for 32-bit hardware, <code>x86/geode</code> for AMD Geode boards including Traverse Geos, and <code>x86/legacy</code>. In practice you will use <code>x86/64</code>. More background on which system to choose is in our <a href="openwrt.html">OpenWrt guide</a>.</p>
+
+        <h2>Which image to download</h2>
+        <p>For OpenWrt 25.12.6, the x86/64 download index at <a href="https://downloads.openwrt.org/releases/25.12.6/targets/x86/64/">downloads.openwrt.org — targets/x86/64</a> lists these images (build dated 18 October 2026, SHA256 sums published on the same page):</p>
+        <ul>
+          <li><strong><code>generic-squashfs-combined-efi.img.gz</code></strong> — for UEFI boot. This is the one most modern mini PCs need (~12.2 MB).</li>
+          <li><strong><code>generic-squashfs-combined.img.gz</code></strong> — for legacy BIOS boot on older machines.</li>
+          <li>Ext4 variants of both, and a <code>rootfs.tar.gz</code> for running OpenWrt in containers or chroots.</li>
+        </ul>
+        <p>Picking the wrong one is the classic mistake: an EFI image will not boot on a BIOS-only board and vice versa. If unsure, boot the machine's firmware setup first and look at which boot mode is listed. The firmware selector builds the same links per target — for example the <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=x86/64&amp;id=generic">x86/64 generic build</a>. The other subtargets have their own selector entries: <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=x86/generic&amp;id=generic">x86/generic</a> and <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=x86/geode&amp;id=geos">x86/geode</a>, the latter covering Traverse Technologies Geos boards as well.</p>
+        <ol>
+          <li>Download the image and its SHA256 sum; verify the hash before flashing.</li>
+          <li>Connect the target machine to your network, and have a second wired connection or a serial console for first-time setup.</li>
+          <li>Write the image straight to the target SSD or USB drive with <code>dd</code> or a flashing tool such as Etcher. Do not try to install it into a running OS — it is a whole-disk image.</li>
+          <li>Boot, then point a browser at the default address OpenWrt prints on its console and set up LAN, WAN and your firewall zones.</li>
+        </ol>
+        <p>To check a new device's vanilla OpenWrt support in general, our <a href="openwrt-firmware-selector.html">firmware selector guide</a> walks the lookup, and <a href="best-openwrt-router.html">best OpenWrt routers</a> covers consumer hardware if x86 turns out to be more box than you need.</p>
+
+        <h2>Hardware picks</h2>
+        <p>OpenWrt only publishes per-model builds for a handful of x86 systems (the Traverse Geos boards, for example). Everything else is covered by the generic target, so the honest claim for any mini PC listed below is "runs the generic x86/64 target", not "listed in the Table of Hardware". Specs below come from the manufacturers' pages.</p>
+
+        <h3>Protectli Vault 4-port</h3>
+        <p>Protectli's Vault 4-port line is built for exactly this role: a fanless quad-core appliance with a choice of Intel N150, J3160, J3710, J4125, N5105 or J6412 processors, up to 32 GB DDR4 (or 64 GB DDR5 on newer boards), and 1GbE, 2.5GbE or SFP+ NIC options. Protectli ships coreboot firmware and states the Vault is OS-agnostic — OpenWrt and OPNsense both run on it. AES-NI is supported across the line, which matters for WireGuard throughput on your remote-access tunnel. Four Ethernet ports give you WAN, LAN and an IoT VLAN without a managed switch. Check <a href="https://www.amazon.com/s?k=Protectli+Vault+4+Port&amp;tag=hanews01-20" rel="sponsored nofollow">Protectli Vault on Amazon</a> for current options and stock, and read Protectli's <a href="https://protectli.com/vault-4-port/">own spec page</a> before picking a CPU. Not sure OpenWrt is your system? Our <a href="openwrt-vs-opnsense.html">OpenWrt vs OPNsense</a> comparison covers the same hardware.</p>
+
+        <h3>PC Engines apu2</h3>
+        <p>The apu2 is the classic budget board for this job: an AMD GX-412TC quad-core 1 GHz Jaguar SoC with AES-NI, 2–4 GB of DDR3, two or three Gigabit Intel i210AT/i211AT NICs, coreboot BIOS and a fanless 6×6-inch board drawing roughly 6–10 W. It boots from m-SATA, SD or USB. Two caveats from the manufacturer: the AMD SoC is at end of life after a long production run, and 2 GB RAM models are tight once you add OpenWrt packages beyond the base system. If you want a hobbyist board rather than an appliance, the <a href="https://www.pcengines.ch/apu2.htm">PC Engines apu2 page</a> has the details, and <a href="https://www.amazon.com/s?k=PC+Engines+apu2&amp;tag=hanews01-20" rel="sponsored nofollow">apu2 boards on Amazon</a> are the usual source.</p>
+
+        <h3>A note on N100-class mini PCs</h3>
+        <p>Cheap N95/N100 mini PCs (Beelink's EQ series and similar) are often recommended for this, and they will run the generic x86/64 image. There is no OpenWrt-specific endorsement for any given model, though — OpenWrt does not certify consumer mini-PC models, and some vendors' product pages are thin on NIC specs. Before buying, check <em>which</em> Ethernet controller the unit has; Intel NICs are the safe choice, and confirm the machine boots UEFI so you know which image to grab. If you are also considering a mini PC as a Home Assistant server rather than a router, see our <a href="best-mini-pc-home-assistant.html">best mini PC for Home Assistant</a> roundup. Hardkernel's ODROID-H4 is a well-known N97/N305 x86 board family, but it is listed as discontinued on Hardkernel's store with the ODROID-H5 as successor, so treat old H4 stock accordingly.</p>
+
+        <h2>The access point problem, and why it is a feature</h2>
+        <p>The x86 image includes no Wi-Fi drivers for typical mini PC hardware, and OpenWrt notes Intel NICs — the standard wireless silicon in almost every mini PC — are generally unsupported or awkward. This is not fixable by installing packages; expect to buy or designate a separate access point. Once you accept it, the setup is actually cleaner than the all-in-one router it replaces: routing and wireless fail independently, the AP can go where Wi-Fi is wanted while the router sits by the modem, and you can upgrade either without rebuilding the other. A cheap wireless router flashed with OpenWrt and set to AP-only mode is one common answer; another is a dedicated AP with VLAN support so your <a href="openwrt-iot-vlan.html">IoT VLAN</a> survives across the whole network. For remote access back into your network, the router is also the natural place to end a VPN tunnel — see <a href="openwrt-tailscale.html">Tailscale on OpenWrt</a> and <a href="openwrt-wireguard.html">WireGuard on OpenWrt</a>.</p>
+
+        <h2>Can the router also run Home Assistant?</h2>
+        <p>Usually not, and it is not worth forcing. OpenWrt is a flash-based appliance OS: the combined images use a read-only squashfs root designed to boot reliably and survive power cuts, built with a minimal musl/uclibc toolchain. That is a poor substrate for Home Assistant Supervised, which will not install on OpenWrt. Home Assistant OS and OpenWrt are alternative OS images for the same class of small x86 hardware — each box runs one. A sensible two-box design is a mini PC running OpenWrt as the router plus a second small machine (a Home Assistant Green, a Raspberry Pi, or another mini PC) running Home Assistant. If your hardware budget allows only one box, decide which job it does and size the other accordingly.</p>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Thread, OpenWrt, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+        <h2>FAQ</h2>
+        <h3>Can I run OpenWrt on any x86 mini PC or old laptop?</h3>
+        <p>Yes, if it is 64-bit and can boot from USB or an SSD. OpenWrt publishes a generic x86/64 image that needs no per-model build, so any 64-bit x86 machine falls under the Generic x86/64 target. Old 32-bit machines fall under the x86/generic or x86/legacy subtargets instead.</p>
+        <h3>Should I run Home Assistant and OpenWrt on the same mini PC?</h3>
+        <p>Usually not. OpenWrt is a flash-based appliance OS with a read-only squashfs root, and Home Assistant Supervised will not install on it. Home Assistant OS and OpenWrt are separate OS images for the same hardware class — pick one per box and run two machines if you need both.</p>
+        <h3>How do I install OpenWrt on an x86 machine — which image do I pick?</h3>
+        <p>For UEFI machines use <code>generic-squashfs-combined-efi.img.gz</code>; for legacy BIOS machines use <code>generic-squashfs-combined.img.gz</code>. Write the image directly to the target SSD or USB drive with <code>dd</code> or Etcher — never install it from inside a running OS, it is a whole-disk image.</p>
+        <h3>Is a mini PC a better router than a consumer OpenWrt router?</h3>
+        <p>It is a different trade. A mini PC brings a faster CPU, more RAM and often 2.5GbE, and the generic x86/64 target means zero per-model support work. Consumer routers cost less and include radios. Choose x86 for routing headroom and VLANs; choose a consumer router when one box must do everything.</p>
+        <h3>Does OpenWrt on x86 provide Wi-Fi, or do I need a separate access point?</h3>
+        <p>You need a separate access point. The x86 image ships no Wi-Fi drivers, and typical mini PC Intel NICs are generally unsupported or awkward under OpenWrt. Pair the router with a dedicated AP, and use VLANs to keep IoT devices segmented.</p>
+        <h3>OpenWrt vs OPNsense on x86 hardware — which should I run?</h3>
+        <p>Both run well on the same hardware, so this is a software choice, not a hardware one. OpenWrt is lighter and sits closer to the smart-home side of your network (VLANs, WireGuard, Tailscale are all in-repo). OPNsense is heavier and firewall-centric. Our <a href="openwrt-vs-opnsense.html">OpenWrt vs OPNsense comparison</a> goes deeper.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://downloads.openwrt.org/releases/25.12.6/targets/x86/64/">OpenWrt 25.12.6 x86/64 downloads</a>; <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=x86/64&amp;id=generic">OpenWrt firmware selector — x86/64</a>; <a href="https://openwrt.org/toh/x86/x86">OpenWrt x86 device page</a>; <a href="https://protectli.com/vault-4-port/">Protectli Vault 4-port</a>; <a href="https://www.pcengines.ch/apu2.htm">PC Engines apu2</a>; <a href="https://www.hardkernel.com/shop/odroid-h4/">Hardkernel ODROID-H4 (discontinued notice)</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
