@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt vs OPNsense: which fits your smart home — HA News</title>
+  <meta name="description" content="OpenWrt vs OPNsense compared: router-on-a-stick vs dedicated firewall, Wi-Fi support, x86 compatibility, package ecosystems, and how to combine both in a home network.">
+  <link rel="canonical" href="https://hanews.org/openwrt-vs-opnsense">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt vs OPNsense: which fits your smart home", "datePublished": "2026-11-16", "dateModified": "2026-11-16", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-vs-opnsense"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I run OpenWrt and OPNsense on the same hardware?", "acceptedAnswer": {"@type": "Answer", "text": "On a generic x86-64 machine, yes, at different times. OpenWrt publishes official x86/64 builds for 25.12.6 and 24.10.8, and OPNsense installs on x86-64 PCs with SSD, USB or virtual disks. One device runs one OS at a time; reinstalling replaces the other."}}, {"@type": "Question", "name": "Does OPNsense support Wi-Fi on a home router?", "acceptedAnswer": {"@type": "Answer", "text": "Only in a limited way. The OPNsense documentation says wireless works but results may vary, notes the drivers lack wireless-ac support, and recommends separate access points."}}, {"@type": "Question", "name": "Is OpenWrt better than OPNsense for a smart home?", "acceptedAnswer": {"@type": "Answer", "text": "Usually, if you want the router and the Wi-Fi in one box or IoT tooling next to the router. OpenWrt runs Wi-Fi drivers on the router itself and ships Linux packages such as mosquitto and Zigbee serial passthrough. If your smart home is fully wireless-AP based and you only want a firewall and VLANs, OPNsense is the steadier appliance."}}, {"@type": "Question", "name": "Can I use OPNsense plus a Wi-Fi router or access point together?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, and it is the common pattern: OPNsense as the router-on-a-stick firewall with one or more access points behind it for Wi-Fi, and an IoT VLAN if you separate smart-home devices."}}, {"@type": "Question", "name": "Which OpenWrt version should I run?", "acceptedAnswer": {"@type": "Answer", "text": "The 25.12 stable series, currently at 25.12.6. The 22.03 series is end-of-life with no further updates, so upgrade."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 16 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt</p>
+        <h1>OpenWrt vs OPNsense: which fits your smart home</h1>
+        <p class="byline">HA News · 16 Nov 2026</p>
+
+        <p>OpenWrt and OPNsense are both open-source operating systems for the box that routes your traffic, and people who run their homes on Home Assistant eventually ask which one belongs on their router. The short answer: <strong>OpenWrt is a router operating system — it drives Wi-Fi radios and runs a Linux package ecosystem that includes smart-home tooling. OPNsense is a firewall appliance — dedicated, hardening-friendly, and x86-only.</strong> Many homes use both: OPNsense as the firewall, OpenWrt (or plain access points) for Wi-Fi.</p>
+
+        <p>Both can run on the same class of hardware, too. OpenWrt publishes official builds for generic x86/64 machines — including 25.12.6 and 24.10.8, per the <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=x86/64&amp;id=generic">OpenWrt Firmware Selector</a> and the <a href="https://openwrt.org/toh/generic/generic">OpenWrt device page</a> — and OPNsense installs on x86-64 PCs, on SSD, HDD, SD, USB or virtual disks, per the <a href="https://docs.opnsense.org/manual/hardware.html">OPNsense hardware documentation</a>. So the choice is less about your hardware and more about what you want the box to do.</p>
+
+        <h2>The core difference: router OS vs firewall appliance</h2>
+        <p>OpenWrt is a Linux distribution for routers. It runs on consumer and prosumer hardware with built-in Wi-Fi — its wireless support is why ath9k, ath10k and mt76 driver families exist in mainline, and OpenWrt devices host SSIDs directly on the router. It also has opkg, a package repository with tooling that sits close to a smart home: mosquitto for MQTT, serial passthrough support for Zigbee coordinators, WireGuard, and VLAN tooling. If you have seen our guide on running <a href="openwrt-iot-vlan.html">an IoT VLAN on OpenWrt</a>, that is the ecosystem in action.</p>
+        <p>OPNsense is built on FreeBSD. The base system and kernel are updated through <code>opnsense-update</code>; extra features arrive as installable plugins with their own UI, per the <a href="https://docs.opnsense.org/manual/software_included.html">OPNsense included-software documentation</a>. It is a deliberate appliance: it expects to be the firewall, not to be your Wi-Fi radio host or your smart-home server. The OPNsense project suggests, where possible, buying turnkey hardware from Deciso or its listed partners, who contribute back to the project.</p>
+
+        <h2>Wi-Fi: the honest comparison</h2>
+        <p>This is where the two are not equal, and the OPNsense project says so itself. The <a href="https://docs.opnsense.org/manual/wireless.html">OPNsense wireless documentation</a> supports wireless "but results may vary", notes that drivers lack wireless-ac support, and recommends separate access points. FreeBSD's Wi-Fi driver coverage simply trails Linux's.</p>
+        <p>OpenWrt, being Linux, runs the same Wi-Fi drivers the Linux kernel ships and can host the SSIDs on the router itself. If you want one box that routes and broadcasts Wi-Fi, OpenWrt is the OS that does it. If you would rather keep radios separate anyway — a common choice for a smart home with 40-50 devices crowding 2.4 GHz — then the difference matters less.</p>
+
+        <h2>Hardware and compatibility</h2>
+        <table>
+          <thead><tr><th></th><th>OpenWrt</th><th>OPNsense</th></tr></thead>
+          <tbody>
+            <tr><td>Base</td><td>Linux</td><td>FreeBSD-based</td></tr>
+            <tr><td>Architectures</td><td>Wide: Broadcom/MediaTek/Qualcomm routers, plus official x86 builds</td><td>x86-64 (amd64) only; no ARM or MIPS router builds</td></tr>
+            <tr><td>Install type</td><td>Firmware flashed per device; selector at firmware-selector.openwrt.org</td><td>Embedded image (RAM disk, reduced write cycles, headless) or Full image (installer or live, writes to local disk)</td></tr>
+            <tr><td>Wi-Fi hosting</td><td>Yes, on the router hardware</td><td>Supported but limited ("results may vary", no wireless-ac); separate APs recommended</td></tr>
+            <tr><td>Packages</td><td>opkg, incl. mosquitto, WireGuard, Zigbee serial passthrough</td><td>Plugins via the UI; base system via opnsense-update</td></tr>
+          </tbody>
+        </table>
+        <p>Sources: <a href="https://raw.githubusercontent.com/opnsense/docs/master/source/manual/hardware.rst">OPNsense hardware docs</a> and <a href="https://raw.githubusercontent.com/opnsense/docs/master/source/manual/install.rst">install docs</a>; <a href="https://raw.githubusercontent.com/opnsense/docs/master/source/manual/software_included.rst">software list</a>; OpenWrt targets and builds from the <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=x86/64&amp;id=generic">Firmware Selector</a> and the official devices list (downloads.openwrt.org data, refreshed 2026-11-09).</p>
+
+        <p>One practical note on x86: the same mini-PC can run either OS. OpenWrt's official build set includes a generic x86/64 profile with current stable firmware, and OPNsense's two image types are designed for exactly that hardware — the Embedded image suits a headless Intel box where you want to protect the storage, and the Full image suits a machine acting as a normal server. Reinstalling one over the other replaces the router; nothing survives on the box, so back up configs before you swap.</p>
+
+        <h2>Which fits a smart home?</h2>
+        <p><strong>Choose OpenWrt if</strong> you want router and Wi-Fi in one box, or you want smart-home-adjacent packages next to the router. mosquitto (MQTT, which bridges directly to Home Assistant) and Zigbee serial passthrough are available as OpenWrt packages. OpenWrt is also the OS behind most of the OpenWrt hardware we cover: see <a href="openwrt.html">our OpenWrt primer</a>, <a href="best-openwrt-router.html">the best OpenWrt routers</a>, and how it compares with <a href="openwrt-vs-dd-wrt.html">DD-WRT</a>.</p>
+        <p><strong>Choose OPNsense if</strong> you want a dedicated firewall in a router-on-a-stick setup: one NIC for the WAN, one or more for LAN and IoT segments, access points handling wireless. That is the architecture the OPNsense docs anticipate, and it pairs well with a separate OpenWrt box or prosumer AP for Wi-Fi. If you wire things as firewall + APs + IoT VLAN, you mostly interact with OPNsense when you touch the network design, not day to day.</p>
+        <p><strong>You can also combine both.</strong> Because each has x86 support, a two-box layout — OPNsense firewall, OpenWrt Wi-Fi and tooling router behind it — works with generic hardware, and can be built one box at a time. Keep local control in mind: neither OS requires a cloud account, which is most of their appeal for a Home Assistant home. For remote access, WireGuard is available on both; we have a walkthrough for <a href="openwrt-wireguard.html">WireGuard on OpenWrt</a>.</p>
+
+        <h2>Gotchas</h2>
+        <ul>
+          <li><strong>Wi-Fi on OPNsense is second-tier by design.</strong> Budget for access points; don't plan on the firewall box also being your Wi-Fi.</li>
+          <li><strong>OPNsense needs real disks.</strong> It installs to SSD/HDD/SD/USB/virtual disks; embedded SD or USB media should be treated as consumable, and the Embedded image trades local logs for longer media life.</li>
+          <li><strong>OpenWrt versions matter.</strong> The stable series is 25.12, currently at <a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.6">25.12.6</a>, which the release notes call the sixth service release of the 25.12 series and flag security fixes for uhttpd and other default network services — updating is strongly recommended. The previous stable series is 24.10, at <a href="https://github.com/openwrt/openwrt/releases/tag/v24.10.8">24.10.8</a>. The 22.03 series is <a href="https://github.com/openwrt/openwrt/releases/tag/v22.03.7">end-of-life</a>: no further updates.</li>
+          <li><strong>Hardware lists differ by source.</strong> For OpenWrt hardware support, use the official Firmware Selector and the published devices data; openwrt.org itself sits behind a bot wall if you visit it with a script.</li>
+          <li><strong>One OS per box at a time.</strong> Swapping requires reimaging; plan your network so the surviving router keeps your VLANs working.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>Can I run OpenWrt and OPNsense on the same hardware?</h3>
+        <p>On a generic x86-64 machine, yes, at different times. OpenWrt publishes official x86/64 builds for 25.12.6 and 24.10.8, and OPNsense installs on x86-64 PCs with SSD, USB or virtual disks. One device runs one OS at a time; reinstalling replaces the other.</p>
+        <h3>Does OPNsense support Wi-Fi on a home router?</h3>
+        <p>Only in a limited way. The OPNsense documentation says wireless works but results may vary, notes the drivers lack wireless-ac support, and recommends separate access points.</p>
+        <h3>Is OpenWrt better than OPNsense for a smart home?</h3>
+        <p>Usually, if you want the router and the Wi-Fi in one box or IoT tooling next to the router. OpenWrt runs Wi-Fi drivers on the router itself and ships Linux packages such as mosquitto and Zigbee serial passthrough. If your smart home is fully wireless-AP based and you only want a firewall and VLANs, OPNsense is the steadier appliance.</p>
+        <h3>Can I use OPNsense plus a Wi-Fi router or access point together?</h3>
+        <p>Yes, and it is the common pattern: OPNsense as the router-on-a-stick firewall with one or more access points behind it for Wi-Fi, and an IoT VLAN if you separate smart-home devices.</p>
+        <h3>Which OpenWrt version should I run?</h3>
+        <p>The 25.12 stable series, currently at 25.12.6. The 22.03 series is end-of-life with no further updates, so upgrade.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://docs.opnsense.org/manual/hardware.html">OPNsense hardware documentation</a>; <a href="https://docs.opnsense.org/manual/install.html">OPNsense installation documentation</a>; <a href="https://docs.opnsense.org/manual/wireless.html">OPNsense wireless documentation</a>; <a href="https://docs.opnsense.org/manual/software_included.html">OPNsense included software</a>; <a href="https://github.com/openwrt/openwrt/releases/tag/v25.12.6">OpenWrt 25.12.6 release notes</a>; <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=x86/64&amp;id=generic">OpenWrt Firmware Selector, x86/64</a>; <a href="https://openwrt.org/toh/generic/generic">OpenWrt device page (generic x86)</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
