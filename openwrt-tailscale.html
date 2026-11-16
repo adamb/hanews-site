@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tailscale on OpenWrt: reach Home Assistant from anywhere without port forwarding — HA News</title>
+  <meta name="description" content="How to install Tailscale on an OpenWrt router, set it up as a subnet router, and reach Home Assistant remotely without opening port 8123 or any other port. Steps, firewall notes and gotchas.">
+  <link rel="canonical" href="https://hanews.org/openwrt-tailscale">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Tailscale on OpenWrt: reach Home Assistant from anywhere without port forwarding", "datePublished": "2026-11-16", "dateModified": "2026-11-16", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-tailscale"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does Tailscale on OpenWrt replace port forwarding for Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Tailscale builds a WireGuard-based mesh network between your devices using NAT traversal, so Home Assistant's port 8123 stays LAN-only and you reach it over the tailnet instead of exposing it to the internet."}}, {"@type": "Question", "name": "Can I install Tailscale on any OpenWrt router?", "acceptedAnswer": {"@type": "Answer", "text": "Any router with enough storage and RAM for the tailscale package. The stable OpenWrt 25.12.6 feed ships tailscale 1.104.1 for common architectures, installed with opkg (or apk on 24.10 and newer releases, which use apk packaging)."}}, {"@type": "Question", "name": "Do I need to keep the Tailscale integration in Home Assistant for remote access?", "acceptedAnswer": {"@type": "Answer", "text": "No. The integration only monitors the tailnet; per Home Assistant's documentation, it does not make Home Assistant itself reachable over Tailscale. Remote access comes from a subnet router advertising your LAN routes, which can be your OpenWrt router."}}, {"@type": "Question", "name": "Is the Luci app for Tailscale official?", "acceptedAnswer": {"@type": "Answer", "text": "No. luci-app-tailscale-community is a community package published in the official Luci feed for OpenWrt 25.12.6, but it is not part of the Tailscale client or core OpenWrt. The command-line client works without it."}}, {"@type": "Question", "name": "What ports do I have to open on my OpenWrt firewall for Tailscale?", "acceptedAnswer": {"@type": "Answer", "text": "None inbound. Per Tailscale's firewall documentation, most of the time you don't need to open any firewall ports; NAT traversal handles direct connections. Optional outbound allowances (TCP 443, UDP 41641, UDP 3478, TCP 80) help direct connections succeed."}}, {"@type": "Question", "name": "Will Tailscale slow down my connection compared to plain WireGuard?", "acceptedAnswer": {"@type": "Answer", "text": "Not when a direct connection is established; it uses the same WireGuard cryptography. If NAT traversal fails, traffic falls back to Tailscale's DERP relays, which still encrypts everything but adds latency."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 16 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt</p>
+        <h1>Tailscale on OpenWrt: reach Home Assistant from anywhere without port forwarding</h1>
+        <p class="byline">HA News · 16 Nov 2026</p>
+
+        <p>You want to open your Home Assistant dashboard from a hotel, from the office, or from the car, and you don't want to forward port 8123 to the internet. The clean way to do it on an OpenWrt router is <a href="https://tailscale.com/kb/1019/subnets">Tailscale</a> installed on the router itself, configured as a subnet router. Your phone joins your tailnet, the router advertises your home LAN's routes, and Home Assistant stays reachable at its local address without a single inbound firewall rule. This guide covers installing Tailscale on OpenWrt, advertising your subnet, the firewall situation, and what the Home Assistant Tailscale integration does and doesn't do.</p>
+
+        <h2>What Tailscale does on a router</h2>
+        <p>Tailscale is a VPN built on WireGuard. Per <a href="https://www.home-assistant.io/integrations/tailscale/">Home Assistant's Tailscale integration documentation</a>, it "creates secure connections between your devices using WireGuard". Same cryptography as plain WireGuard, which we cover in our <a href="openwrt-wireguard.html">OpenWrt WireGuard guide</a>, but with the parts that make WireGuard fiddly automated: key management, NAT traversal, and a coordination server that hands out addresses. You don't distribute keys manually, and you don't need to listen on a port at your house.</p>
+        <p>Putting it on the router rather than on the Home Assistant machine has one practical advantage: the whole LAN becomes reachable, not just Home Assistant. Your OpenWrt router runs the Tailscale daemon on boot, advertises the LAN subnet to your tailnet, and from anywhere your phone or laptop can reach any device on your home network — Home Assistant, a printer, a camera, an ESP32 flashing host. Nothing is installed on Home Assistant or the devices themselves.</p>
+        <p>There's a trade-off to know up front: Tailscale's coordination runs Tailscale the company's servers, so sign-in is a cloud account. The traffic itself is peer-to-peer and encrypted end to end with WireGuard keys that never touch the coordination server, and if you want to self-host the coordination layer, the open-source Headscale project exists — but that's a separate build, not what this guide sets up.</p>
+
+        <h2>Installing the package on OpenWrt</h2>
+        <p>The official OpenWrt package feeds ship Tailscale. The current stable release, <strong>OpenWrt 25.12.6</strong>, includes the <code>tailscale</code> package — version 1.104.1 (tailscale-1.104.1-r1) appears in the official feed for aarch64_generic at <a href="https://downloads.openwrt.org/releases/25.12.6/packages/aarch64_generic/packages/">downloads.openwrt.org</a>. The oldstable release, 24.10.8, provides the package too. Check your architecture's feed on the same downloads server if you're not aarch64.</p>
+        <p>Install it over SSH:</p>
+        <pre><code>opkg update
+opkg install tailscale</code></pre>
+        <p>One packaging note: releases from 24.10 onward switched OpenWrt from ipk to apk packaging, so on those releases the same command may be <code>apk add tailscale</code> depending on your setup. The package name is the same.</p>
+        <p>The <code>tailscale</code> package pulls in <code>tailscaled</code>, the daemon, plus an OpenWrt init.d service, so it starts on boot rather than living only in your SSH session. This install pattern — including the <code>kmod-tun</code> kernel module the daemon needs — is documented in the OpenWrt forums at <a href="https://forum.openwrt.org/t/help-to-configure-tailscale-as-a-proxy-service/142428/4">forum.openwrt.org</a>. If <code>kmod-tun</code> isn't pulled in automatically on your build, install it explicitly.</p>
+        <p>A note on what's official: there is no Tailscale-published OpenWrt guide. We checked the <a href="https://tailscale.com/kb">Tailscale knowledge base</a> on 15 November 2026 and found no OpenWrt entry in the platform install docs. The OpenWrt-specific steps below are sourced to the OpenWrt package feeds and Tailscale's generic Linux and subnet-router documentation.</p>
+        <p>If you prefer a web UI, a Luci app exists as a <em>community</em> package — <code>luci-app-tailscale-community</code> (version 26.317.52279) sits in the official Luci feed for 25.12.6 at <a href="https://downloads.openwrt.org/releases/25.12.6/packages/aarch64_generic/luci/">downloads.openwrt.org</a>. It's not part of the Tailscale client or of core OpenWrt, and the command line works fine without it. Everything below uses the CLI.</p>
+
+        <h2>Sign in and run it on boot</h2>
+        <p>Once installed:</p>
+        <pre><code>tailscale up</code></pre>
+        <p>That prints an authentication URL. Open it in a browser, sign in to your Tailscale account (Google, Microsoft, GitHub or a plain email login work), and the router joins your tailnet. Because the init script starts the daemon at boot, the router keeps its Tailscale identity across reboots and power cuts — exactly what you want from a device that only exists to keep the tunnel up.</p>
+
+        <aside class="rail-sub article-cta" aria-label="Newsletter">
+          <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, Zigbee, Z-Wave and ESPHome releases, sourced from the projects themselves.</p>
+          <button type="button" class="signup-trigger">Get the briefing</button>
+        </aside>
+
+        <h2>Make the router a subnet router</h2>
+        <p>A subnet router is a Tailscale device that advertises routes to networks it can already reach — in this case, your home LAN. The steps come from Tailscale's <a href="https://tailscale.com/kb/1019/subnets">subnet router documentation</a>:</p>
+        <ol>
+          <li><strong>Enable IP forwarding.</strong> In <code>/etc/sysctl.d/99-tailscale.conf</code> set <code>net.ipv4.ip_forward = 1</code> and <code>net.ipv6.conf.all.forwarding = 1</code>, then run <code>sysctl -p /etc/sysctl.d/99-tailscale.conf</code>.</li>
+          <li><strong>Advertise your routes.</strong> Run <code>tailscale set --advertise-routes=192.0.2.0/24</code>, substituting your actual LAN subnet. Multiple subnets go in one comma-separated list.</li>
+          <li><strong>Approve the routes.</strong> Open the Machines page of the Tailscale admin console and approve the subnet routes for the router. Alternatively, add an <code>autoApprovers</code> entry to your tailnet policy file so routes from that device are approved automatically — useful if you rebuild the router often.</li>
+          <li><strong>Add an access rule.</strong> In the tailnet policy file, let your user devices reach the advertised subnet. Without this they can see the route but can't use it.</li>
+          <li><strong>Verify from another Tailscale device.</strong> From your phone on cellular data, load Home Assistant's local address. It should answer.</li>
+        </ol>
+        <p>On a generic Linux box, steps 1 and onward are all required. On OpenWrt, the practical difference is that IP forwarding is already part of being a router — the machine has been forwarding packets since the day you flashed it — so the real work is running <code>tailscale up</code> on boot via the init script and advertising the LAN subnet. Tailscale's subnet-router steps then apply unchanged.</p>
+
+        <h2>Firewall: what you do not have to open</h2>
+        <p>This is the part worth underlining. You do not need to open any port forwarding. Tailscale's <a href="https://tailscale.com/kb/1082/firewall-ports">firewall documentation</a> states plainly: "Most of the time, you don't need to open any firewall ports for Tailscale." Coordination happens outbound over HTTPS, and NAT traversal — punching through both routers from the inside — establishes a direct WireGuard tunnel without manual intervention. The page was last validated 2 February 2026.</p>
+        <p>Two caveats in that same documentation matter on a home router:</p>
+        <ul>
+          <li><strong>Outbound-only allowances help direct connections.</strong> If your OpenWrt firewall is unusually strict about outbound traffic, Tailscale lists what it needs to talk to: TCP port 443 (coordination and DERP relays), UDP source port 41641 to anything (direct WireGuard on its default port), UDP 3478 (STUN), and TCP 80 as a coordination fallback. Most OpenWrt setups allow outbound traffic by default, so most setups change nothing.</li>
+          <li><strong>Relays are the fallback, and they're slower.</strong> If NAT traversal fails — some carrier-grade NATs and strict corporate networks cause this — traffic still flows, but through Tailscale's DERP relays rather than a direct tunnel. Encrypted either way, just with extra latency. You'll notice it as a sluggish dashboard, not a broken one.</li>
+        </ul>
+        <p>Because the tunnel is inbound-initiated from your phone outward, Home Assistant's port 8123 never faces the internet. We explain why that port matters in its own right elsewhere in the paper; the short version is that with a subnet router, 8123 stays a LAN-only port and remote access happens over the tailnet instead.</p>
+
+        <h2>What the Home Assistant Tailscale integration actually does</h2>
+        <p>Home Assistant ships an official Tailscale integration, and it's easy to assume it provides the remote access. It doesn't. The integration is a monitor: it shows each tailnet device's last-seen time, Tailscale IP address, key expiry, and whether a client update is available, and it can notify you. The documentation's own "Important" note is worth quoting exactly: "This integration monitors your Tailscale network. It does not make Home Assistant itself reachable over Tailscale."</p>
+        <p>The docs page sits under Home Assistant 2026.11.1, so the integration is current as of November 2026. Install it if you want to watch key expiry — a client whose key expires can silently drop off the tailnet — but the thing that makes your dashboard reachable from the road is the subnet router on the OpenWrt router. One without the other leads to the common confusion: the integration appears healthy, remote access still doesn't work, because nothing is advertising routes.</p>
+
+        <h2>Subnet routes vs exit nodes</h2>
+        <p>Tailscale distinguishes two ways to expose "everything at home". Advertising <code>192.0.2.0/24</code>-style subnets gives your tailnet devices access to specific LAN ranges. Advertising <code>0.0.0.0/0</code> and <code>::/0</code> — default routes — is a different feature, exit nodes, which route <em>all</em> of a client's traffic through your home. Per <a href="https://tailscale.com/kb/1019/subnets">Tailscale's documentation</a>, "If you'd like to expose default routes (0.0.0.0/0 and ::/0), consider using exit nodes instead" and use <code>--advertise-exit-node</code>.</p>
+        <p>For reaching Home Assistant, a plain subnet route is the right tool: it's scoped, it doesn't drag your work laptop's traffic through your home connection, and it doesn't break streaming services that dislike your home IP as a travel origin. Use an exit node only when the goal is genuinely "treat me as if I were at home for everything".</p>
+
+        <h2>Tailscale vs plain WireGuard on OpenWrt</h2>
+        <p>Both use WireGuard cryptography, so the encryption is equivalent. The differences are operational. Plain WireGuard on OpenWrt, as covered in our <a href="openwrt-wireguard.html">WireGuard guide</a>, means generating and distributing a key pair per device, opening a UDP listening port on your home firewall for each peer, and having no coordination if your home IP changes.</p>
+        <p>Tailscale adds the coordination server, NAT traversal, and a policy file for access control — no manually distributed keys and no listening port on the home router. The cost is the cloud dependency for sign-in and coordination. If you already run plain WireGuard and your WAN IP is stable, it works well and stays entirely self-hosted. If devices wander between networks with unpredictable NATs — phones on cellular, laptops on hotel Wi-Fi — the NAT traversal and auto key handling are what you're paying for. Tailscale's own firewall documentation frames it as the difference between needing an inbound port and needing none.</p>
+
+        <h2>Gotchas worth knowing</h2>
+        <ul>
+          <li><strong>The HA integration is not the access path.</strong> Restating the docs: it monitors, it doesn't expose. The subnet router does the exposing.</li>
+          <li><strong>There's no official Tailscale OpenWrt guide.</strong> Lean on the OpenWrt package feed listing and Tailscale's generic Linux/subnet router docs; anything claiming a vendor OpenWrt walkthrough is off-base as of our 15 November 2026 check.</li>
+          <li><strong>Packaging changed at 24.10.</strong> OpenWrt moved from ipk to apk packaging with the 24.10 series, so older forum posts may show ipk-era commands. The package name <code>tailscale</code> is unchanged.</li>
+          <li><strong>The Luci app is community work.</strong> <code>luci-app-tailscale-community</code> lives in the official Luci feed, but it's not maintained by Tailscale. It won't exist on all releases, and CLI fluency ages better.</li>
+          <li><strong>Key expiry notifications are worth having.</strong> The integration can notify before a key expires; a silently expired key looks like "the tunnel broke" with no error.</li>
+          <li><strong>DERP relay fallback is slow but present.</strong> A dashboard that loads in five seconds instead of one usually means NAT traversal failed, not that something is broken. Check the admin console for a direct vs relayed connection.</li>
+        </ul>
+
+        <h2>Where this sits in an OpenWrt house</h2>
+        <p>Remote access is one of the quieter reasons to run OpenWrt. The same router that segments your IoT devices into a VLAN can host the tunnel you use to reach them from anywhere — and if you're choosing the router itself, our <a href="openwrt.html">OpenWrt pillar</a> and the broader <a href="openwrt-wireguard.html">WireGuard on OpenWrt</a> guide cover the rest of the stack. If your access needs are temporary and mobile — a travel router running OpenWrt rather than a fixed home one — see our guide to <a href="travel-router-openwrt.html">travel routers and OpenWrt</a>, where Tailscale comes up again as the standard remote-access layer.</p>
+
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+
+        <h2>FAQ</h2>
+        <h3>Does Tailscale on OpenWrt replace port forwarding for Home Assistant?</h3>
+        <p>Yes. Tailscale builds a WireGuard-based mesh network between your devices using NAT traversal, so Home Assistant's port 8123 stays LAN-only and you reach it over the tailnet instead of exposing it to the internet.</p>
+        <h3>Can I install Tailscale on any OpenWrt router?</h3>
+        <p>Any router with enough storage and RAM for the tailscale package. The stable OpenWrt 25.12.6 feed ships tailscale 1.104.1 for common architectures, installed with opkg (or apk on 24.10 and newer releases, which use apk packaging).</p>
+        <h3>Do I need to keep the Tailscale integration in Home Assistant for remote access?</h3>
+        <p>No. The integration only monitors the tailnet; per Home Assistant's documentation, it does not make Home Assistant itself reachable over Tailscale. Remote access comes from a subnet router advertising your LAN routes, which can be your OpenWrt router.</p>
+        <h3>Is the Luci app for Tailscale official?</h3>
+        <p>No. luci-app-tailscale-community is a community package published in the official Luci feed for OpenWrt 25.12.6, but it is not part of the Tailscale client or core OpenWrt. The command-line client works without it.</p>
+        <h3>What ports do I have to open on my OpenWrt firewall for Tailscale?</h3>
+        <p>None inbound. Per Tailscale's firewall documentation, most of the time you don't need to open any firewall ports; NAT traversal handles direct connections. Optional outbound allowances (TCP 443, UDP 41641, UDP 3478, TCP 80) help direct connections succeed.</p>
+        <h3>Will Tailscale slow down my connection compared to plain WireGuard?</h3>
+        <p>Not when a direct connection is established; it uses the same WireGuard cryptography. If NAT traversal fails, traffic falls back to Tailscale's DERP relays, which still encrypts everything but adds latency.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://tailscale.com/kb/1019/subnets">Tailscale subnet router documentation</a>; <a href="https://tailscale.com/kb/1082/firewall-ports">Tailscale firewall ports</a>; <a href="https://www.home-assistant.io/integrations/tailscale/">Home Assistant Tailscale integration</a>; <a href="https://downloads.openwrt.org/releases/25.12.6/packages/aarch64_generic/packages/">OpenWrt 25.12.6 package feed</a>; <a href="https://forum.openwrt.org/t/help-to-configure-tailscale-as-a-proxy-service/142428/4">OpenWrt forum: tailscaled install pattern</a></dd>
+        </dl>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
