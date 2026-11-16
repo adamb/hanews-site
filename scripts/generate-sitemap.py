@@ -76,22 +76,35 @@ def cadence(path):
     return "weekly", "0.4"
 
 
+# Pages Functions routes that are not static HTML files. The sort key is a
+# fake filename so /feeds lands in the same alphabetical place as a page.
+FUNCTION_ROUTES = [
+    ("feeds.html", "/feeds", "functions/feeds.js", "hourly", "0.5"),
+]
+
+
 def main():
     pages = tracked_pages()
     if not pages:
         sys.stderr.write("no tracked HTML pages found; refusing to write an empty sitemap\n")
         return 1
 
+    entries = []
+    for path in pages:
+        changefreq, priority = cadence(path)
+        entries.append((os.path.basename(path), canonical_url(path), lastmod(path), changefreq, priority))
+    for sort_key, slug, source, changefreq, priority in FUNCTION_ROUTES:
+        entries.append((sort_key, SITE + slug, lastmod(source), changefreq, priority))
+    entries.sort(key=lambda entry: entry[0])
+
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ]
-    for path in pages:
-        changefreq, priority = cadence(path)
-        loc = canonical_url(path)
+    for _sort_key, loc, stamp, changefreq, priority in entries:
         lines.append("  <url>")
         lines.append("    <loc>{}</loc>".format(escape(loc)))
-        lines.append("    <lastmod>{}</lastmod>".format(escape(lastmod(path))))
+        lines.append("    <lastmod>{}</lastmod>".format(escape(stamp)))
         lines.append("    <changefreq>{}</changefreq>".format(changefreq))
         lines.append("    <priority>{}</priority>".format(priority))
         lines.append("  </url>")
@@ -101,7 +114,7 @@ def main():
     with open(OUTPUT, "w", encoding="utf-8") as handle:
         handle.write("\n".join(lines))
 
-    print("wrote {} with {} urls".format(OUTPUT, len(pages)))
+    print("wrote {} with {} urls".format(OUTPUT, len(entries)))
     return 0
 
 
