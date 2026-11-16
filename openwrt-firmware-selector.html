@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWrt Firmware Selector: check if your router is supported and get the right image — HA News</title>
+  <meta name="description" content="How to use the OpenWrt Firmware Selector to find out if your router is supported, pick the right build, and choose between factory and sysupgrade images.">
+  <link rel="canonical" href="https://hanews.org/openwrt-firmware-selector">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <script src="/ga.js" defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "OpenWrt Firmware Selector: check if your router is supported and get the right image", "datePublished": "2026-11-16", "dateModified": "2026-11-16", "author": {"@type": "Organization", "name": "HA News"}, "publisher": {"@type": "Organization", "name": "HA News"}, "mainEntityOfPage": "https://hanews.org/openwrt-firmware-selector"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I find out if my router is supported by OpenWrt?", "acceptedAnswer": {"@type": "Answer", "text": "Open the Firmware Selector at firmware-selector.openwrt.org, type your router's model name, and see whether an official build appears. If it does, the page links straight to the download for your hardware revision."}}, {"@type": "Question", "name": "What is the difference between a factory and a sysupgrade image?", "acceptedAnswer": {"@type": "Answer", "text": "A factory image is for the first flash from the vendor's own firmware, usually through the vendor's web interface. A sysupgrade image is for upgrading or reinstalling a router that already runs OpenWrt, either from the LuCI web interface or with the sysupgrade command over SSH."}}, {"@type": "Question", "name": "Is there a 25.12.6 image for my device?", "acceptedAnswer": {"@type": "Answer", "text": "For most supported devices, yes. Of the 2,187 devices with official builds in OpenWrt's device list, 2,153 have a 25.12.6 build. The Firmware Selector shows which version is available for your model."}}, {"@type": "Question", "name": "How many devices does OpenWrt support?", "acceptedAnswer": {"@type": "Answer", "text": "OpenWrt's official device list counts 2,187 devices with stable-release builds. 2,153 of them have a build for the current stable release 25.12.6, and 1,872 have one for the previous stable 24.10.8."}}, {"@type": "Question", "name": "Can I use the Firmware Selector to customize installed packages?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The selector offers an optional \"Customize installed packages\" section and a first-boot script (uci-defaults) field, so the image it produces can include the packages and settings you want from the first boot."}}, {"@type": "Question", "name": "What is the OpenWrt snapshot build and should I install it?", "acceptedAnswer": {"@type": "Answer", "text": "Snapshots are nightly trunk builds for developers. They do not include the LuCI web interface and they are not point releases. For a home router, install the latest stable release instead, which is 25.12.6."}}]}]}</script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="topbar" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="masthead__meta">
+      <span class="dateline">Monday, 16 November 2026</span>
+      <div class="masthead__aside">
+        <span class="masthead__edition">Home automation edition</span>
+        <button type="button" class="signup-trigger">Get the briefing</button>
+      </div>
+    </div>
+    <a class="masthead__brand" href="index.html" aria-label="Home Assistant News home">Home Assistant News</a>
+    <p class="masthead__tagline">Reporting the local stack, from radio to automations.</p>
+  </header>
+  <nav class="sectionnav" aria-label="Sections">
+    <div class="sectionnav__inner">
+      <a href="index.html" aria-current="page" class="sectionnav__home">HOME</a>
+      <a href="ha.html">HOME ASSISTANT</a>
+      <a href="matter.html">MATTER &amp; THREAD</a>
+      <a href="esphome.html">ESPHOME</a>
+      <a href="devices.html">DEVICES</a>
+      <a href="energy.html">ENERGY</a>
+      <a href="explainers.html">EXPLAINERS</a>
+      <a href="about.html">ABOUT</a>
+    </div>
+  </nav>
+
+  <main id="main" class="page">
+    <div class="sheet page-with-rail">
+      <div class="page-inner">
+        <p class="kicker">Guide · OpenWrt</p>
+        <h1>OpenWrt Firmware Selector: check if your router is supported and get the right image</h1>
+        <p class="byline">HA News · 16 Nov 2026</p>
+
+        <p>Before you put OpenWrt on a router you have two questions: does OpenWrt support this model at all, and which file do I download for it. The <a href="https://firmware-selector.openwrt.org/">OpenWrt Firmware Selector</a> answers both. It is a single-page web app: you type the model name, it shows the matching device profile with its target, the current version, the build date and the download links, and it links to the device's page on openwrt.org for the installation notes. The rule for which file to take is simple once you know it: a <strong>sysupgrade</strong> image if the router already runs OpenWrt, a <strong>factory</strong> image for the first flash from the vendor's own firmware.</p>
+
+        <p>The selector is also the safest source of truth. Download sites mirror OpenWrt images, but the selector reads OpenWrt's own build data, so what it lists for your model is what the project actually built. This guide walks through checking support, picking a version, telling factory from sysupgrade, and the customization options most people miss.</p>
+
+        <h2>Step 1: check whether your router is supported</h2>
+        <p>Go to <a href="https://firmware-selector.openwrt.org/">firmware-selector.openwrt.org</a> and start typing the model name exactly as printed on the case, for example "GL-A1300". The selector autocompletes against OpenWrt's device database. When your device appears, the result card shows four things: the model, the <em>target</em> (the SoC family and variant the build was made for, such as <code>ipq40xx/generic</code> or <code>ath79/generic</code>), the version you are looking at, and the build date.</p>
+        <p>If nothing shows up under your model name, the router is not in the official device list, which means there is no official build for it. Searching the exact hardware revision helps: vendors sell several revisions under one product name, and OpenWrt support is per revision, not per marketing name. Each device also has a dedicated page on openwrt.org (in the "Table of Hardware", at a URL of the form <code>openwrt.org/toh/&lt;vendor&gt;/&lt;model&gt;</code>) with install notes specific to that hardware, including any debricking steps. Always read that page before flashing.</p>
+        <p>The scale of support is worth knowing. OpenWrt's official per-release device list, refreshed this month, counts <strong>2,187 devices with stable builds</strong> — and coverage of the current release is nearly total: 2,153 of those 2,187 devices have a build for the current stable release, <strong>25.12.6</strong>, and 1,872 have a build for the previous stable, 24.10.8. A handful of devices only have builds in older releases, usually because their SoC support was removed or reworked.</p>
+
+        <h2>Step 2: pick a version — stable, oldstable, or nothing</h2>
+        <p>The selector defaults to the current stable release. As of 16 November 2026 that is <strong>OpenWrt 25.12.6</b>, with 24.10.8 as oldstable; the release history goes back through 19.07. For a home router, take the current stable. It gets bug fixes and security updates, and the device profiles in the selector point at those builds by default.</p>
+        <p>A device listed in the device database carries a deep link straight into the selector with version, target and profile filled in. For the GL.iNet GL-A1300, for example, the link is <a href="https://firmware-selector.openwrt.org/?version=25.12.6&amp;target=ipq40xx/generic&amp;id=glinet_gl-a1300">firmware-selector.openwrt.org/?version=25.12.6&amp;target=ipq40xx/generic&amp;id=glinet_gl-a1300</a> — bookmark that form of link for your own model once you have found it, and you never have to search again.</p>
+        <p>If your device shows a build for 24.10.8 but not for 25.12.6, you face the ordinary tradeoff: an older stable release still receives maintenance updates for a while, but the device is not on current code. If a release you need does not appear at all, the selector offers a <em>"Request build"</em> button, which signals to the release engineers that someone wants that device in a given release.</p>
+        <p>One important exclusion: the selector also offers nightly <strong>"snapshot"</strong> builds. Snapshots are trunk builds for developers and testers. They do not include the LuCI web interface, they are not point releases, and they churn daily. For a router your house depends on, install the latest stable. If you want to know what is in the current stable release, see our <a href="openwrt-25-12">OpenWrt 25.12 release notes</a>.</p>
+
+        <h2>Step 3: factory or sysupgrade — which image do you download?</h2>
+        <p>This is the question the selector can't answer for you, because both files sit side by side in the same release directory. The naming follows a convention:</p>
+        <table>
+          <thead><tr><th>Your situation</th><th>Image to use</th><th>How you flash it</th></tr></thead>
+          <tbody>
+            <tr><td>Router runs the vendor's own firmware</td><td><code>factory</code> image</td><td>Usually through the vendor web interface: upload the image in the firmware-update page</td></tr>
+            <tr><td>Router already runs OpenWrt</td><td><code>sysupgrade</code> image</td><td>LuCI: System → Backup/Flash; or over SSH with the <code>sysupgrade</code> command, per the <a href="https://openwrt.org/docs/guide-user/install/sysupgrade.cli">sysupgrade CLI documentation</a></td></tr>
+            <tr><td>Recovery / unbricking on some devices</td><td><code>initramfs-kernel</code> image</td><td>Booted into RAM without writing flash; used to recover or to bootstrap certain devices</td></tr>
+          </tbody>
+        </table>
+        <p>The reason for two files is the firmware container. A factory image wraps the OpenWrt system in whatever container the vendor's own updater expects to accept — for GL.iNet's GL-A1300 in the 25.12.6 release that is a <code>glinet_gl-a1300-squashfs-factory.ubi</code> file, which the vendor update page accepts from stock firmware. The upgrade of an existing OpenWrt install on the same device is <code>glinet_gl-a1300-squashfs-sysupgrade.bin</code>. A sysupgrade image on a device running vendor firmware will be rejected; a factory image flashed over an existing OpenWrt install overwrites more than necessary and can leave you with a half-configured system. Match the file to the situation.</p>
+        <p>Note that a factory image does not exist for every device. On some SoC families — ath79 devices, for instance — the release directory only carries <code>sysupgrade.bin</code> and the initramfs image, because the vendor firmware on those devices expects the same container or is flashed through a different mechanism (a bootloader menu, TFTP, or a command-line tool). The device's page on openwrt.org documents the specific path for your hardware. The distinction between the two image kinds is what the project's own <a href="https://openwrt.org/docs/guide-quick-start/factory_and_sysupgrade">factory-and-sysupgrade guide</a> is about.</p>
+
+        <h2>Step 4: the flash, in short</h2>
+        <ol>
+          <li>Confirm support in the selector and read the device's openwrt.org page for any model-specific steps.</li>
+          <li>Download the right image kind (factory for first flash, sysupgrade for an OpenWrt-to-OpenWrt upgrade) for your hardware revision from the release directory the selector links to.</li>
+          <li>For a first flash, follow the device page's instructions — commonly the vendor web UI uploading the factory image. Watch for vendor warnings about the exact revision.</li>
+          <li>For an OpenWrt upgrade, back up your configuration first (LuCI → System → Backup/Flash, or <code>sysupgrade -b</code> over SSH), then flash the sysupgrade image. The same <a href="https://openwrt.org/docs/guide-user/install/sysupgrade.cli">CLI guide</a> covers keeping or dropping settings.</li>
+          <li>After the first flash, set a password, and connect to LuCI over <code>http://192.168.1.1</code> (or whatever the device page says the default address is) to configure.</li>
+        </ol>
+        <p>If you have not yet chosen hardware, our <a href="best-openwrt-router">best OpenWrt routers roundup</a> lists devices with official builds across the current releases, so everything there works end-to-end with the selector.</p>
+
+        <h2>Customizing the image: packages and first-boot scripts</h2>
+        <p>Two optional features in the selector are worth knowing about, because they change the flash-once-configure-forever experience:</p>
+        <ul>
+          <li><strong>"Customize installed packages"</strong>: the selector lets you edit the package list that goes into the image. If you know you always install WireGuard or a specific USB driver, baking it into the image avoids a reinstall after every reflash.</li>
+          <li><strong>First-boot script (uci-defaults)</strong>: you can attach a script that runs on the first boot, applying UCI configuration — setting a password hash, disabling unused services, pre-seeding network settings. It makes reflashing a router reproducible instead of a click-through exercise.</li>
+        </ul>
+        <p>Both are optional; the defaults produce a normal, clean OpenWrt image. They are most useful when you maintain several routers of the same model and want them identical after a flash.</p>
+
+        <h2>Gotchas worth knowing before you flash</h2>
+        <ul>
+          <li><strong>Support is per hardware revision.</strong> Two boxes with the same product name can be different devices inside. The selector's autocomplete lists the revision strings — pick the one that matches the label on your unit, not just the model line.</li>
+          <li><strong>Don't install a snapshot on a production router.</strong> The nightly trunk builds lack LuCI and are for development. The stable release exists precisely so you don't have to run trunk.</li>
+          <li><strong>Match image kind to current firmware.</strong> Factory image for vendor firmware; sysupgrade image for an existing OpenWrt install. Downloading the wrong kind is the most common first-flash failure.</li>
+          <li><strong>Read the device page first.</strong> Some devices need a specific order of steps (an initramfs boot before a sysupgrade, a bootloader unlocked with a vendor tool, an antenna swap, or a serial connection to recover). The openwrt.org Table of Hardware page for your model is the checklist.</li>
+          <li><strong>Version freshness.</strong> The release list moves; current stable is 25.12.6 (oldstable 24.10.8). If the selector shows something newer, trust the selector — it reads OpenWrt's own version feed.</li>
+        </ul>
+
+<aside class="rail-sub article-cta" aria-label="Newsletter">
+  <p><strong>Get the HA News brief.</strong> One short weekday email on Home Assistant, Matter, OpenWrt, ESPHome and local-first networking, sourced from the projects themselves.</p>
+  <button type="button" class="signup-trigger">Get the briefing</button>
+</aside>
+
+        <h2>FAQ</h2>
+        <h3>How do I find out if my router is supported by OpenWrt?</h3>
+        <p>Open the Firmware Selector at <a href="https://firmware-selector.openwrt.org/">firmware-selector.openwrt.org</a>, type your router's model name, and see whether an official build appears. If it does, the page links straight to the download for your hardware revision. The model's page on openwrt.org has install notes.</p>
+        <h3>What is the difference between a factory and a sysupgrade image?</h3>
+        <p>A factory image is for the first flash from the vendor's own firmware, usually through the vendor's web interface. A sysupgrade image is for upgrading or reinstalling a router that already runs OpenWrt, either from the LuCI web interface or with the <code>sysupgrade</code> command over SSH.</p>
+        <h3>Is there a 25.12.6 image for my device?</h3>
+        <p>For most supported devices, yes. Of the 2,187 devices with official builds in OpenWrt's device list, 2,153 have a 25.12.6 build. The Firmware Selector shows which version is available for your model.</p>
+        <h3>How many devices does OpenWrt support?</h3>
+        <p>OpenWrt's official device list counts 2,187 devices with stable-release builds. 2,153 of them have a build for the current stable release 25.12.6, and 1,872 have one for the previous stable 24.10.8.</p>
+        <h3>Can I use the Firmware Selector to customize installed packages?</h3>
+        <p>Yes. The selector offers an optional "Customize installed packages" section and a first-boot script (uci-defaults) field, so the image it produces can include the packages and settings you want from the first boot.</p>
+        <h3>What is the OpenWrt snapshot build and should I install it?</h3>
+        <p>Snapshots are nightly trunk builds for developers. They do not include the LuCI web interface and they are not point releases. For a home router, install the latest stable release instead, which is 25.12.6.</p>
+
+        <dl class="facts">
+          <dt>Primary sources</dt>
+          <dd><a href="https://firmware-selector.openwrt.org/">OpenWrt Firmware Selector</a>; <a href="https://downloads.openwrt.org/releases/25.12.6/targets/ipq40xx/generic/">OpenWrt 25.12.6 release directory (ipq40xx/generic example)</a>; <a href="https://openwrt.org/docs/guide-quick-start/factory_and_sysupgrade">Factory and sysupgrade guide</a>; <a href="https://openwrt.org/docs/guide-user/install/sysupgrade.cli">sysupgrade CLI documentation</a></dd>
+        </dl>
+        <p class="affiliate-note"><small>As an Amazon Associate, HA News earns from qualifying purchases.</small></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="sheet foot-inner">
+      <span>HA News</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="https://github.com/adamb/hanews">Pipeline on GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Published weekdays · Review welcome</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>© 2026</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="advertise.html">Advertise</a>
+      <p class="host">Hosted target: Cloudflare Pages.</p>
+    </div>
+  </footer>
+  <dialog class="signup-modal" aria-labelledby="signup-modal-title">
+    <form class="signup-modal__close" method="dialog">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" aria-label="Close">×</button>
+    </form>
+    <form class="signup-modal__body sub-form" action="/subscribe" method="post">
+      <p class="signup-modal__kicker">The Briefing</p>
+      <h2 id="signup-modal-title" class="signup-modal__title">Get the HA briefing in your inbox</h2>
+      <p class="signup-modal__text">Home Assistant, Matter, Thread, ESPHome and local-first devices — the daily brief, with signal and primary sources.</p>
+      <label class="signup-modal__field">
+        <span>Name</span>
+        <input type="text" name="name" required autocomplete="name" maxlength="80" placeholder="Name">
+      </label>
+      <label class="signup-modal__field">
+        <span>Email</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="signup-modal__field">
+        <span>Phone</span>
+      </label>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFXNHNNq9PO5vjk5" data-appearance="interaction-only"></div>
+        <button type="submit" class="signup-modal__submit">Subscribe</button>
+      <p class="signup-modal__fine">We'll email a confirm link. Unsubscribe anytime.</p>
+      <p class="sub-status" role="status"></p>
+    </form>
+  </dialog>
+  <script src="subscribe.js"></script>
+</body>
+</html>
