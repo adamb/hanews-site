@@ -40,3 +40,8 @@ jobs:
           # Direct-upload to the existing production project (domains + secrets live here).
           # Native Git cannot attach to a Direct Upload project; this is the push→live path.
           command: pages deploy . --project-name=hanews
+
+  seed-feeds:
+    needs: deploy
+    uses: ./.github/workflows/refresh-feeds.yml
+    secrets: inherit

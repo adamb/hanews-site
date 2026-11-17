@@ -12,8 +12,10 @@ import {
   categoriesOf,
   dedupeItems,
   fetchOne,
+  FEEDS_KV_KEY,
   formatAst,
   isLowPriority,
+  loadFeeds,
   mergeResults,
   nearDuplicate,
   parseArctic,
@@ -603,6 +605,67 @@ test("a failing source does not reject the rest of the refresh", async () => {
   assert.equal(results[0].error, "network error");
   assert.equal(results[1].ok, true);
   assert.equal(results[1].items[0].title, "OpenWrt & friends");
+});
+
+test("a visitor read uses KV and does not fetch", async () => {
+  let fetched = false;
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => {
+    fetched = true;
+    throw new Error("visitor path fetched");
+  };
+  try {
+    const stored = {
+      refreshedAt: "2026-11-17T04:00:00.000Z",
+      feeds: [
+        {
+          name: "How-To Geek: Smart Home",
+          category: "Smart home news",
+          priority: "high",
+          site_url: "https://www.howtogeek.com/smart-home/",
+          feed_url: "https://www.howtogeek.com/feed/category/smart-home/",
+          ok: true,
+          fetchedAt: "2026-11-17T04:00:00.000Z",
+          lastOkAt: "2026-11-17T04:00:00.000Z",
+          items: [
+            {
+              title: "My smart home started swearing",
+              url: "https://www.howtogeek.com/example/",
+              date: "2026-11-17T03:00:00.000Z",
+              excerpt: "A short excerpt.",
+            },
+          ],
+        },
+      ],
+    };
+    const env = {
+      SUBSCRIBERS: {
+        async get(key, type) {
+          assert.equal(key, FEEDS_KV_KEY);
+          assert.equal(type, "json");
+          return stored;
+        },
+      },
+    };
+    const loaded = await loadFeeds(env, catalog);
+    assert.equal(loaded.cache, "kv");
+    assert.equal(loaded.cacheControl, HOUR_CACHE);
+    const html = renderFeedsPage(catalog, loaded.aggregate);
+    assert.match(html, /My smart home started swearing/);
+    assert.match(html, /Updated hourly\. Last refresh:/);
+    const empty = await loadFeeds({ SUBSCRIBERS: { async get() { return null; } } }, catalog);
+    assert.equal(empty.cache, "empty");
+    const updating = renderFeedsPage(catalog, empty.aggregate);
+    assert.match(updating, /Updating\. Headlines are stored hourly/);
+    assert.match(updating, /class="feed-empty">Updating\./);
+    assert.match(updating, /<span class="sep" aria-hidden="true">·<\/span> Updating/);
+    assert.equal(fetched, false);
+    const pages = readFileSync(new URL("../functions/feeds.js", import.meta.url), "utf8");
+    assert.equal(pages.includes("refreshFeeds"), false);
+    assert.equal(pages.includes("fetch("), false);
+  } finally {
+    globalThis.fetch = original;
+  }
 });
 
 test("parseArctic applies min_score only after the age window", () => {

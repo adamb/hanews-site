@@ -227,7 +227,7 @@ export async function subscriberSummary(env) {
       for (let i = 0; i < keys.length; i++) {
         const name = keys[i] && keys[i].name;
         if (typeof name !== "string") continue;
-        if (name.startsWith("draft:") || name.startsWith("token:")) continue;
+        if (name.startsWith("draft:") || name.startsWith("token:") || name.startsWith("feeds:")) continue;
         let rec = null;
         if (typeof kv.get === "function") {
           try {

@@ -1,7 +1,9 @@
-// Server-side aggregation for /feeds.
-// RSS/Atom feeds are fetched directly. Reddit subs use Arctic Shift, never
-// reddit.com RSS. Cache the aggregate for one hour and keep the last good
-// items when a source fails. Do not use the SUBSCRIBERS KV namespace.
+// Aggregation for /feeds.
+// A visitor request never fetches sources. It only reads the aggregate that
+// the hourly job stored at SUBSCRIBERS key "feeds:aggregate". Reddit subs are
+// fetched by that job through Arctic Shift, never reddit.com RSS.
+// The same KV namespace holds subscribers under other keys. Do not write
+// subscriber records from this file.
 
 export const USER_AGENT = "HANewsBot/1.0 (+https://hanews.org/feeds)";
 export const HOUR_CACHE =
@@ -9,7 +11,7 @@ export const HOUR_CACHE =
 export const SHORT_CACHE = "public, max-age=120";
 
 const FRESH_MS = 60 * 60 * 1000;
-const CACHE_URL = "https://hanews.org/internal/feeds-aggregate-v3";
+export const FEEDS_KV_KEY = "feeds:aggregate";
 const MAX_BYTES = 800000;
 const PARSE_ITEMS = 16;
 const KEEP_ITEMS = 12;
@@ -30,8 +32,6 @@ const HOST_LIMIT = {
   "forum.openwrt.org": 1,
   "arctic-shift.photon-reddit.com": 1,
 };
-
-let inflight = null;
 
 export function isArcticShift(feed) {
   const kind = String((feed && (feed.intake || feed.type || feed.format)) || "");
@@ -91,71 +91,74 @@ export function aggregateFreshForMs(feeds) {
   return blocked ? 90 * 1000 : FRESH_MS;
 }
 
-export async function getAggregate(catalog) {
-  if (inflight) return inflight;
-  inflight = loadAggregate(catalog).finally(() => {
-    inflight = null;
-  });
-  return inflight;
+export function placeholderAggregate(catalog) {
+  const now = new Date().toISOString();
+  return {
+    refreshedAt: null,
+    stale: false,
+    updating: true,
+    feeds: activeFeeds(catalog).map((feed) => ({
+      name: feed.name,
+      site_url: feed.site_url || "",
+      feed_url: feed.feed_url || "",
+      category: feed.category,
+      priority: feed.priority || "normal",
+      status: feed.status || "",
+      intake: isArcticShift(feed) ? "arctic-shift" : "rss",
+      subreddit: arcticSubreddit(feed),
+      ok: false,
+      error: "updating",
+      fetchedAt: now,
+      lastOkAt: null,
+      retained: false,
+      items: [],
+    })),
+  };
 }
 
-async function loadAggregate(catalog) {
-  const feeds = activeFeeds(catalog);
-  const stored = await readStored();
-  const age = stored ? ageMs(stored.refreshedAt) : Infinity;
-  const freshFor = stored && stored.freshForMs ? stored.freshForMs : FRESH_MS;
-  if (stored && age >= -60000 && age < freshFor) {
-    return { aggregate: stored, cache: "hit" };
-  }
+export async function readFeedsKv(env) {
   try {
-    const started = Date.now();
-    const fresh = await refreshFeeds(feeds);
-    const merged = mergeResults(stored, fresh);
-    const aggregate = {
-      refreshedAt: new Date().toISOString(),
-      stale: false,
-      freshForMs: aggregateFreshForMs(merged),
-      feeds: merged,
-    };
-    await writeStored(aggregate);
-    const failed = merged.filter((feed) => !feed.ok);
-    console.log(
-      "feeds refresh ok=" +
-        (merged.length - failed.length) +
-        " fail=" +
-        failed.length +
-        " ms=" +
-        (Date.now() - started)
-    );
-    for (const feed of failed) {
-      console.log("feeds fail " + feed.name + " " + (feed.error || ""));
-    }
-    return { aggregate, cache: "refresh" };
+    const kv = env && env.SUBSCRIBERS;
+    if (!kv || typeof kv.get !== "function") return null;
+    const raw = await kv.get(FEEDS_KV_KEY, "json");
+    if (raw && typeof raw === "object") return raw;
+    if (typeof raw === "string" && raw) return JSON.parse(raw);
+    return null;
   } catch (err) {
-    console.log("feeds refresh failed");
-    if (stored && Array.isArray(stored.feeds)) {
-      return { aggregate: { ...stored, stale: true }, cache: "stale" };
-    }
-    const now = new Date().toISOString();
-    return {
-      aggregate: {
-        refreshedAt: now,
-        stale: true,
-        feeds: feeds.map((feed) => ({
-          name: feed.name,
-          site_url: feed.site_url || "",
-          feed_url: feed.feed_url,
-          category: feed.category,
-          ok: false,
-          error: "unavailable",
-          fetchedAt: now,
-          lastOkAt: null,
-          retained: false,
-          items: [],
-        })),
+    return null;
+  }
+}
+
+export async function loadFeeds(env, catalog) {
+  const stored = await readFeedsKv(env);
+  if (stored && Array.isArray(stored.feeds) && stored.feeds.length) {
+    return { aggregate: stored, cacheControl: cacheControlFor(stored), cache: "kv" };
+  }
+  return {
+    aggregate: placeholderAggregate(catalog),
+    cacheControl: SHORT_CACHE,
+    cache: "empty",
+  };
+}
+
+export function fallbackFeedsResponse(request, catalog) {
+  try {
+    return finish(
+      request,
+      renderFeedsPage(catalog, placeholderAggregate(catalog)),
+      "text/html; charset=utf-8",
+      SHORT_CACHE,
+      "empty"
+    );
+  } catch (err) {
+    return new Response("Feeds are updating.", {
+      status: 200,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Feeds-Cache": "empty",
       },
-      cache: "stale",
-    };
+    });
   }
 }
 
@@ -673,12 +676,16 @@ export function renderFeedsPage(catalog, aggregate) {
   const staleNote = aggregate.stale
     ? " A newer check failed, so this is the last good copy."
     : "";
+  const refreshLine = aggregate.updating
+    ? "Updating. Headlines are stored hourly and this page does not fetch sources when you open it."
+    : "Updated hourly. Last refresh: " + refreshed + "." + staleNote;
   const sections = categories
     .map((category) =>
       renderSection(
         category,
         sectionItems(feeds, category),
-        sectionItems(feeds, category, { low: true })
+        sectionItems(feeds, category, { low: true }),
+        !!aggregate.updating
       )
     )
     .join("");
@@ -746,10 +753,8 @@ export function renderFeedsPage(catalog, aggregate) {
     "        <p class=\"kicker\">Outside sources</p>\n" +
     "        <h1>Feeds</h1>\n" +
     "        <p class=\"lede\">Headlines from the local-stack sources we follow. Every link goes to the original article. We show a short excerpt, at most 300 characters, not the full text. Release notes and industry posts are folded at the bottom of each section.</p>\n" +
-    "        <p class=\"feed-refresh\">Updated hourly. Last refresh: " +
-    esc(refreshed) +
-    "." +
-    esc(staleNote) +
+    "        <p class=\"feed-refresh\">" +
+    esc(refreshLine) +
     " <a href=\"/feeds.opml\">OPML</a></p>\n" +
     sections +
     "        <section class=\"sources-block\" aria-labelledby=\"sources-h\">\n" +
@@ -781,12 +786,14 @@ export function renderFeedsPage(catalog, aggregate) {
   );
 }
 
-function renderSection(category, items, shelfItems) {
+function renderSection(category, items, shelfItems, updating) {
   const id = slug(category);
   const shelf = shelfItems || [];
   let body = "";
   if (!items.length && !shelf.length) {
-    body = "<p class=\"feed-empty\">No items from these sources on the last check.</p>";
+    body = updating
+      ? "<p class=\"feed-empty\">Updating.</p>"
+      : "<p class=\"feed-empty\">No items from these sources on the last check.</p>";
   } else if (items.length) {
     body = "<ul class=\"feed-list\">" + items.map(renderItem).join("") + "</ul>";
   }
@@ -863,6 +870,7 @@ function readerFeedUrl(feed) {
 }
 
 function sourceStatus(feed) {
+  if (feed.error === "updating") return "Updating";
   if (feed.ok && feed.items && feed.items.length) {
     return "Last ok " + formatAst(feed.lastOkAt || feed.fetchedAt, true);
   }
@@ -1273,51 +1281,6 @@ function safeUrl(value, base) {
     return url.href;
   } catch (err) {
     return "";
-  }
-}
-
-function ageMs(iso) {
-  const ms = Date.parse(iso || "");
-  if (Number.isNaN(ms)) return Infinity;
-  return Date.now() - ms;
-}
-
-function cacheStore() {
-  try {
-    if (typeof caches === "undefined" || !caches || !caches.default) return null;
-    return caches.default;
-  } catch (err) {
-    return null;
-  }
-}
-
-async function readStored() {
-  const cache = cacheStore();
-  if (!cache) return null;
-  try {
-    const hit = await cache.match(new Request(CACHE_URL));
-    if (!hit) return null;
-    return await hit.json();
-  } catch (err) {
-    return null;
-  }
-}
-
-async function writeStored(aggregate) {
-  const cache = cacheStore();
-  if (!cache) return;
-  try {
-    await cache.put(
-      new Request(CACHE_URL),
-      new Response(JSON.stringify(aggregate), {
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-          "Cache-Control": "public, max-age=86400",
-        },
-      })
-    );
-  } catch (err) {
-    console.log("feeds cache put failed");
   }
 }
 
