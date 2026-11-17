@@ -15,7 +15,7 @@ Do not change DNS or custom domains from this repo. Secrets (`ADMIN_PASSWORD`, `
 
 - Root HTML/CSS/JS — newspaper pages and weekday briefs
 - `functions/` — Pages Functions (`/subscribe`, `/confirm`, `/admin`, `/feeds`, GA)
-- `data/feeds.json` — vetted source list for the hourly `/feeds` page
+- `data/feeds.json` — vetted source list for the hourly `/feeds` page. Reddit subs are read through Arctic Shift, not reddit.com RSS.
 - `images/`, `shots/` — static assets
 - `wrangler.toml` — local/Pages config (KV binding `SUBSCRIBERS`)
 

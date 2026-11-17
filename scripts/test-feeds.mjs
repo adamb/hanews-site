@@ -6,13 +6,16 @@ import {
   HOUR_CACHE,
   USER_AGENT,
   activeFeeds,
+  arcticSearchUrl,
   cacheControlFor,
   categoriesOf,
   dedupeItems,
   fetchOne,
   formatAst,
+  isLowPriority,
   mergeResults,
   nearDuplicate,
+  parseArctic,
   parseFeed,
   prepareFeedItems,
   refreshFeeds,
@@ -64,9 +67,12 @@ const ATOM = `<?xml version="1.0" encoding="utf-8"?>
   </entry>
 </feed>`;
 
-test("catalog keeps the 40 vetted feeds and ignores dropped", () => {
+test("catalog keeps the 70 v2 feeds and drops the stale ones", () => {
   const feeds = activeFeeds(catalog);
-  assert.equal(feeds.length, 40);
+  assert.equal(feeds.length, 70);
+  assert.equal(feeds.filter((feed) => feed.status === "dropped").length, 0);
+  assert.equal(feeds.filter((feed) => isLowPriority(feed)).length, 20);
+  assert.equal(feeds.filter((feed) => feed.intake === "arctic-shift").length, 9);
   assert.deepEqual(categoriesOf(catalog, feeds), [
     "Home Assistant",
     "Matter & Thread",
@@ -77,10 +83,38 @@ test("catalog keeps the 40 vetted feeds and ignores dropped", () => {
   ]);
   assert.equal(feeds.some((feed) => feed.feed_url.includes("latest.rss")), false);
   assert.equal(feeds.some((feed) => /stacey/i.test(feed.name)), false);
+  assert.equal(
+    feeds.some((feed) => String(feed.feed_url).includes("hackaday.com/tag/home-automation")),
+    false
+  );
+  assert.equal(
+    feeds.some((feed) => feed.feed_url === "https://www.howtogeek.com/feed/category/smart-home/"),
+    true
+  );
+  assert.equal(feeds.some((feed) => /https?:\/\/([^/]*\.)?reddit\.com/i.test(feed.feed_url)), false);
   const opml = renderOpml(catalog);
-  assert.equal((opml.match(/xmlUrl="/g) || []).length, 40);
+  assert.equal((opml.match(/xmlUrl="/g) || []).length, 70);
   assert.equal(opml.includes("staceyoniot.com"), false);
+  assert.equal(opml.includes("hackaday.com/tag/home-automation"), false);
   assert.equal(opml.includes("forum.openwrt.org/c/announcements/14.rss"), true);
+  assert.equal(opml.includes("https://www.howtogeek.com/feed/category/smart-home/"), true);
+  assert.equal(opml.includes("contributors.home-assistant.io/blog/rss.xml"), true);
+  assert.equal(opml.includes("https://www.reddit.com/r/homeassistant/.rss"), true);
+  assert.equal(opml.includes("Arctic Shift"), true);
+  assert.equal(opml.includes("arctic-shift.photon-reddit.com"), false);
+  const dropped = activeFeeds({
+    categories: ["Home Assistant"],
+    feeds: [
+      {
+        name: "Gone",
+        category: "Home Assistant",
+        feed_url: "https://example.com/gone.xml",
+        status: "dropped",
+        intake: "rss",
+      },
+    ],
+  });
+  assert.equal(dropped.length, 0);
 });
 
 test("parses RSS and Atom, strips markup, and rejects javascript urls", () => {
@@ -249,6 +283,55 @@ test("page renders six sections, nav, footer, and escaped titles", () => {
   assert.equal(cacheControlFor({ feeds: [{ ok: false, items: [] }] }), "public, max-age=120");
 });
 
+test("low-priority feeds stay out of the main river and in the shelf", () => {
+  const feeds = [
+    {
+      name: "How-To Geek: Smart Home",
+      category: "Smart home news",
+      priority: "high",
+      feed_url: "https://www.howtogeek.com/feed/category/smart-home/",
+      items: [
+        {
+          title: "A practical automation",
+          url: "https://www.howtogeek.com/example/",
+          date: "2026-11-16T12:00:00.000Z",
+          excerpt: "Do this at home.",
+        },
+      ],
+    },
+    {
+      name: "Home Assistant Core releases",
+      category: "Home Assistant",
+      priority: "low",
+      status: "deprioritize",
+      feed_url: "https://github.com/home-assistant/core/releases.atom",
+      items: [
+        {
+          title: "2026.11.2",
+          url: "https://github.com/home-assistant/core/releases/tag/2026.11.2",
+          date: "2026-11-16T20:00:00.000Z",
+          excerpt: "",
+        },
+      ],
+    },
+  ];
+  assert.equal(sectionItems(feeds, "Home Assistant").length, 0);
+  const shelf = sectionItems(feeds, "Home Assistant", { low: true });
+  assert.equal(shelf.length, 1);
+  assert.equal(shelf[0].title, "2026.11.2");
+  assert.equal(sectionItems(feeds, "Smart home news").length, 1);
+  const html = renderFeedsPage(
+    { categories: ["Home Assistant", "Smart home news"] },
+    { refreshedAt: "2026-11-16T06:40:00.000Z", stale: false, feeds }
+  );
+  assert.match(html, /<details class="feed-shelf"><summary>Release notes &amp; industry<\/summary>/);
+  const shelfStart = html.indexOf("<details class=\"feed-shelf\">");
+  const shelfHtml = html.slice(shelfStart, html.indexOf("</details>", shelfStart));
+  assert.ok(shelfHtml.includes("2026.11.2"));
+  assert.equal(shelfHtml.includes("A practical automation"), false);
+  assert.ok(html.includes("A practical automation"));
+});
+
 test("fetch sends the bot user agent and retries HTTP 429 once", async () => {
   const calls = [];
   const fetchImpl = async (url, init) => {
@@ -297,4 +380,186 @@ test("refresh caps concurrency", async () => {
   assert.equal(results.length, 8);
   assert.ok(results.every((feed) => feed.ok));
   assert.ok(maxActive <= 3, "max active " + maxActive);
+});
+
+const ARCTIC_FEED = {
+  name: "r/homeassistant",
+  site_url: "https://www.reddit.com/r/homeassistant/",
+  feed_url: "https://arctic-shift.photon-reddit.com/api/posts/search?subreddit=homeassistant",
+  category: "Home Assistant",
+  format: "arctic-shift",
+  intake: "arctic-shift",
+  status: "replace",
+  priority: "normal",
+  subreddit: "homeassistant",
+  arctic: {
+    endpoint: "https://arctic-shift.photon-reddit.com/api/posts/search",
+    fields: "title,created_utc,score,id,selftext,subreddit,permalink",
+    after: "168h",
+    limit: 60,
+    min_score: 15,
+    min_score_age_hours: 36,
+    link_template: "https://www.reddit.com/r/{subreddit}/comments/{id}/",
+  },
+};
+
+test("arctic-shift queries by epoch seconds and retries a 422 with limit 25", async () => {
+  const nowSec = 1763330000;
+  const calls = [];
+  const fetchImpl = async (url) => {
+    calls.push(String(url));
+    const parsed = new URL(url);
+    assert.equal(parsed.host, "arctic-shift.photon-reddit.com");
+    assert.equal(parsed.searchParams.get("subreddit"), "homeassistant");
+    assert.equal(parsed.searchParams.get("after"), String(nowSec - 168 * 3600));
+    assert.equal(
+      parsed.searchParams.get("fields"),
+      "title,created_utc,score,id,selftext,subreddit"
+    );
+    assert.equal(parsed.searchParams.has("permalink"), false);
+    assert.equal(String(url).includes("permalink"), false);
+    assert.equal(parsed.host.endsWith(".reddit.com") || parsed.host === "reddit.com", false);
+    if (parsed.searchParams.get("limit") === "60") {
+      return new Response("unprocessable", { status: 422 });
+    }
+    assert.equal(parsed.searchParams.get("limit"), "25");
+    const young = nowSec - 2 * 3600;
+    const old = nowSec - 50 * 3600;
+    const data = [
+      {
+        id: "oldhot1",
+        title: "Old hot post",
+        score: 40,
+        created_utc: old,
+        selftext: "A useful writeup of a Home Assistant dashboard that is long enough.",
+        subreddit: "homeassistant",
+      },
+      {
+        id: "oldquiet",
+        title: "Old quiet post",
+        score: 2,
+        created_utc: old - 10,
+        selftext: "This older post is under the score floor and must be hidden.",
+        subreddit: "homeassistant",
+      },
+      {
+        id: "newquiet",
+        title: "New quiet post",
+        score: 1,
+        created_utc: young,
+        selftext: "Just asked this today, scores have not caught up yet at all.",
+        subreddit: "homeassistant",
+      },
+    ];
+    for (let i = 0; i < 6; i++) {
+      data.push({
+        id: "fresh" + i,
+        title: "Fresh post " + i,
+        score: 1,
+        created_utc: young - i * 60,
+        selftext: "Another brand new post that should be capped in the kept list.",
+        subreddit: "homeassistant",
+      });
+    }
+    return new Response(JSON.stringify({ data }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+  const result = await fetchOne(ARCTIC_FEED, { fetch: fetchImpl, nowSec, timeoutMs: 1000 });
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0].includes("User-Agent"), false);
+  assert.equal(result.ok, true);
+  assert.equal(result.error, null);
+  const titles = result.items.map((item) => item.title);
+  assert.equal(titles.includes("Old quiet post"), false);
+  assert.equal(titles.includes("Old hot post"), true);
+  assert.equal(titles.includes("New quiet post"), true);
+  assert.ok(titles.filter((title) => title.startsWith("Fresh post")).length <= 4);
+  const fresh = result.items.find((item) => item.title === "New quiet post");
+  assert.equal(fresh.url, "https://www.reddit.com/r/homeassistant/comments/newquiet/");
+  assert.ok(fresh.excerpt.length >= 20);
+  assert.equal(calls.some((url) => url.includes("www.reddit.com")), false);
+});
+
+test("arctic-shift does not fall back to reddit.com RSS", async () => {
+  const calls = [];
+  const fetchImpl = async (url) => {
+    calls.push(String(url));
+    return new Response("nope", { status: 500 });
+  };
+  const result = await fetchOne(ARCTIC_FEED, {
+    fetch: fetchImpl,
+    nowSec: 1763330000,
+    timeoutMs: 1000,
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.error, "HTTP 500");
+  assert.equal(result.items.length, 0);
+  assert.equal(calls.length, 1);
+  assert.equal(new URL(calls[0]).host.endsWith(".reddit.com"), false);
+  const blocked = await fetchOne(
+    {
+      name: "r/homeassistant",
+      site_url: "https://www.reddit.com/r/homeassistant/",
+      feed_url: "https://www.reddit.com/r/homeassistant/.rss",
+      category: "Home Assistant",
+      intake: "rss",
+    },
+    { fetch: fetchImpl, timeoutMs: 1000 }
+  );
+  assert.equal(blocked.error, "reddit rss disabled");
+  assert.equal(calls.length, 1);
+});
+
+test("a failing source does not reject the rest of the refresh", async () => {
+  const fetchImpl = async (url) => {
+    if (String(url).includes("bad.example")) throw new Error("socket hang up");
+    return new Response(RSS, { status: 200 });
+  };
+  const results = await refreshFeeds(
+    [
+      {
+        name: "Bad",
+        site_url: "https://bad.example",
+        feed_url: "https://bad.example/rss",
+        category: "Home Assistant",
+        intake: "rss",
+      },
+      {
+        name: "Good",
+        site_url: "https://example.com",
+        feed_url: "https://example.com/rss",
+        category: "Home Assistant",
+        intake: "rss",
+      },
+    ],
+    { fetch: fetchImpl, concurrency: 2, staggerMs: 0, retryDelayMs: 0, timeoutMs: 1000 }
+  );
+  assert.equal(results[0].ok, false);
+  assert.equal(results[0].error, "network error");
+  assert.equal(results[1].ok, true);
+  assert.equal(results[1].items[0].title, "OpenWrt & friends");
+});
+
+test("parseArctic applies min_score only after the age window", () => {
+  const nowSec = 1763330000;
+  const parsed = parseArctic(
+    JSON.stringify({
+      data: [
+        { id: "aa", title: "Young", score: 1, created_utc: nowSec - 3600, selftext: "", subreddit: "openwrt" },
+        { id: "bb", title: "Old enough", score: 3, created_utc: nowSec - 40 * 3600, selftext: "", subreddit: "openwrt" },
+        { id: "cc", title: "Old and hot", score: 9, created_utc: nowSec - 40 * 3600, selftext: "", subreddit: "openwrt" },
+      ],
+    }),
+    { ...ARCTIC_FEED, subreddit: "openwrt", arctic: { ...ARCTIC_FEED.arctic, min_score: 8 } },
+    nowSec
+  );
+  assert.equal(parsed.ok, true);
+  assert.deepEqual(
+    parsed.items.map((item) => item.title).sort(),
+    ["Old and hot", "Young"]
+  );
+  const url = arcticSearchUrl(ARCTIC_FEED, 60, nowSec);
+  assert.equal(new URL(url).searchParams.get("fields").includes("permalink"), false);
 });
