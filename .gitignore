@@ -3,6 +3,7 @@ node_modules/
 .wrangler/
 .DS_Store
 *.log
+feeds-aggregate.json
 
 # Search Console OAuth artifacts (never commit tokens or client secrets)
 gsc-token*.json

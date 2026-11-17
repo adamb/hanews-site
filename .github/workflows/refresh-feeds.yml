@@ -1,0 +1,35 @@
+name: Refresh feeds
+
+on:
+  schedule:
+    # Top of every hour, UTC. GitHub may start the run a few minutes late.
+    - cron: "0 * * * *"
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fetch sources
+        run: node scripts/refresh-feeds.mjs feeds-aggregate.json
+
+      - name: Store aggregate in KV
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: "47fc5188afc9aa2306c4f30dc9e3cc30"
+          # Existing Pages namespace. Key feeds:aggregate is not a subscriber record.
+          command: kv:key put --namespace-id=0f64d5199cb844eab5bc654e61496a65 feeds:aggregate --path=feeds-aggregate.json

@@ -1,21 +1,21 @@
 import catalog from "../data/feeds.json";
-import {
-  cacheControlFor,
-  finish,
-  getAggregate,
-  methodNotAllowed,
-  renderFeedsPage,
-} from "./_feeds.js";
+import { fallbackFeedsResponse, finish, loadFeeds, methodNotAllowed, renderFeedsPage } from "./_feeds.js";
 
 export async function onRequest(context) {
-  const method = context.request.method.toUpperCase();
-  if (method !== "GET" && method !== "HEAD") return methodNotAllowed();
-  const result = await getAggregate(catalog);
-  return finish(
-    context.request,
-    renderFeedsPage(catalog, result.aggregate),
-    "text/html; charset=utf-8",
-    cacheControlFor(result.aggregate),
-    result.cache
-  );
+  const request = context.request;
+  try {
+    const method = request.method.toUpperCase();
+    if (method !== "GET" && method !== "HEAD") return methodNotAllowed();
+    const loaded = await loadFeeds(context.env, catalog);
+    return finish(
+      request,
+      renderFeedsPage(catalog, loaded.aggregate),
+      "text/html; charset=utf-8",
+      loaded.cacheControl,
+      loaded.cache
+    );
+  } catch (err) {
+    console.log("feeds handler failed");
+    return fallbackFeedsResponse(request, catalog);
+  }
 }
