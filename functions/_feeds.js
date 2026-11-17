@@ -1,7 +1,7 @@
-// Server-side RSS/Atom aggregation for /feeds.
-// The browser cannot fetch most of these feeds (no CORS). Cache the
-// aggregate for one hour and keep the last good items when a source fails.
-// Do not use the SUBSCRIBERS KV namespace.
+// Server-side aggregation for /feeds.
+// RSS/Atom feeds are fetched directly. Reddit subs use Arctic Shift, never
+// reddit.com RSS. Cache the aggregate for one hour and keep the last good
+// items when a source fails. Do not use the SUBSCRIBERS KV namespace.
 
 export const USER_AGENT = "HANewsBot/1.0 (+https://hanews.org/feeds)";
 export const HOUR_CACHE =
@@ -9,25 +9,60 @@ export const HOUR_CACHE =
 export const SHORT_CACHE = "public, max-age=120";
 
 const FRESH_MS = 60 * 60 * 1000;
-const CACHE_URL = "https://hanews.org/internal/feeds-aggregate-v1";
+const CACHE_URL = "https://hanews.org/internal/feeds-aggregate-v2";
 const MAX_BYTES = 800000;
 const PARSE_ITEMS = 16;
 const KEEP_ITEMS = 12;
 const SECTION_LIMIT = 10;
 const AST = "America/Puerto_Rico";
+const ARCTIC_ENDPOINT = "https://arctic-shift.photon-reddit.com/api/posts/search";
+const ARCTIC_FIELDS = "title,created_utc,score,id,selftext,subreddit";
+const ARCTIC_WINDOW_HOURS = 168;
+const ARCTIC_LIMIT = 60;
+const ARCTIC_RETRY_LIMIT = 25;
+// Posts newer than min_score_age_hours skip the score floor. Cap how many of
+// those unscored posts we keep so a busy sub does not fill the river.
+const FRESH_SCORE_CAP = 4;
 
 const HOST_LIMIT = {
   "www.reddit.com": 1,
   "reddit.com": 1,
   "forum.openwrt.org": 1,
+  "arctic-shift.photon-reddit.com": 4,
 };
 
 let inflight = null;
 
+export function isArcticShift(feed) {
+  const kind = String((feed && (feed.intake || feed.type || feed.format)) || "");
+  return kind === "arctic-shift";
+}
+
+export function isLowPriority(feed) {
+  if (!feed) return false;
+  return feed.priority === "low" || feed.status === "deprioritize";
+}
+
+export function arcticSubreddit(feed) {
+  if (!feed) return "";
+  const direct = feed.subreddit || (feed.arctic && feed.arctic.subreddit) || "";
+  if (/^[A-Za-z0-9_]{2,30}$/.test(direct)) return direct;
+  try {
+    const sub = new URL(feed.feed_url).searchParams.get("subreddit") || "";
+    if (/^[A-Za-z0-9_]{2,30}$/.test(sub)) return sub;
+  } catch (err) {
+    /* no url */
+  }
+  return "";
+}
+
 export function activeFeeds(catalog) {
   const list = catalog && Array.isArray(catalog.feeds) ? catalog.feeds : [];
   return list.filter((feed) => {
-    if (!feed || !feed.name || !feed.category || !feed.feed_url) return false;
+    if (!feed || !feed.name || !feed.category) return false;
+    if (feed.status === "dropped") return false;
+    if (isArcticShift(feed)) return !!arcticSubreddit(feed);
+    if (!feed.feed_url) return false;
     return /^https?:\/\//i.test(String(feed.feed_url));
   });
 }
@@ -136,7 +171,21 @@ export function mergeResults(previous, current) {
 }
 
 export async function refreshFeeds(feeds, opts = {}) {
-  const concurrency = opts.concurrency || 6;
+  const concurrency = opts.concurrency || 12;
+  const indexed = (feeds || []).map((feed, index) => ({ feed, index }));
+  const arctic = indexed.filter((row) => isArcticShift(row.feed));
+  const rest = indexed.filter((row) => !isArcticShift(row.feed));
+  const arcticConcurrency = Math.min(opts.arcticConcurrency || 4, concurrency);
+  const out = new Array(indexed.length);
+  const [arcticRows, restRows] = await Promise.all([
+    runPool(arctic, arcticConcurrency, opts),
+    runPool(rest, concurrency, opts),
+  ]);
+  for (const row of arcticRows.concat(restRows)) out[row.index] = row.result;
+  return out;
+}
+
+async function runPool(rows, concurrency, opts) {
   const gates = new Map();
 
   async function withHost(host, fn) {
@@ -149,19 +198,18 @@ export async function refreshFeeds(feeds, opts = {}) {
     gate.active += 1;
     try {
       const result = await fn();
-      if (
-        result &&
-        result.error === "HTTP 429" &&
-        host.endsWith("reddit.com") &&
-        opts.staggerMs !== 0
-      ) {
+      if (result && result.error === "HTTP 429" && isRedditHost(host) && opts.staggerMs !== 0) {
         await sleep(1500);
       }
       return result;
     } finally {
       if (HOST_LIMIT[host] && opts.staggerMs !== 0) {
-        const pause =
-          opts.staggerMs == null ? (host.endsWith("reddit.com") ? 1200 : 250) : opts.staggerMs;
+        let pause = opts.staggerMs;
+        if (pause == null) {
+          if (isRedditHost(host)) pause = 1200;
+          else if (host === "forum.openwrt.org") pause = 250;
+          else pause = 0;
+        }
         await sleep(pause);
       }
       gate.active -= 1;
@@ -170,30 +218,37 @@ export async function refreshFeeds(feeds, opts = {}) {
     }
   }
 
-  return mapLimit(feeds, concurrency, (feed) => {
+  const results = await mapLimit(rows, concurrency, (row) => {
     let host = "";
     try {
-      host = new URL(feed.feed_url).host;
+      host = new URL(requestUrlFor(row.feed)).host;
     } catch (err) {
       host = "";
     }
-    return withHost(host, () => fetchOne(feed, opts));
+    return withHost(host, async () => ({
+      index: row.index,
+      result: await fetchOne(row.feed, opts),
+    }));
   });
+  return results;
+}
+
+function requestUrlFor(feed) {
+  if (isArcticShift(feed)) return arcticEndpoint(feed);
+  return feed.feed_url || "";
 }
 
 export async function fetchOne(feed, opts = {}) {
-  const fetchImpl = opts.fetch || fetch;
-  const timeoutMs = opts.timeoutMs || 8000;
   const fetchedAt = new Date().toISOString();
-  const reddit = isReddit(feed.feed_url);
-  // Reddit 429s if the same IP retries immediately. Space the subreddits
-  // instead of retrying; one hourly pass is enough when they are not burst.
-  const attempts = reddit ? 1 : 2;
   const base = {
     name: feed.name,
     site_url: feed.site_url || "",
-    feed_url: feed.feed_url,
+    feed_url: feed.feed_url || "",
     category: feed.category,
+    priority: feed.priority || "normal",
+    status: feed.status || "",
+    intake: isArcticShift(feed) ? "arctic-shift" : "rss",
+    subreddit: arcticSubreddit(feed),
     ok: false,
     error: null,
     fetchedAt,
@@ -201,7 +256,15 @@ export async function fetchOne(feed, opts = {}) {
     retained: false,
     items: [],
   };
+  if (isArcticShift(feed)) return fetchArctic(feed, base, opts);
+  if (isReddit(feed.feed_url)) return { ...base, error: "reddit rss disabled" };
+  return fetchRss(feed, base, opts);
+}
 
+async function fetchRss(feed, base, opts) {
+  const fetchImpl = opts.fetch || fetch;
+  const timeoutMs = opts.timeoutMs || 8000;
+  const attempts = 2;
   for (let attempt = 0; attempt < attempts; attempt++) {
     try {
       const res = await fetchImpl(feed.feed_url, {
@@ -216,8 +279,7 @@ export async function fetchOne(feed, opts = {}) {
       });
       if (res.status === 429 && attempt < attempts - 1) {
         await cancelBody(res);
-        const delay =
-          opts.retryDelayMs == null ? (reddit ? 1200 * (attempt + 1) : 600) : opts.retryDelayMs;
+        const delay = opts.retryDelayMs == null ? 600 : opts.retryDelayMs;
         await sleep(delay);
         continue;
       }
@@ -232,19 +294,173 @@ export async function fetchOne(feed, opts = {}) {
         ...base,
         ok: true,
         error: null,
-        lastOkAt: fetchedAt,
+        lastOkAt: base.fetchedAt,
         items: parsed.items,
       };
     } catch (err) {
-      const name = err && err.name ? err.name : "";
-      const message = String((err && err.message) || err || "");
-      if (name === "TimeoutError" || name === "AbortError" || /timeout/i.test(message)) {
-        return { ...base, error: "timeout" };
-      }
-      return { ...base, error: "network error" };
+      return { ...base, error: fetchError(err) };
     }
   }
   return { ...base, error: "HTTP 429" };
+}
+
+async function fetchArctic(feed, base, opts) {
+  const fetchImpl = opts.fetch || fetch;
+  const timeoutMs = opts.timeoutMs || 8000;
+  const sub = arcticSubreddit(feed);
+  if (!sub) return { ...base, error: "missing subreddit" };
+  const nowSec = opts.nowSec || Math.floor(Date.now() / 1000);
+  const firstLimit = Number(feed.arctic && feed.arctic.limit) || ARCTIC_LIMIT;
+  const limits = [firstLimit, ARCTIC_RETRY_LIMIT];
+  for (let attempt = 0; attempt < limits.length; attempt++) {
+    const url = arcticSearchUrl(feed, limits[attempt], nowSec);
+    if (/[?&]fields=[^&]*permalink/i.test(url) || /[?&]permalink=/i.test(url)) {
+      return { ...base, error: "bad arctic query" };
+    }
+    try {
+      const res = await fetchImpl(url, {
+        method: "GET",
+        redirect: "follow",
+        headers: {
+          "User-Agent": USER_AGENT,
+          Accept: "application/json",
+        },
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      if (res.status === 422 && attempt < limits.length - 1) {
+        await cancelBody(res);
+        continue;
+      }
+      if (!res.ok) {
+        await cancelBody(res);
+        return { ...base, error: "HTTP " + res.status };
+      }
+      const text = await readText(res, MAX_BYTES);
+      const parsed = parseArctic(text, feed, nowSec);
+      if (!parsed.ok) return { ...base, error: parsed.error || "not a feed" };
+      return {
+        ...base,
+        ok: true,
+        error: null,
+        lastOkAt: base.fetchedAt,
+        items: parsed.items,
+      };
+    } catch (err) {
+      return { ...base, error: fetchError(err) };
+    }
+  }
+  return { ...base, error: "HTTP 422" };
+}
+
+function fetchError(err) {
+  const name = err && err.name ? err.name : "";
+  const message = String((err && err.message) || err || "");
+  if (name === "TimeoutError" || name === "AbortError" || /timeout/i.test(message)) return "timeout";
+  return "network error";
+}
+
+function arcticEndpoint(feed) {
+  const raw = (feed.arctic && feed.arctic.endpoint) || ARCTIC_ENDPOINT;
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== "https:") return ARCTIC_ENDPOINT;
+    return url.origin + url.pathname;
+  } catch (err) {
+    return ARCTIC_ENDPOINT;
+  }
+}
+
+function arcticFields(feed) {
+  const raw = (feed.arctic && feed.arctic.fields) || ARCTIC_FIELDS;
+  const allowed = new Set(ARCTIC_FIELDS.split(","));
+  const picked = String(raw)
+    .split(",")
+    .map((part) => part.trim().toLowerCase())
+    .filter((part) => part && part !== "permalink" && allowed.has(part));
+  return picked.length ? picked.join(",") : ARCTIC_FIELDS;
+}
+
+function arcticWindowHours(feed) {
+  const raw = feed.arctic && feed.arctic.after;
+  if (raw == null || raw === "") return ARCTIC_WINDOW_HOURS;
+  const text = String(raw).trim();
+  const hours = text.match(/^(\d+)\s*h$/i);
+  if (hours) return Number(hours[1]);
+  const asNumber = Number(text);
+  if (Number.isFinite(asNumber) && asNumber > 0 && asNumber < 24 * 60) return asNumber;
+  return ARCTIC_WINDOW_HOURS;
+}
+
+export function arcticSearchUrl(feed, limit, nowSec) {
+  const after = nowSec - arcticWindowHours(feed) * 3600;
+  const url = new URL(arcticEndpoint(feed));
+  url.searchParams.set("subreddit", arcticSubreddit(feed));
+  url.searchParams.set("after", String(after));
+  url.searchParams.set("limit", String(limit));
+  url.searchParams.set("fields", arcticFields(feed));
+  return url.href;
+}
+
+export function parseArctic(jsonText, feed, nowSec) {
+  let body;
+  try {
+    body = JSON.parse(String(jsonText || ""));
+  } catch (err) {
+    return { ok: false, error: "not a feed", items: [] };
+  }
+  const rows = Array.isArray(body) ? body : body && Array.isArray(body.data) ? body.data : null;
+  if (!rows) return { ok: false, error: "not a feed", items: [] };
+  const minScore =
+    feed.arctic && feed.arctic.min_score != null && feed.arctic.min_score !== ""
+      ? Number(feed.arctic.min_score)
+      : 0;
+  const ageHours =
+    feed.arctic && feed.arctic.min_score_age_hours != null
+      ? Number(feed.arctic.min_score_age_hours)
+      : 36;
+  const ageSec = (Number.isFinite(ageHours) ? ageHours : 36) * 3600;
+  const floor = Number.isFinite(minScore) ? minScore : 0;
+  const subFallback = arcticSubreddit(feed);
+  const scored = [];
+  const fresh = [];
+  const seen = new Set();
+  for (const row of rows) {
+    if (!row || typeof row !== "object") continue;
+    const id = String(row.id || "").trim();
+    if (!/^[a-z0-9]+$/i.test(id) || seen.has(id)) continue;
+    const title = cleanText(row.title || "");
+    if (!title || title === "[deleted]" || title === "[removed]") continue;
+    const created = Number(row.created_utc);
+    const hasDate = Number.isFinite(created);
+    const age = hasDate ? nowSec - created : Infinity;
+    const scoreNum = Number(row.score);
+    const score = Number.isFinite(scoreNum) ? scoreNum : 0;
+    const young = hasDate && age < ageSec;
+    const passes = score >= floor;
+    if (!passes && !young) continue;
+    const fromPost = String(row.subreddit || "");
+    const sub = /^[A-Za-z0-9_]{2,30}$/.test(fromPost) ? fromPost : subFallback;
+    if (!sub) continue;
+    seen.add(id);
+    const item = {
+      title: title.length > 240 ? clip(title, 240) : title,
+      url: "https://www.reddit.com/r/" + sub + "/comments/" + id + "/",
+      date: hasDate ? new Date(created * 1000).toISOString() : null,
+      excerpt: excerptFromSelftext(row.selftext),
+    };
+    if (passes) scored.push(item);
+    else fresh.push(item);
+  }
+  scored.sort(compareItems);
+  fresh.sort(compareItems);
+  const items = scored.concat(fresh.slice(0, FRESH_SCORE_CAP)).sort(compareItems).slice(0, KEEP_ITEMS);
+  return { ok: true, error: null, items };
+}
+
+function excerptFromSelftext(raw) {
+  const plain = tidyExcerpt(cleanText(String(raw || "")).slice(0, 8000));
+  if (plain.length < 20) return "";
+  return clip(plain, 300);
 }
 
 export function parseFeed(xml, base) {
@@ -325,11 +541,13 @@ function excerptFrom(block) {
   return "";
 }
 
-export function sectionItems(feeds, category) {
+export function sectionItems(feeds, category, opts = {}) {
+  const low = !!opts.low;
   function gather(perSource) {
     const pool = [];
     for (const feed of feeds || []) {
       if (feed.category !== category) continue;
+      if (isLowPriority(feed) !== low) continue;
       const items = prepareFeedItems(feed).slice(0, perSource);
       for (const item of items) {
         pool.push({
@@ -435,7 +653,13 @@ export function renderFeedsPage(catalog, aggregate) {
     ? " A newer check failed, so this is the last good copy."
     : "";
   const sections = categories
-    .map((category) => renderSection(category, sectionItems(feeds, category)))
+    .map((category) =>
+      renderSection(
+        category,
+        sectionItems(feeds, category),
+        sectionItems(feeds, category, { low: true })
+      )
+    )
     .join("");
   const sources = categories
     .map((category) => {
@@ -500,7 +724,7 @@ export function renderFeedsPage(catalog, aggregate) {
     "      <div class=\"page-inner wide\">\n" +
     "        <p class=\"kicker\">Outside sources</p>\n" +
     "        <h1>Feeds</h1>\n" +
-    "        <p class=\"lede\">Headlines from the local-stack sources we follow. Every link goes to the original article. We show a short excerpt, at most 300 characters, not the full text.</p>\n" +
+    "        <p class=\"lede\">Headlines from the local-stack sources we follow. Every link goes to the original article. We show a short excerpt, at most 300 characters, not the full text. Release notes and industry posts are folded at the bottom of each section.</p>\n" +
     "        <p class=\"feed-refresh\">Updated hourly. Last refresh: " +
     esc(refreshed) +
     "." +
@@ -536,14 +760,20 @@ export function renderFeedsPage(catalog, aggregate) {
   );
 }
 
-function renderSection(category, items) {
+function renderSection(category, items, shelfItems) {
   const id = slug(category);
-  let body;
-  if (!items.length) {
+  const shelf = shelfItems || [];
+  let body = "";
+  if (!items.length && !shelf.length) {
     body = "<p class=\"feed-empty\">No items from these sources on the last check.</p>";
-  } else {
+  } else if (items.length) {
     body = "<ul class=\"feed-list\">" + items.map(renderItem).join("") + "</ul>";
   }
+  const folded = shelf.length
+    ? "<details class=\"feed-shelf\"><summary>Release notes &amp; industry</summary><ul class=\"feed-list\">" +
+      shelf.map(renderItem).join("") +
+      "</ul></details>"
+    : "";
   return (
     "<section aria-labelledby=\"" +
     esc(id) +
@@ -554,6 +784,7 @@ function renderSection(category, items) {
     esc(category) +
     "</h2>" +
     body +
+    folded +
     "</section>"
   );
 }
@@ -580,22 +811,34 @@ function renderItem(item) {
 
 function renderSource(feed) {
   const site = safeUrl(feed.site_url);
-  const feedUrl = safeUrl(feed.feed_url);
+  const feedUrl = safeUrl(readerFeedUrl(feed));
   const name = site
     ? "<a href=\"" + esc(site) + "\" rel=\"noopener noreferrer\">" + esc(feed.name) + "</a>"
     : esc(feed.name);
   const feedLink = feedUrl
     ? "<a href=\"" + esc(feedUrl) + "\" rel=\"noopener noreferrer\">feed</a>"
     : "feed";
+  const via =
+    feed.intake === "arctic-shift"
+      ? " <span class=\"sep\" aria-hidden=\"true\">·</span> Arctic Shift"
+      : "";
   return (
     "<li>" +
     name +
     " <span class=\"sep\" aria-hidden=\"true\">·</span> " +
     feedLink +
+    via +
     " <span class=\"sep\" aria-hidden=\"true\">·</span> " +
     esc(sourceStatus(feed)) +
     "</li>"
   );
+}
+
+function readerFeedUrl(feed) {
+  if (feed && feed.intake === "arctic-shift" && feed.subreddit) {
+    return "https://www.reddit.com/r/" + feed.subreddit + "/.rss";
+  }
+  return (feed && feed.feed_url) || "";
 }
 
 function sourceStatus(feed) {
@@ -618,13 +861,8 @@ export function renderFeedsJson(catalog, aggregate) {
     timezone: AST,
     categories: categoriesOf(catalog, feeds).map((name) => ({
       name,
-      items: sectionItems(feeds, name).map((item) => ({
-        title: item.title,
-        url: item.url,
-        source: item.source,
-        date: item.date,
-        excerpt: item.excerpt || "",
-      })),
+      items: sectionItems(feeds, name).map(publicItem),
+      release_notes: sectionItems(feeds, name, { low: true }).map(publicItem),
     })),
     sources: feeds.map((feed) => ({
       name: feed.name,
@@ -640,6 +878,33 @@ export function renderFeedsJson(catalog, aggregate) {
   };
 }
 
+function publicItem(item) {
+  return {
+    title: item.title,
+    url: item.url,
+    source: item.source,
+    date: item.date,
+    excerpt: item.excerpt || "",
+  };
+}
+
+export function opmlTarget(feed) {
+  if (isArcticShift(feed)) {
+    const sub = arcticSubreddit(feed);
+    return {
+      xmlUrl: "https://www.reddit.com/r/" + sub + "/.rss",
+      htmlUrl: feed.site_url || "https://www.reddit.com/r/" + sub + "/",
+      description:
+        "HA News reads this subreddit through Arctic Shift, not Reddit RSS. This link is the public Reddit feed for readers.",
+    };
+  }
+  return {
+    xmlUrl: feed.feed_url,
+    htmlUrl: feed.site_url || "",
+    description: "",
+  };
+}
+
 export function renderOpml(catalog) {
   const feeds = activeFeeds(catalog);
   const groups = categoriesOf(catalog, feeds)
@@ -647,16 +912,22 @@ export function renderOpml(catalog) {
       const outlines = feeds
         .filter((feed) => feed.category === category)
         .map((feed) => {
+          const target = opmlTarget(feed);
+          const description = target.description
+            ? " description=\"" + esc(target.description) + "\""
+            : "";
           return (
             "      <outline type=\"rss\" text=\"" +
             esc(feed.name) +
             "\" title=\"" +
             esc(feed.name) +
             "\" xmlUrl=\"" +
-            esc(feed.feed_url) +
+            esc(target.xmlUrl) +
             "\" htmlUrl=\"" +
-            esc(feed.site_url || "") +
-            "\"/>"
+            esc(target.htmlUrl) +
+            "\"" +
+            description +
+            "/>"
           );
         })
         .join("\n");
@@ -921,11 +1192,14 @@ function tidyExcerpt(text) {
 
 function isReddit(url) {
   try {
-    const host = new URL(url).host;
-    return host === "reddit.com" || host.endsWith(".reddit.com");
+    return isRedditHost(new URL(url).host);
   } catch (err) {
     return false;
   }
+}
+
+function isRedditHost(host) {
+  return host === "reddit.com" || host === "www.reddit.com" || String(host || "").endsWith(".reddit.com");
 }
 
 function unwrapCdata(text) {

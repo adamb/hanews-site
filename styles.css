@@ -926,6 +926,22 @@ a:hover { color: var(--accent); text-decoration-color: var(--accent); }
   color: var(--ink-dim);
   font-size: 0.95rem;
 }
+.feed-shelf {
+  margin: 0.15rem 0 0.85rem;
+  border-top: 1px solid var(--rule);
+}
+.feed-shelf summary {
+  cursor: pointer;
+  padding: 0.7rem 0;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.feed-shelf summary:hover { color: var(--accent); }
+.feed-shelf .feed-list { margin-top: 0; }
 .page h3.source-cat {
   margin: 1.05rem 0 0.1rem;
   font-family: var(--sans);
