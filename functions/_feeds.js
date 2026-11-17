@@ -9,7 +9,7 @@ export const HOUR_CACHE =
 export const SHORT_CACHE = "public, max-age=120";
 
 const FRESH_MS = 60 * 60 * 1000;
-const CACHE_URL = "https://hanews.org/internal/feeds-aggregate-v2";
+const CACHE_URL = "https://hanews.org/internal/feeds-aggregate-v3";
 const MAX_BYTES = 800000;
 const PARSE_ITEMS = 16;
 const KEEP_ITEMS = 12;
@@ -28,7 +28,7 @@ const HOST_LIMIT = {
   "www.reddit.com": 1,
   "reddit.com": 1,
   "forum.openwrt.org": 1,
-  "arctic-shift.photon-reddit.com": 4,
+  "arctic-shift.photon-reddit.com": 1,
 };
 
 let inflight = null;
@@ -84,6 +84,13 @@ export function cacheControlFor(aggregate) {
   return useful ? HOUR_CACHE : SHORT_CACHE;
 }
 
+export function aggregateFreshForMs(feeds) {
+  const blocked = (feeds || []).some(
+    (feed) => feed && feed.intake === "arctic-shift" && !feed.ok && feed.error === "HTTP 429"
+  );
+  return blocked ? 90 * 1000 : FRESH_MS;
+}
+
 export async function getAggregate(catalog) {
   if (inflight) return inflight;
   inflight = loadAggregate(catalog).finally(() => {
@@ -96,7 +103,8 @@ async function loadAggregate(catalog) {
   const feeds = activeFeeds(catalog);
   const stored = await readStored();
   const age = stored ? ageMs(stored.refreshedAt) : Infinity;
-  if (stored && age >= -60000 && age < FRESH_MS) {
+  const freshFor = stored && stored.freshForMs ? stored.freshForMs : FRESH_MS;
+  if (stored && age >= -60000 && age < freshFor) {
     return { aggregate: stored, cache: "hit" };
   }
   try {
@@ -106,6 +114,7 @@ async function loadAggregate(catalog) {
     const aggregate = {
       refreshedAt: new Date().toISOString(),
       stale: false,
+      freshForMs: aggregateFreshForMs(merged),
       feeds: merged,
     };
     await writeStored(aggregate);
@@ -175,7 +184,7 @@ export async function refreshFeeds(feeds, opts = {}) {
   const indexed = (feeds || []).map((feed, index) => ({ feed, index }));
   const arctic = indexed.filter((row) => isArcticShift(row.feed));
   const rest = indexed.filter((row) => !isArcticShift(row.feed));
-  const arcticConcurrency = Math.min(opts.arcticConcurrency || 4, concurrency);
+  const arcticConcurrency = Math.min(opts.arcticConcurrency || 1, concurrency);
   const out = new Array(indexed.length);
   const [arcticRows, restRows] = await Promise.all([
     runPool(arctic, arcticConcurrency, opts),
@@ -208,6 +217,7 @@ async function runPool(rows, concurrency, opts) {
         if (pause == null) {
           if (isRedditHost(host)) pause = 1200;
           else if (host === "forum.openwrt.org") pause = 250;
+          else if (host === "arctic-shift.photon-reddit.com") pause = 700;
           else pause = 0;
         }
         await sleep(pause);
@@ -310,10 +320,12 @@ async function fetchArctic(feed, base, opts) {
   const sub = arcticSubreddit(feed);
   if (!sub) return { ...base, error: "missing subreddit" };
   const nowSec = opts.nowSec || Math.floor(Date.now() / 1000);
-  const firstLimit = Number(feed.arctic && feed.arctic.limit) || ARCTIC_LIMIT;
-  const limits = [firstLimit, ARCTIC_RETRY_LIMIT];
-  for (let attempt = 0; attempt < limits.length; attempt++) {
-    const url = arcticSearchUrl(feed, limits[attempt], nowSec);
+  let limit = Number(feed.arctic && feed.arctic.limit) || ARCTIC_LIMIT;
+  let narrowed = false;
+  let rateRetries = 0;
+  const maxRateRetries = opts.rateRetries == null ? 1 : opts.rateRetries;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const url = arcticSearchUrl(feed, limit, nowSec);
     if (/[?&]fields=[^&]*permalink/i.test(url) || /[?&]permalink=/i.test(url)) {
       return { ...base, error: "bad arctic query" };
     }
@@ -327,8 +339,17 @@ async function fetchArctic(feed, base, opts) {
         },
         signal: AbortSignal.timeout(timeoutMs),
       });
-      if (res.status === 422 && attempt < limits.length - 1) {
+      if (res.status === 422 && !narrowed) {
         await cancelBody(res);
+        limit = ARCTIC_RETRY_LIMIT;
+        narrowed = true;
+        continue;
+      }
+      if (res.status === 429 && rateRetries < maxRateRetries) {
+        await cancelBody(res);
+        rateRetries += 1;
+        const delay = opts.retryDelayMs == null ? 1500 : opts.retryDelayMs;
+        await sleep(delay);
         continue;
       }
       if (!res.ok) {

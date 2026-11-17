@@ -6,6 +6,7 @@ import {
   HOUR_CACHE,
   USER_AGENT,
   activeFeeds,
+  aggregateFreshForMs,
   arcticSearchUrl,
   cacheControlFor,
   categoriesOf,
@@ -480,6 +481,68 @@ test("arctic-shift queries by epoch seconds and retries a 422 with limit 25", as
   assert.equal(fresh.url, "https://www.reddit.com/r/homeassistant/comments/newquiet/");
   assert.ok(fresh.excerpt.length >= 20);
   assert.equal(calls.some((url) => url.includes("www.reddit.com")), false);
+});
+
+test("arctic-shift retries one HTTP 429 and does not call reddit.com", async () => {
+  const calls = [];
+  const fetchImpl = async (url) => {
+    calls.push(String(url));
+    if (calls.length === 1) return new Response("slow", { status: 429 });
+    return new Response(
+      JSON.stringify({
+        data: [
+          {
+            id: "abc123",
+            title: "Recovered post",
+            score: 20,
+            created_utc: 1763330000 - 100,
+            selftext: "Long enough selftext to keep as an excerpt here.",
+            subreddit: "homeassistant",
+          },
+        ],
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
+  };
+  const result = await fetchOne(ARCTIC_FEED, {
+    fetch: fetchImpl,
+    nowSec: 1763330000,
+    retryDelayMs: 0,
+    timeoutMs: 1000,
+  });
+  assert.equal(calls.length, 2);
+  assert.equal(result.ok, true);
+  assert.equal(result.items[0].url, "https://www.reddit.com/r/homeassistant/comments/abc123/");
+  assert.equal(calls.every((url) => !new URL(url).host.endsWith(".reddit.com")), true);
+  assert.equal(aggregateFreshForMs([{ intake: "arctic-shift", ok: false, error: "HTTP 429" }]), 90000);
+  assert.equal(aggregateFreshForMs([{ intake: "arctic-shift", ok: true, error: null }]), 60 * 60 * 1000);
+});
+
+test("arctic-shift requests run one at a time", async () => {
+  let active = 0;
+  let maxActive = 0;
+  const fetchImpl = async () => {
+    active += 1;
+    maxActive = Math.max(maxActive, active);
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    active -= 1;
+    return new Response(JSON.stringify({ data: [] }), { status: 200 });
+  };
+  const feeds = ["homeassistant", "openwrt", "esphome"].map((sub) => ({
+    ...ARCTIC_FEED,
+    name: "r/" + sub,
+    subreddit: sub,
+    feed_url: "https://arctic-shift.photon-reddit.com/api/posts/search?subreddit=" + sub,
+  }));
+  const results = await refreshFeeds(feeds, {
+    fetch: fetchImpl,
+    staggerMs: 0,
+    timeoutMs: 1000,
+    nowSec: 1763330000,
+  });
+  assert.equal(results.length, 3);
+  assert.ok(results.every((feed) => feed.ok));
+  assert.equal(maxActive, 1);
 });
 
 test("arctic-shift does not fall back to reddit.com RSS", async () => {
